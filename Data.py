@@ -3,6 +3,7 @@ import wall
 from fragment import *
 import fragment
 import other
+from level import Level
 
 
 class Data:
@@ -13,6 +14,12 @@ class Data:
         self.frame_rate = frame_rate
         self.width = width
         self.height = height
+        self.img = pygame.image.load('./assets/Background_1.png')
+        self.bimgs = [pygame.image.load('./assets/B_04.png').convert_alpha(),
+                      pygame.image.load('./assets/B_03.png').convert_alpha(),
+                      pygame.image.load('./assets/B_02.png').convert_alpha(),
+                      pygame.image.load('./assets/B_01.png').convert_alpha()
+                      ]
 
         self.player = Player()
         self.playersprite = pygame.sprite.GroupSingle()
@@ -28,7 +35,9 @@ class Data:
         self.playersprite.add(self.player)
         self.player2sprite.add(self.player2)
 
-        wall.randomLevel(self)
+        #wall.randomLevel(self)
+        self.level = Level("level_01")
+        self.level.gameLev(self)
         self.player.walls = self.wall_list
         self.player2.walls =self.wall_list
         self.player.deaths = self.deathwalls
@@ -191,7 +200,7 @@ class Data:
     def newRound(self):
             self.newLevel()
             self.player.rect.y = 130
-            self.player.rect.x = 192
+            self.player.rect.x = 150
             self.player.xvel = 0
             self.player.yvel = 0
             self.player.jumps = 1
@@ -209,6 +218,12 @@ class Data:
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((55,55,55), rect)#back
+
+        for n in self.bimgs:
+            surface.blit(n, (0,0))
+
+        #surface.blit(self.img, (0, 0))
+        #pygame.display.flip()
 
         if self.p1win >0 and not self.p1vic and not self.p2vic:
             self.drawTextLeft(surface, "PLAYER 1 SCORED", (255, 255, 255), 240, 50, self.font)
@@ -301,6 +316,7 @@ class Data:
                     pygame.quit()
             self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
 
+        #self.level.display(surface)
 
         return
     #menu activity

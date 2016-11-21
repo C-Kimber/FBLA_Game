@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/Player1.png')
+        ss = spritesheet.spritesheet('./assets/Player1_small.png')
 
 
         self.xvel = 0
@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.height = 32
         self.color = (255,255,255)
 
-        self.image = ss.image_at((0, 0, 64, 64), (255, 255, 255))
+        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
 
 
         self.rect = self.image.get_rect()
@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = 0, 640, 0, 800
+        highbound, lowbound, leftbound, rightbound = 0, 800, 0, 800
         self.boundries(highbound, lowbound, leftbound, rightbound)
 
         self.pushing = self.yvel * self.pushfactor
@@ -147,7 +147,7 @@ class Player2(Player):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/Player2.png')
+        ss = spritesheet.spritesheet('./assets/Player2_small.png')
 
         self.xvel = 0
         self.yvel = 0
@@ -160,7 +160,7 @@ class Player2(Player):
         self.height = 32
         self.color = (255,255,255)
 
-        self.image = ss.image_at((0, 0, 64, 64), (255, 255, 255))
+        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
 
 
         self.rect = self.image.get_rect()

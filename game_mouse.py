@@ -1,5 +1,6 @@
 import pygame
 import pygame.locals
+import sys
 
 class Game:
     def __init__(self, name, width, height, frames_per_second):
@@ -41,7 +42,7 @@ class Game:
             for e in pygame.event.get():
 
                 if e.type == pygame.QUIT:
-                    pygame.quit()
+                    sys.exit(0)
 
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     buttons.add(e.button)

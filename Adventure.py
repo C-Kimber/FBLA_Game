@@ -1,6 +1,30 @@
 from game_mouse import Game
 from Data import Data
+from DataD import DataD
 import other
+
+
+class Design(Game):
+
+    def __init__(self, width, height, frame_rate):
+        self.newGame(width,height, frame_rate)
+        return
+
+    def game_logic(self, keys, newkeys, buttons, newbuttons, mouse_position):
+        self.data.evolve(keys, newkeys, buttons, newbuttons, mouse_position)
+        return
+
+    def paint(self, surface):
+        self.data.draw(surface)
+
+        return
+
+    def newGame(self, width, height, frame_rate):
+        self.width = width
+        self.height = height
+        self.frame_rate = frame_rate
+        Game.__init__(self, "LEVEL EDITOR", width, height, frame_rate)
+        self.data = DataD(width, height, frame_rate)
 
 
 class Adventure(Game):
@@ -29,5 +53,5 @@ class Adventure(Game):
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
-        Game.__init__(self, "Adventure", width, height, frame_rate)
+        Game.__init__(self, "THE GAME", width, height, frame_rate)
         self.data = Data(width, height, frame_rate)
