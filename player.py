@@ -26,8 +26,8 @@ class Player(pygame.sprite.Sprite):
 
 
         self.rect = self.image.get_rect()
-        self.rect.y = 130
-        self.rect.x = 150
+        self.rect.y = 400
+        self.rect.x = 400
 
         self.walls = None
         self.deaths = None
@@ -164,8 +164,8 @@ class Player2(Player):
 
 
         self.rect = self.image.get_rect()
-        self.rect.y = 130
-        self.rect.x =575
+        self.rect.y = 400
+        self.rect.x =400
 
         self.walls = None
         self.deaths = None

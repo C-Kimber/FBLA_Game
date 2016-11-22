@@ -4,6 +4,7 @@ from fragment import *
 import fragment
 import other
 from level import Level
+import os
 
 
 class Data:
@@ -15,11 +16,14 @@ class Data:
         self.width = width
         self.height = height
         self.img = pygame.image.load('./assets/Background_1.png')
-        self.bimgs = [pygame.image.load('./assets/B_04.png').convert_alpha(),
-                      pygame.image.load('./assets/B_03.png').convert_alpha(),
-                      pygame.image.load('./assets/B_02.png').convert_alpha(),
-                      pygame.image.load('./assets/B_01.png').convert_alpha()
-                      ]
+        self.bimgs = [ pygame.image.load('./assets/background_2.png').convert_alpha()]
+        """pygame.image.load('./assets/B_04.png').convert_alpha(),
+            pygame.image.load('./assets/B_03.png').convert_alpha(),
+            pygame.image.load('./assets/B_02.png').convert_alpha(),
+            pygame.image.load('./assets/B_01.png').convert_alpha()"""
+
+        self.num_files = len([f for f in os.listdir("./assets/levels")
+                         if os.path.isfile(os.path.join("./assets/levels", f))])
 
         self.player = Player()
         self.playersprite = pygame.sprite.GroupSingle()
@@ -36,7 +40,7 @@ class Data:
         self.player2sprite.add(self.player2)
 
         #wall.randomLevel(self)
-        self.level = Level("level_01")
+        self.level = Level("level_0"+str(random.randint(1,self.num_files-1)))
         self.level.gameLev(self)
         self.player.walls = self.wall_list
         self.player2.walls =self.wall_list
@@ -171,7 +175,9 @@ class Data:
         self.all_sprites.empty()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        wall.randomLevel(self)
+        n = str(random.randint(1,self.num_files-1))
+        self.level = Level("level_0"+n)
+
     #end of a single battle
     def endRound(self,surface):
         if self.player.alive and not self.player2.alive:
@@ -193,27 +199,27 @@ class Data:
 
 
         self.diedfirst = 0
+        wall.clearwalls(self)
         self.newRound()
 
         return
     #begins new battle
     def newRound(self):
             self.newLevel()
-            self.player.rect.y = 130
-            self.player.rect.x = 150
             self.player.xvel = 0
             self.player.yvel = 0
             self.player.jumps = 1
             self.player.alive = True
 
-            self.player2.rect.y = 130
-            self.player2.rect.x = 575
+
             self.player2.xvel = 0
             self.player2.yvel = 0
             self.player2.jumps = 1
             self.player2.alive = True
 
             self.time = 30
+
+            self.level.gameLev(self)
     #draws all the stuff, also button functionality
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
