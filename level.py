@@ -91,6 +91,16 @@ class Level():
                 elif y == "4":  # player 4 spawn
                     r = pygame.Rect(m * 32, n * 32, 32, 32)
                     pygame.draw.rect(surface, (255, 0, 255), r)
+                elif y == "T":#Tele wall
+                    r = pygame.Rect(m * 32, n * 32, 32, 32)
+                    pygame.draw.rect(surface, (255, 0, 255), r)
+                    r = pygame.Rect((m * 32)+8, (n * 32)+8, 16, 16)
+                    pygame.draw.rect(surface, (155, 0, 155), r)
+                elif y == "t":
+                    r = pygame.Rect(m * 32, n * 32, 32, 32)
+                    pygame.draw.rect(surface, (155, 0, 155), r)
+                    r = pygame.Rect((m * 32) + 8, (n * 32) + 8, 16, 16)
+                    pygame.draw.rect(surface, (255, 0, 255), r)
                 else:#empty
                     l = pygame.Rect(m * 32, n * 32, 32, 32)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
@@ -129,6 +139,10 @@ class Level():
                 elif y == "=":  # small walls
                     thing.wall_list.add(longWall(m * 32, n * 32, 128))
                     thing.all_sprites.add(longWall(m * 32, n * 32, 128))
+                elif y == "T":  # Tele walls
+                    thing.telewalls.add(teleWall(m * 32, n * 32))
+                elif y == "t": #Tele Walls group 2
+                    thing. telewalls2.add(teleWall2(m*32, n*32))
 
                 """elif y == "3":  # player 3 spawn
                     thing.player.x = m * 32

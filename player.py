@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/Player1_small.png')
+        ss = spritesheet.spritesheet('./assets/images/Player1_small.png')
 
 
         self.xvel = 0
@@ -31,6 +31,8 @@ class Player(pygame.sprite.Sprite):
 
         self.walls = None
         self.deaths = None
+        self.teles = None
+        self.teles2 = None
 
         self.jumps = 1
 
@@ -41,6 +43,8 @@ class Player(pygame.sprite.Sprite):
 
         self.alive = True
 
+        self.teletime = 0
+
 
     def update(self):
         highbound, lowbound, leftbound, rightbound = 0, 800, 0, 800
@@ -49,6 +53,10 @@ class Player(pygame.sprite.Sprite):
         self.pushing = self.yvel * self.pushfactor
 
         self.wallCollisions()
+
+        #teleportion time
+        if self.teletime > 0:
+            self.teletime -= 1
 
         #movement control
         self.rect.x += self.xvel
@@ -93,24 +101,65 @@ class Player(pygame.sprite.Sprite):
     def wallCollisions(self):
         block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
         for block in block_hit_list:
-            if self.rect.right == block.rect.left:
-                self.rect.right = block.rect.left
-                self.xvel = 0
-            if self.rect.left == block.rect.right:
-                self.rect.left = block.rect.right
-                self.xvel = 0
+            block.t = False
+            block.d = False
+            if self.yvel < 0:  # falling down
+                if self.rect.bottom >= block.rect.top:  # from top of block down
+                    if self.rect.bottom <= block.rect.top + 15:  # from top of block + 10 up
+                        self.yvel = 0
+                        self.rect.bottom = block.rect.top + 1
+                        self.onGround = True
+                        self.jumps = 1
+                        block.t = True
 
-            if self.yvel < 0:
-                self.rect.bottom = block.rect.top
-                self.onGround = True
-                self.jumps = 1
-                self.yvel = 0
-            else:
-                self.rect.top = block.rect.bottom
-                self.yvel = 0
+            elif self.yvel > 0:#going up
+                if self.rect.top <= block.rect.bottom: #from bottom of block up
+                    if self.rect.top >= block.rect.bottom-15:#from bottom of bock -10 down
+                        self.rect.top = block.rect.bottom
+                        self.yvel = 0
+                        block.d = True
+
+
+            if self.xvel <0 and block.t==False and block.d == False:#
+                if self.rect.right >= block.rect.left:# and self.rect.right <= block.rect.left+5:
+                    if self.rect.bottom < block.rect.bottom or self.rect.top > block.rect.top:
+                        self.rect.left -= -2
+                        self.xvel = 0
+
+            elif self.xvel > 0 and block.t==False and block.d ==False:
+                if self.rect.left <= block.rect.right:
+                    #if self.rect.right >= block.rect.left-5:
+                    self.rect.right -= 2
+                    self.xvel = 0
+
+
+
+
 
         if pygame.sprite.spritecollide(self, self.deaths, False):
+
             self.die()
+
+        hit_teles2 = pygame.sprite.spritecollide(self, self.teles2, False)
+        hit_teles = pygame.sprite.spritecollide(self, self.teles, False)
+        if self.teletime == 0:
+            for tell2 in hit_teles2:
+                for tell in self.teles:
+                    self.rect.x = tell.rect.x
+                    self.rect.y = tell.rect.y
+                    self.teletime = 120
+                    break
+            for tell in hit_teles:
+                for tell2 in self.teles2:
+                    self.rect.x =  tell2.rect.x
+                    self.rect.y = tell2.rect.y
+                    self.teletime = 120
+                    break
+
+
+
+
+
     #death by explosion
     def die(self):
         for _ in range(35):
@@ -147,7 +196,7 @@ class Player2(Player):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/Player2_small.png')
+        ss = spritesheet.spritesheet('./assets/images/Player2_small.png')
 
         self.xvel = 0
         self.yvel = 0
@@ -169,6 +218,8 @@ class Player2(Player):
 
         self.walls = None
         self.deaths = None
+        self.teles = None
+        self.teles2 = None
 
         self.jumps = 1
 
@@ -178,9 +229,37 @@ class Player2(Player):
         self.pushing = 0
         self.alive = True
 
+        self.teletime = 0
 
         return
 
+
+
+#goes through the bottom
+"""
+for block in block_hit_list:
+    print "Hit block %s" % block
+    if self.rect.right == block.rect.left:
+        print "hit block on right"
+        self.rect.right = block.rect.left
+        self.xvel = 0
+    elif self.rect.left == block.rect.right:
+        self.rect.left = block.rect.right
+        self.xvel = 0
+        print "hit block on left"
+
+
+    elif self.rect.top == block.rect.bottom:
+        self.rect.top = block.rect.bottom
+        self.yvel = 0
+        print "hit block on bottom"
+
+    elif self.yvel < 0:
+        self.yvel = 0
+        self.rect.bottom = block.rect.top + 1
+        self.onGround = True
+        self.jumps = 1
+        print "hit block on top" """
 
 
 

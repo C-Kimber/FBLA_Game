@@ -18,7 +18,11 @@ class DataD:
 
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mp = mouse_position
-        block = self.mp[1] / 32, self.mp[0] / 32
+        block = [self.mp[1] / 32, self.mp[0] / 32]
+        if block[0] > 19:
+            block[0]= 19
+        if block[1] > 24:
+            block[1] = 24
 
         if 1 in buttons:
             self.level.write(block,"-")
@@ -40,6 +44,10 @@ class DataD:
             self.level.write(block, '[')
         elif pygame.K_l in keys:
             self.level.write(block, '_')
+        elif pygame.K_t in keys:
+            self.level.write(block, "T")
+        elif pygame.K_g in keys:
+            self.level.write(block, 't')
 
         if pygame.K_n in newkeys:
             self.level.new("level_0"+str(self.num_files))

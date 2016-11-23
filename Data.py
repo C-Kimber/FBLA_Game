@@ -15,12 +15,15 @@ class Data:
         self.frame_rate = frame_rate
         self.width = width
         self.height = height
-        self.img = pygame.image.load('./assets/Background_1.png')
-        self.bimgs = [ pygame.image.load('./assets/background_2.png').convert_alpha()]
-        """pygame.image.load('./assets/B_04.png').convert_alpha(),
-            pygame.image.load('./assets/B_03.png').convert_alpha(),
-            pygame.image.load('./assets/B_02.png').convert_alpha(),
-            pygame.image.load('./assets/B_01.png').convert_alpha()"""
+        self.img = pygame.image.load('./assets/images/Background_1.png')
+        self.bimgs = [ pygame.image.load('./assets/images/background_2.png').convert_alpha()]
+        """pygame.image.load('./assets/imagas/B_04.png').convert_alpha(),
+            pygame.image.load('./assets/images/B_03.png').convert_alpha(),
+            pygame.image.load('./assets/images/B_02.png').convert_alpha(),
+            pygame.image.load('./assets/imgaes/B_01.png').convert_alpha()"""
+
+        self.menimg = pygame.image.load('./assets/images/background_3.png').convert_alpha()
+        self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
 
         self.num_files = len([f for f in os.listdir("./assets/levels")
                          if os.path.isfile(os.path.join("./assets/levels", f))])
@@ -33,6 +36,8 @@ class Data:
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
         self.deathwalls =pygame.sprite.Group()
+        self.telewalls = pygame.sprite.Group()
+        self.telewalls2 = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -40,12 +45,20 @@ class Data:
         self.player2sprite.add(self.player2)
 
         #wall.randomLevel(self)
-        self.level = Level("level_0"+str(random.randint(1,self.num_files-1)))
+        self.level = Level("level_07")#+str(random.randint(1,self.num_files-1)))
         self.level.gameLev(self)
+
         self.player.walls = self.wall_list
         self.player2.walls =self.wall_list
+
         self.player.deaths = self.deathwalls
         self.player2.deaths = self.deathwalls
+
+        self.player.teles = self.telewalls
+        self.player2.teles = self.telewalls
+
+        self.player.teles2 = self.telewalls2
+        self.player2.teles2 = self.telewalls2
 
         self.diedfirst = 0
         self.p1score = 0
@@ -60,6 +73,7 @@ class Data:
         self.fragmentgroup = fragment.fragmentgroup
         Fragment.groups = self.fragmentgroup, self.all_sprites
         custFrag.groups = self.fragmentgroup
+
     #active stuff
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.newbuttons = newbuttons
@@ -172,6 +186,8 @@ class Data:
     #wipes sprite lists, and puts in players + adding new level
     def newLevel(self):
         self.wall_list.empty()
+        self.telewalls.empty()
+        self.telewalls2.empty()
         self.all_sprites.empty()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -248,6 +264,10 @@ class Data:
 
         #draw sprites
         self.all_sprites.draw(surface)
+
+        #draw
+        self.telewalls.draw(surface)
+        self.telewalls2.draw(surface)
 
         ###
         #END MATCH
@@ -336,6 +356,8 @@ class Data:
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((0, 0, 0), rect)  # back
 
+        surface.blit(self.menimg, (0, 0))
+
         self.drawTextLeft(surface, "WELCOME TO THE GAME", (0, 255, 0), 200, 150, self.font)
 
         r = pygame.Rect(200,200, 100,100)
@@ -358,6 +380,8 @@ class Data:
             if 1 in self.newbuttons:
                 pygame.quit()
         self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
+
+
 
         return
     #text function
