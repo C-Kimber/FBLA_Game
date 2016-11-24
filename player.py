@@ -2,6 +2,8 @@ import pygame
 from fragment import Fragment
 import fragment
 import spritesheet
+import random
+import other
 
 #Player 1 Class
 class Player(pygame.sprite.Sprite):
@@ -33,6 +35,9 @@ class Player(pygame.sprite.Sprite):
         self.deaths = None
         self.teles = None
         self.teles2 = None
+        self.upwalls = None
+
+        self.down = False
 
         self.jumps = 1
 
@@ -47,12 +52,16 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = 0, 800, 0, 800
+        highbound, lowbound, leftbound, rightbound = 0, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
         self.boundries(highbound, lowbound, leftbound, rightbound)
 
         self.pushing = self.yvel * self.pushfactor
+        self.jumps = 1
+        self.onGround = True
+
 
         self.wallCollisions()
+        self.down = False
 
         #teleportion time
         if self.teletime > 0:
@@ -103,6 +112,7 @@ class Player(pygame.sprite.Sprite):
         for block in block_hit_list:
             block.t = False
             block.d = False
+
             if self.yvel < 0:  # falling down
                 if self.rect.bottom >= block.rect.top:  # from top of block down
                     if self.rect.bottom <= block.rect.top + 15:  # from top of block + 10 up
@@ -132,10 +142,6 @@ class Player(pygame.sprite.Sprite):
                     self.rect.right -= 2
                     self.xvel = 0
 
-
-
-
-
         if pygame.sprite.spritecollide(self, self.deaths, False):
 
             self.die()
@@ -147,22 +153,34 @@ class Player(pygame.sprite.Sprite):
                 for tell in self.teles:
                     self.rect.x = tell.rect.x
                     self.rect.y = tell.rect.y
-                    self.teletime = 120
+                    self.teletime = 10
                     break
             for tell in hit_teles:
                 for tell2 in self.teles2:
                     self.rect.x =  tell2.rect.x
                     self.rect.y = tell2.rect.y
-                    self.teletime = 120
+                    self.teletime = 10
                     break
 
+        hit_ups = pygame.sprite.spritecollide(self, self.upwalls, False)
+        for up in hit_ups:
+            if self.down == True:
+                #self.rect.top = up.rect.bottom-4
+                continue
+
+
+            elif self.rect.bottom > up.rect.top and self.rect.bottom < up.rect.top+10 and self.yvel < 0:
+                self.yvel = 0
+                self.rect.bottom = up.rect.top+1
+                self.onGround = True
+                self.jumps = 1
 
 
 
 
     #death by explosion
     def die(self):
-        for _ in range(35):
+        for _ in range(random.randint(8,24)):
             fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y)))
         self.alive = False
 
@@ -171,6 +189,9 @@ class Player(pygame.sprite.Sprite):
         if self.xvel > 3:
             self.xvel += .3
         self.xvel -= .5
+
+    def moveDown(self):
+        self.down = True
 
     def moveRight(self):
         if self.xvel < -3:
@@ -235,31 +256,18 @@ class Player2(Player):
 
 
 
-#goes through the bottom
+#goes on underside, and stays
 """
-for block in block_hit_list:
-    print "Hit block %s" % block
-    if self.rect.right == block.rect.left:
-        print "hit block on right"
-        self.rect.right = block.rect.left
-        self.xvel = 0
-    elif self.rect.left == block.rect.right:
-        self.rect.left = block.rect.right
-        self.xvel = 0
-        print "hit block on left"
+for up in hit_ups:
+            if self.down == True:
+                self.rect.top = up.rect.bottom-8
+                self.yvel = 3
 
-
-    elif self.rect.top == block.rect.bottom:
-        self.rect.top = block.rect.bottom
-        self.yvel = 0
-        print "hit block on bottom"
-
-    elif self.yvel < 0:
-        self.yvel = 0
-        self.rect.bottom = block.rect.top + 1
-        self.onGround = True
-        self.jumps = 1
-        print "hit block on top" """
+            elif self.yvel < 0:
+                self.yvel = 0
+                self.rect.bottom = up.rect.top + 8
+                self.onGround = True
+                self.jumps = 1"""
 
 
 

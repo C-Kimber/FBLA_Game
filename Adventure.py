@@ -39,6 +39,8 @@ class Adventure(Game):
             self.data.menuve(keys, newkeys, buttons, newbuttons, mouse_position)
         if other.GAMESTATE == 1:
             self.data.evolve(keys, newkeys, buttons, newbuttons, mouse_position)
+        if other.GAMESTATE == 2:
+            self.data.mainEvolve(keys, newkeys, buttons, newbuttons, mouse_position)
         return
 
     def paint(self, surface):
@@ -46,6 +48,8 @@ class Adventure(Game):
             self.data.menuDraw(surface)
         elif other.GAMESTATE == 1:
             self.data.draw(surface)
+        elif other.GAMESTATE == 2:
+            self.data.mainDraw(surface)
 
         return
 
