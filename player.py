@@ -54,11 +54,9 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         highbound, lowbound, leftbound, rightbound = 0, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
         self.boundries(highbound, lowbound, leftbound, rightbound)
+        print self.alive
 
         self.pushing = self.yvel * self.pushfactor
-        self.jumps = 1
-        self.onGround = True
-
 
         self.wallCollisions()
         self.down = False
@@ -180,8 +178,8 @@ class Player(pygame.sprite.Sprite):
 
     #death by explosion
     def die(self):
-        for _ in range(random.randint(8,24)):
-            fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y)))
+        #for _ in range(random.randint(8,24)):
+        #    fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y)))
         self.alive = False
 
 
@@ -253,8 +251,6 @@ class Player2(Player):
         self.teletime = 0
 
         return
-
-
 
 #goes on underside, and stays
 """

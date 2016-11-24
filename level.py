@@ -71,13 +71,14 @@ class Level():
         txt.close()
         return
 
-    def display(self, surface):
+    def display(self, surface, data):
         txt = open(self.file)
-        multi = 32
-        if other.GAMESTATE == 2:
-            multi = 8
+        camx, camy = data
 
-        print multi
+        multi = 32
+        #if other.GAMESTATE == 2:
+        #    multi = 8
+
         n = -1
         m = -1
         for x in txt:
@@ -85,58 +86,58 @@ class Level():
             for y in x:
                 m += 1
                 if y == "X" or y == "x":#deathwalls
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (255, 255, 0), r)
 
                 elif y == "-":# one unit walls
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "_":#long walls
-                    r = pygame.Rect(m * multi, n * multi, 16*multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, 16*multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "[":  # medium walls
-                    r = pygame.Rect(m * multi, n * multi, 8*multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, 8*multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "=":  # small walls
-                    r = pygame.Rect(m * multi, n * multi, 4*multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, 4*multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "|": #Tall wall
-                    r = pygame.Rect(m*multi,n*multi,multi,512)
+                    r = pygame.Rect(m*multi+camx,n*multi+camy,multi,512)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "/":  # Tall wall mid
-                    r = pygame.Rect(m * multi, n * multi, multi, 256)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, 256)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == ";":  # Tall wall small
-                    r = pygame.Rect(m * multi, n * multi, multi, 128)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, 128)
                     pygame.draw.rect(surface, (155, 155, 155), r)
                 elif y == "+":
-                    r = pygame.Rect(m * multi, n * multi, multi, 16)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, 16)
                     pygame.draw.rect(surface, (155, 155, 155), r)
 
                 elif y == "1":#player 1 spawn
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (255, 0, 0), r)
                 elif y == "2":  # player 2 spawn
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 255, 0), r)
                 elif y == "3":  # player 3 spawn
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 255), r)
                 elif y == "4":  # player 4 spawn
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (255, 0, 255), r)
                 elif y == "T":#Tele wall
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (255, 0, 255), r)
-                    r = pygame.Rect((m * multi)+8, (n * multi)+8, 16, 16)
+                    r = pygame.Rect((m * multi)+8+camx, (n * multi)+8+camy, 16, 16)
                     pygame.draw.rect(surface, (155, 0, 155), r)
                 elif y == "t":
-                    r = pygame.Rect(m * multi, n * multi, multi, multi)
+                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (155, 0, 155), r)
-                    r = pygame.Rect((m * multi) + 8, (n * multi) + 8, 16, 16)
+                    r = pygame.Rect((m * multi) + 8+camx, (n * multi) + 8+camy, 16, 16)
                     pygame.draw.rect(surface, (255, 0, 255), r)
                 else:#empty
-                    l = pygame.Rect(m * multi, n * multi, multi, multi)
+                    l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
             m=-1
 
@@ -187,8 +188,10 @@ class Level():
 
                 elif y == "T":  # Tele walls
                     thing.telewalls.add(teleWall(m * 32, n * 32))
+                    thing.all_sprites.add(teleWall(m * 32, n * 32))
                 elif y == "t": #Tele Walls group 2
                     thing. telewalls2.add(teleWall2(m*32, n*32))
+                    thing.all_sprites.add(teleWall2(m * 32, n * 32))
 
                 """elif y == "3":  # player 3 spawn
                     thing.player.x = m * 32

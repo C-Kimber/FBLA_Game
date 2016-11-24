@@ -87,7 +87,7 @@ class Data:
         self.mainlevel = Level("level_0", "./assets/long_levels/")
         self.mainlevel.gameLev(self)
 
-        self.camera = Camera(camera.simple_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
+        self.camera = Camera(camera.complex_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
 
 
     #active stuff
@@ -406,6 +406,7 @@ class Data:
         surface.fill((55, 55, 55), rect)  # back
         for e in self.all_sprites:
             surface.blit(e.image, self.camera.apply(e))
+
 
         #self.all_sprites.draw(surface)
 

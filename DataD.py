@@ -18,21 +18,43 @@ class DataD:
         self.l = 1
         self.selected = "."
         self.multi  =32
+
+        self.cameraX = 0
+        self.cameraY = 0
         return
 
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mp = mouse_position
 
-        block = [self.mp[1] / 32, self.mp[0] / 32]
-        if other.GAMESTATE == 2:
-            block = [self.mp[1] / 8, self.mp[0] / 8]
-            self.multi = 8
+        block = [(self.mp[1]-self.cameraY) / 32, (self.mp[0]-self.cameraX) / 32]
+        #if other.GAMESTATE == 2:
+            #block = [self.mp[1] / 8+self.cameraX, self.mp[0] / 8+self.cameraY]
+            #self.multi = 8
+        #print block
 
         if other.GAMESTATE != 2:
             if block[0] > 19:
                 block[0]= 19
             if block[1] > 24:
                 block[1] = 24
+
+        if pygame.K_a in keys:
+            self.cameraX += 16
+        if pygame.K_d in keys:
+            self.cameraX -= 16
+        if pygame.K_w in keys:
+            self.cameraY += 16
+        if pygame.K_s in keys:
+            self.cameraY -= 16
+
+        if self.cameraY > 0:
+            self.cameraY = 0
+        if self.cameraY < -608:
+            self.cameraY = -608
+        if self.cameraX > 0:
+            self.cameraX = 0
+        if self.cameraX < -2432:
+            self.cameraX = -2432
 
         if 1 in buttons:
             self.button(mouse_position,(self.width-37, self.height-37, 32, 32),".")#clear selected
@@ -108,7 +130,10 @@ class DataD:
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((255, 255, 255), rect)  # back
-        self.level.display(surface)
+
+        self.level.display(surface,(self.cameraX,self.cameraY))
+
+
         r = pygame.Rect(800,0,180, 640)
         pygame.draw.rect(surface, (255, 255, 255), r)
         pygame.draw.rect(surface, (25, 25, 25), r,5)
