@@ -1,6 +1,6 @@
 import spritesheet
 
-GAMESTATE = 2
+GAMESTATE = 0
 MINISTATE = 0
 
 WIDTH = 800

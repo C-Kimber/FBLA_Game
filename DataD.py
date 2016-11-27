@@ -32,6 +32,9 @@ class DataD:
             #self.multi = 8
         #print block
 
+        if self.level.dir == './assets/long_levels/':
+            other.GAMESTATE = 2
+
         if other.GAMESTATE != 2:
             if block[0] > 19:
                 block[0]= 19
@@ -53,8 +56,9 @@ class DataD:
             self.cameraY = -608
         if self.cameraX > 0:
             self.cameraX = 0
-        if self.cameraX < -2432:
-            self.cameraX = -2432
+        if self.cameraX < -1*other.TOTAL_LEVEL_WIDTH/1.5:
+            self.cameraX = -1*other.TOTAL_LEVEL_WIDTH/1.5
+
 
         if 1 in buttons:
             self.button(mouse_position,(self.width-37, self.height-37, 32, 32),".")#clear selected

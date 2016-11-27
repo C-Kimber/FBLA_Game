@@ -22,6 +22,7 @@ class Level():
             self.file.close()
 
         self.levelSize = 32
+        self.levelMeasured = False
 
 
 
@@ -78,13 +79,16 @@ class Level():
         multi = 32
         #if other.GAMESTATE == 2:
         #    multi = 8
-
+        w = -1
+        h = -1
         n = -1
         m = -1
         for x in txt:
             n += 1
+            h +=1
             for y in x:
                 m += 1
+                w += 1
                 if y == "X" or y == "x":#deathwalls
                     r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (255, 255, 0), r)
@@ -139,7 +143,17 @@ class Level():
                 else:#empty
                     l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
+
             m=-1
+
+        if self.levelMeasured == False:
+            other.TOTAL_LEVEL_WIDTH = w
+            other.TOTAL_LEVEL_HEIGHT = h
+            print other.TOTAL_LEVEL_WIDTH
+            self.levelMeasured = True
+            h = -1
+            w = -1
+
 
 
     def gameLev(self,thing):
@@ -157,9 +171,13 @@ class Level():
                     thing.wall_list.add(Wall(m * 32, n * 32))
                     thing.all_sprites.add(Wall(m * 32, n * 32))
                 elif y == "1":  # player 1 spawn
+                    thing.player.spawnx = m * 32
+                    thing.player.spawny = n * 32
                     thing.player.rect.x = m* 32
                     thing.player.rect.y = n*32
                 elif y == "2":  # player 2 spawn
+                    thing.player2.spawnx = m * 32
+                    thing.player2.spawny = n * 32
                     thing.player2.rect.x = m * 32
                     thing.player2.rect.y = n * 32
 
@@ -205,4 +223,5 @@ class Level():
             self.levelSize= n,m
             other.TOTAL_LEVEL_WIDTH = n * 32
             other.TOTAL_LEVEL_HEIGHT = m * 32
+            print other.TOTAL_LEVEL_WIDTH
             m = -1

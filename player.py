@@ -25,17 +25,20 @@ class Player(pygame.sprite.Sprite):
         self.color = (255,255,255)
 
         self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
-
+        self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
-        self.rect.y = 400
-        self.rect.x = 400
+        self.spanwx = 400
+        self.spawny = 400
+        self.rect.y = self.spawny
+        self.rect.x = self.spanwx
 
         self.walls = None
         self.deaths = None
         self.teles = None
         self.teles2 = None
         self.upwalls = None
+        self.otherplayers = pygame.sprite.Group()
 
         self.down = False
 
@@ -54,12 +57,10 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         highbound, lowbound, leftbound, rightbound = 0, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
         self.boundries(highbound, lowbound, leftbound, rightbound)
-        print self.alive
 
         self.pushing = self.yvel * self.pushfactor
+        #self.playerCollisions()
 
-        self.wallCollisions()
-        self.down = False
 
         #teleportion time
         if self.teletime > 0:
@@ -89,6 +90,9 @@ class Player(pygame.sprite.Sprite):
         self.yvel-=.66
         #if self.yvel != 0:
          #   self.onGround = False
+
+        self.wallCollisions()
+        self.down = False
         return
     #stays onscreen
     def boundries(self, highbound, lowbound, leftbound, rightbound):
@@ -104,41 +108,63 @@ class Player(pygame.sprite.Sprite):
             self.yvel = 0
         return
 
+    def playerCollisions(self):
+        if self.otherplayers != None:
+            hit_bros =  pygame.sprite.spritecollide(self, self.otherplayers, False)
+            for bro in hit_bros:
+                #for _ in range(20):
+                 #   self.fragmentgroup.add(custFrag((self.player.rect.x, self.player.rect.y), (1, 3), (255, 255, 0)))
+                if self.rect.x <= bro.rect.x:
+                    self.xvel = -3 + self.xvel * -bro.pushfactor
+                    bro.xvel = 3 + bro.xvel * -self.pushfactor
+                elif bro.rect.x <= self.rect.x:
+                    self.xvel = 3 + self.xvel * -bro.pushfactor
+                    bro.xvel = -3 + bro.xvel * -self.pushfactor
+
+                if self.rect.y - bro.rect.y > 1:  # if p1 is above p2
+                    if self.stunting:
+                        bro.yvel *= 30
+                        self.yvel = -3
+                    else:
+                        bro.yvel = 5
+                        self.yvel = -3
+
+                elif bro.rect.y - self.rect.y > 1:  # if p2 is above p1
+                    if bro.stunting:
+                        self.yvel *= 30
+                        bro.yvel = -3
+                    else:
+                        self.yvel = 5
+                        bro.yvel = -3
     #Collisions with walls
     def wallCollisions(self):
         block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
         for block in block_hit_list:
-            block.t = False
-            block.d = False
-
-            if self.yvel < 0:  # falling down
-                if self.rect.bottom >= block.rect.top:  # from top of block down
-                    if self.rect.bottom <= block.rect.top + 15:  # from top of block + 10 up
-                        self.yvel = 0
-                        self.rect.bottom = block.rect.top + 1
-                        self.onGround = True
-                        self.jumps = 1
-                        block.t = True
-
-            elif self.yvel > 0:#going up
-                if self.rect.top <= block.rect.bottom: #from bottom of block up
-                    if self.rect.top >= block.rect.bottom-15:#from bottom of bock -10 down
-                        self.rect.top = block.rect.bottom
-                        self.yvel = 0
-                        block.d = True
 
 
-            if self.xvel <0 and block.t==False and block.d == False:#
-                if self.rect.right >= block.rect.left:# and self.rect.right <= block.rect.left+5:
-                    if self.rect.bottom < block.rect.bottom or self.rect.top > block.rect.top:
-                        self.rect.left -= -2
-                        self.xvel = 0
-
-            elif self.xvel > 0 and block.t==False and block.d ==False:
-                if self.rect.left <= block.rect.right:
-                    #if self.rect.right >= block.rect.left-5:
-                    self.rect.right -= 2
+            if self.rect.bottom >= block.rect.top and self.rect.bottom <= block.rect.top + 15:  # Moving down; Hit the top side of the wall
+                if self.rect.right > block.rect.left:
+                    self.rect.bottom = block.rect.top
+                    self.yvel = 0
+                    self.onGround = True
+                    self.jumps = 1
+                    print "v"
+            elif self.rect.top <= block.rect.bottom and self.rect.top >= block.rect.bottom - 15:  # Moving up; Hit the bottom side of the wall
+                self.rect.top = block.rect.bottom
+                self.yvel = 0
+                print "^"
+            elif self.rect.right >= block.rect.left and self.rect.right <= block.rect.left + 15:  # Moving right; Hit the left side of the wall
+                if self.rect.bottom > block.rect.top+15:
+                    self.rect.right = block.rect.left#+1
                     self.xvel = 0
+                    print ">"
+            elif self.rect.left <= block.rect.right and self.rect.left >= block.rect.right - 15:  # Moving left; Hit the right side of the wall
+                self.rect.left = block.rect.right#-1
+                self.xvel = 0
+                print "<"
+
+
+
 
         if pygame.sprite.spritecollide(self, self.deaths, False):
 
@@ -178,9 +204,11 @@ class Player(pygame.sprite.Sprite):
 
     #death by explosion
     def die(self):
-        #for _ in range(random.randint(8,24)):
-        #    fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y)))
+        for _ in range(random.randint(8,24)):
+            fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y)))
         self.alive = False
+        self.rect.x = self.spanwx
+        self.rect.y = self.spawny
 
 
     def moveLeft(self):
@@ -217,7 +245,7 @@ class Player2(Player):
         pygame.sprite.Sprite.__init__(self)
         ss = spritesheet.spritesheet('./assets/images/Player2_small.png')
 
-        self.xvel = 0
+        self.xvel = 5
         self.yvel = 0
         self.maxyvel = 15
         self.maxxvel = 11
@@ -232,13 +260,17 @@ class Player2(Player):
 
 
         self.rect = self.image.get_rect()
-        self.rect.y = 400
-        self.rect.x =400
+        self.spanwx = 400
+        self.spawny = 400
+        self.rect.y = self.spawny
+        self.rect.x = self.spanwx
 
         self.walls = None
         self.deaths = None
         self.teles = None
         self.teles2 = None
+        self.otherplayers = pygame.sprite.Group()
+
 
         self.jumps = 1
 
@@ -266,4 +298,11 @@ for up in hit_ups:
                 self.jumps = 1"""
 
 
+
+
+class Empty(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        return
 

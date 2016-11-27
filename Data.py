@@ -33,10 +33,16 @@ class Data:
         self.num_files = len([f for f in os.listdir("./assets/levels")
                          if os.path.isfile(os.path.join("./assets/levels", f))])
 
+
+        self.emptysprite = Empty()
         self.player = Player()
-        self.playersprite = pygame.sprite.GroupSingle()
-        self.player2sprite = pygame.sprite.GroupSingle()
+        #self.playersprite = pygame.sprite.GroupSingle()
+        #self.player2sprite = pygame.sprite.GroupSingle()
         self.player2 = Player2()
+        self.player3 = self.emptysprite
+        self.player4 = self.emptysprite
+
+
 
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
@@ -44,15 +50,25 @@ class Data:
         self.telewalls = pygame.sprite.Group()
         self.telewalls2 = pygame.sprite.Group()
         self.upwalls = pygame.sprite.Group()
+        self.players = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        self.playersprite.add(self.player)
-        self.player2sprite.add(self.player2)
+        #self.playersprite.add(self.player)
+        #self.player2sprite.add(self.player2)
+        self.players.add(self.player, self.player2, self.player3, self.player4)
 
-        #wall.randomLevel(self)
-        self.level = Level("level_010")#+str(random.randint(1,self.num_files-1)))
-        #self.level.gameLev(self)
+
+        for x in self.players:
+            if x != self.emptysprite:
+                self.player.otherplayers.add(x)
+                self.player2.otherplayers.add(x)
+                if x == self.player:
+                    self.player.otherplayers.remove(self.player)
+                elif x == self.player2:
+                    self.player.otherplayers.remove(self.player2)
+
+
 
         self.player.walls = self.wall_list
         self.player2.walls =self.wall_list
@@ -84,8 +100,7 @@ class Data:
         custFrag.groups = self.fragmentgroup
 
 
-        self.mainlevel = Level("level_0", "./assets/long_levels/")
-        self.mainlevel.gameLev(self)
+        self.isLoaded = False
 
         self.camera = Camera(camera.complex_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
 
@@ -94,6 +109,10 @@ class Data:
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.newbuttons = newbuttons
         self.mouse_position = mouse_position
+
+        if self.isLoaded == False:
+            self.initLevel()
+
 
 
         if pygame.K_ESCAPE in newkeys:
@@ -206,32 +225,48 @@ class Data:
     #wipes sprite lists, and puts in players + adding new level
 
     def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
-        a = 0
-        a += 1
-        self.camera.update(self.player)
+        if self.isLoaded == False:
+            self.initLevel()
 
-        if pygame.K_w in newkeys:
-            self.player.jump()
-        elif pygame.K_s in keys:
-            self.player.moveDown()
-
-        if pygame.K_a in keys:
-            self.player.moveLeft()
-
-
-        elif pygame.K_d in keys:
-            self.player.moveRight()
-
-        if pygame.K_i in newkeys:
-            self.player2.jump()
-
-        elif pygame.K_k in keys:
-            self.player2.moveDown()
+        if pygame.K_ESCAPE in newkeys:
+            if other.MINISTATE == 0:
+                other.MINISTATE = 1
+            elif other.MINISTATE == 1:
+                other.MINISTATE = 0
+        if other.MINISTATE == 0:
+            a = 0
+            a += 1
+            self.camera.update(self.player)
 
 
+            if self.player.alive == False:
+                self.player.alive  = True
+                self.lives -= 1
 
-        self.all_sprites.update()
-        self.fragmentgroup.update(a)
+
+            if self.player2 != self.emptysprite:
+                self.all_sprites.remove(self.player2)
+                self.player2 = self.emptysprite
+
+
+            if pygame.K_w in newkeys:
+                self.player.jump()
+            elif pygame.K_s in keys:
+                self.player.moveDown()
+
+            if pygame.K_a in keys:
+                self.player.moveLeft()
+
+
+            elif pygame.K_d in keys:
+                self.player.moveRight()
+
+
+
+            self.all_sprites.update()
+            self.fragmentgroup.update(a)
+        if other.MINISTATE == 1:
+            return
 
     def newLevel(self):
         self.wall_list.empty()
@@ -370,36 +405,43 @@ class Data:
 
         ### menu
         if other.MINISTATE == 1:
-            rect = pygame.Rect(100, 50, self.width-200, self.height-100)
-            pygame.draw.rect(surface, (25, 25, 25), rect)
-
-            r = pygame.Rect(200, 200, 100, 100)
-            pygame.draw.rect(surface, (25, 25, 25), rect)
-            pygame.draw.rect(surface, (255, 255, 255), r)
-            self.drawTextLeft(surface, "Menu", (255, 255, 255), 350, 150, self.font)
-
-            if ((self.mouse_position[0] <= 300 and self.mouse_position[0] >= 200) and (
-                            self.mouse_position[1] <= 300 and self.mouse_position[
-                        1] >= 200)):  # If mouse is in the rectangle
-                pygame.draw.rect(surface, (155, 155, 155), r)
-            if 1 in self.newbuttons:
-                other.MINISTATE = 0
-            self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
-
-            r = pygame.Rect(500, 200, 100, 100)
-            pygame.draw.rect(surface, (255, 255, 255), r)
-            if ((self.mouse_position[0] <= 600 and self.mouse_position[0] >= 500) and (
-                            self.mouse_position[1] <= 300 and self.mouse_position[
-                        1] >= 200)):  # If mouse is in the rectangle
-                pygame.draw.rect(surface, (155, 155, 155), r)
-
-                if 1 in self.newbuttons:
-                    pygame.quit()
-            self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
-
+            self.pauseMenu(surface)
         #self.level.display(surface)
 
         return
+    def pauseMenu(self, surface):
+        rect = pygame.Rect(100, 50, self.width - 200, self.height - 100)
+        pygame.draw.rect(surface, (25, 25, 25), rect)
+
+        r = pygame.Rect(200, 200, 100, 100)
+        pygame.draw.rect(surface, (25, 25, 25), rect)
+        pygame.draw.rect(surface, (255, 255, 255), r)
+        self.drawTextLeft(surface, "Menu", (255, 255, 255), 350, 150, self.font)
+
+        if ((self.mouse_position[0] <= 300 and self.mouse_position[0] >= 200) and (
+                        self.mouse_position[1] <= 300 and self.mouse_position[
+                    1] >= 200)):  # If mouse is in the rectangle
+            pygame.draw.rect(surface, (155, 155, 155), r)
+            #if 1 in self.newbuttons:
+
+                #other.MINISTATE = 0
+        self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
+
+        r = pygame.Rect(500, 200, 100, 100)
+        pygame.draw.rect(surface, (255, 255, 255), r)
+        if ((self.mouse_position[0] <= 600 and self.mouse_position[0] >= 500) and (
+                        self.mouse_position[1] <= 300 and self.mouse_position[
+                    1] >= 200)):  # If mouse is in the rectangle
+            pygame.draw.rect(surface, (155, 155, 155), r)
+
+            if 1 in self.newbuttons:
+                pygame.quit()
+        self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
+
+        return
+    def singlePlay(self):
+        self.all_sprites.remove(self.player2)
+
     #menu activity
     def mainDraw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
@@ -407,9 +449,20 @@ class Data:
         for e in self.all_sprites:
             surface.blit(e.image, self.camera.apply(e))
 
+        if other.MINISTATE ==1:
+            self.pauseMenu(surface)
+
 
         #self.all_sprites.draw(surface)
 
+    def initLevel(self):
+        if other.GAMESTATE == 1:
+            self.level = Level("level_01")
+        elif other.GAMESTATE == 2:
+            self.level =  Level("level_0", "./assets/long_levels/")
+            self.lives = 3
+        self.level.gameLev(self)
+        self.isLoaded = True
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
@@ -442,8 +495,8 @@ class Data:
                         self.mouse_position[1] <= r[1] + r[3] and self.mouse_position[1] >= r[
                     1])):  # If mouse is in the rectangle
             pygame.draw.rect(surface, (155, 155, 155), r)
-        if 1 in self.newbuttons:
-            other.GAMESTATE = 2
+            if 1 in self.newbuttons:
+                other.GAMESTATE = 2
 
         self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
 
