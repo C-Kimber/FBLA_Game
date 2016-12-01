@@ -1,0 +1,34 @@
+Add mass to players for better bouncing
+
+check other surrounding walls to created mearged tiles
+
+use vector with random variables to create elevevation in random background (#less important)
+
+fix tile collisions  (#not quite working)
+
+fix fragment class  (#causes major lag)
+
+optimize fragment class to not cause lag, when using png's
+
+add goal at end of level
+
+add enemies
+		*ground enemy, flying enemy, jumping enemy
+     
+players animations
+
+add functionality for players 3, and 4 in battle mode
+
+optimize pause and menu graphics
+
+create more levels
+
+create credits screen
+
+add sign block (hit the block and brings up a screen with words)
+
+add hitable blocks
+
+
+
+
