@@ -45,8 +45,9 @@ class Player(pygame.sprite.Sprite):
         self.jumps = 1
 
         self.stunting = False
-
-        self.pushing = 0
+        self.mass = 100
+        self.xmom = 0
+        self.ymom = 0
         self.pushfactor = 1.25
 
         self.alive = True
@@ -58,7 +59,8 @@ class Player(pygame.sprite.Sprite):
         highbound, lowbound, leftbound, rightbound = 0, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
         self.boundries(highbound, lowbound, leftbound, rightbound)
 
-        self.pushing = self.yvel * self.pushfactor
+        self.xmom = self.xvel * self.mass
+        self.ymom = self.yvel * self.mass
         #self.playerCollisions()
 
 
@@ -115,27 +117,19 @@ class Player(pygame.sprite.Sprite):
                 #for _ in range(20):
                  #   self.fragmentgroup.add(custFrag((self.player.rect.x, self.player.rect.y), (1, 3), (255, 255, 0)))
                 if self.rect.x <= bro.rect.x:
-                    self.xvel = -3 + self.xvel * -bro.pushfactor
-                    bro.xvel = 3 + bro.xvel * -self.pushfactor
+                    self.xvel = bro.xmom
+                    bro.xvel = 0
                 elif bro.rect.x <= self.rect.x:
-                    self.xvel = 3 + self.xvel * -bro.pushfactor
-                    bro.xvel = -3 + bro.xvel * -self.pushfactor
+                    self.xvel = bro.xmom
+                    self.xvel = 0
 
                 if self.rect.y - bro.rect.y > 1:  # if p1 is above p2
-                    if self.stunting:
-                        bro.yvel *= 30
-                        self.yvel = -3
-                    else:
-                        bro.yvel = 5
-                        self.yvel = -3
+                        self.yvel = bro.ymom
+                        bro.yvel = -3
 
                 elif bro.rect.y - self.rect.y > 1:  # if p2 is above p1
-                    if bro.stunting:
-                        self.yvel *= 30
-                        bro.yvel = -3
-                    else:
-                        self.yvel = 5
-                        bro.yvel = -3
+                    self.yvel = bro.ymom
+                    
     #Collisions with walls
     def wallCollisions(self):
         block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
@@ -275,9 +269,9 @@ class Player2(Player):
         self.jumps = 1
 
         self.stunting = False
-
-        self.pushfactor = 1.25
-        self.pushing = 0
+        self.xmom = 0
+        self.ymom = 0
+        self.mass = 100
         self.alive = True
 
         self.teletime = 0
