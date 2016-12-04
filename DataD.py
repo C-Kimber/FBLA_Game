@@ -12,7 +12,8 @@ class DataD:
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
-        self.level = Level("level_0",'./assets/long_levels/')
+        #self.level = Level("level_0",'./assets/long_levels/')
+        self.level = Level("level_01")
         self.num_files = len([f for f in os.listdir("./assets/levels")
                               if os.path.isfile(os.path.join("./assets/levels", f))])
         self.l = 1
@@ -27,6 +28,7 @@ class DataD:
         self.mp = mouse_position
 
         block = [(self.mp[1]-self.cameraY) / 32, (self.mp[0]-self.cameraX) / 32]
+        self.b = block
         #if other.GAMESTATE == 2:
             #block = [self.mp[1] / 8+self.cameraX, self.mp[0] / 8+self.cameraY]
             #self.multi = 8
@@ -62,7 +64,7 @@ class DataD:
 
         if 1 in buttons:
             self.button(mouse_position,(self.width-37, self.height-37, 32, 32),".")#clear selected
-            self.clearbutton(mouse_position, (self.width - 69, self.height - 37, 32, 32))  # clear
+            #self.clearbutton(mouse_position, (self.width - 69, self.height - 37, 32, 32))  # clear
             self.button(mouse_position, (832,32,32, 32),'-') #wall
             self.button(mouse_position, (832, 96, 32, 32),"X")  # lava
             self.button(mouse_position,(832, 160, 32, 32),"1")  #p1
@@ -169,51 +171,59 @@ class DataD:
 
         self.drawTextLeft(surface, "Level "+ str(self.l), (55,0,55), 832, 35, self.font)
 
+
         #follow mouse
-        if self.selected != ".":
-            if self.selected == "-":
-                pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # wall
-            elif self.selected == "X":
-                pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # lava
-            elif self.selected == "1":
-                pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # p1
-            elif self.selected == "2":
-                pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # p2
-            elif self.selected == "3":
-                pygame.draw.rect(surface, (0, 0, 255), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # p3
-            elif self.selected == "4":
-                pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32))  # p4
-            elif self.selected == "T":
-                pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32)))  # Telewall 1
-                pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(pygame.Rect(self.mp[0]+24, self.mp[1]+24, 16, 16)))
-            elif self.selected == "t":
-                pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(pygame.Rect(self.mp[0]+16, self.mp[1]+16, 32, 32)))  # Telewall 2
-                pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(pygame.Rect(self.mp[0]+24, self.mp[1]+24, 16, 16)))
-            elif self.selected == "=":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32*4, 32))  # longWall short
+        if self.mp[0] < 800:
+            pygame.draw.rect(surface, (55, 55, 255), pygame.Rect(self.b[1] * 32, self.b[0] * 32, 32, 32), 3)
+            if self.selected != ".":
+                if self.selected == "-":
+                    pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # wall
+                elif self.selected == "X":
+                    pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # lava
+                elif self.selected == "1":
+                    pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # p1
+                elif self.selected == "2":
+                    pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # p2
+                elif self.selected == "3":
+                    pygame.draw.rect(surface, (0, 0, 255), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # p3
+                elif self.selected == "4":
+                    pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32))  # p4
+                elif self.selected == "T":
+                    pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32)))  # Telewall 1
+                    pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(pygame.Rect(self.b[1]*32,self.b[0]*32, 16, 16)))
+                elif self.selected == "t":
+                    pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32)))  # Telewall 2
+                    pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(pygame.Rect(self.b[1]*32,self.b[0]*32, 16, 16)))
+                elif self.selected == "=":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32*4, 32))  # longWall short
 
-            elif self.selected == "[":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32 * 8, 32))  # longWall medium
+                elif self.selected == "[":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32 * 8, 32))  # longWall medium
 
-            elif self.selected == "_":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32 * 16, 32))  # longWall long
-            elif self.selected == ";":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32, 32*4))  # tallWall short
+                elif self.selected == "_":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32 * 16, 32))  # longWall long
+                elif self.selected == ";":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32*4))  # tallWall short
 
-            elif self.selected == "/":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32, 32*8))  # tallWall medium
+                elif self.selected == "/":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32*8))  # tallWall medium
 
-            elif self.selected == "|":
-                pygame.draw.rect(surface, (155, 155, 155),
-                                 pygame.Rect(self.mp[0] + 16, self.mp[1] + 16, 32, 32*16))  # ltallWall long
+                elif self.selected == "|":
+                    pygame.draw.rect(surface, (155, 155, 155),
+                                     pygame.Rect(self.b[1]*32,self.b[0]*32, 32, 32*16))  # ltallWall long
 
-            elif self.selected == "+":
-                pygame.draw.rect(surface, (155, 155, 155), (self.mp[0] + 16, self.mp[1] + 16, 32, 16))
+                elif self.selected == "-":
+                    pygame.draw.rect(surface, (155, 155, 155), (self.b[1]*32,self.b[0]*32, 32, 16))
+
+                elif self.selected == "+":
+                    pygame.draw.rect(surface, (155, 155, 155), (self.b[1] * 32, self.b[0] * 32, 32, 16))
+                    pygame.draw.rect(surface, (55, 55, 55), pygame.Rect(self.b[1] * 32, self.b[0] * 32, 32, 32), 3)
+
 
         return
 

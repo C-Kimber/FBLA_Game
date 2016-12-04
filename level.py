@@ -165,11 +165,11 @@ class Level():
             for y in x:
                 m += 1
                 if y == "X" or y == "x":
-                    thing.deathwalls.add(deathWall(m*32, n*32))
-                    thing.all_sprites.add(deathWall(m*32, n*32))
+                    thing.deathwalls.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
+                    thing.all_sprites.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
                 elif y == "-":
-                    thing.wall_list.add(Wall(m * 32, n * 32))
-                    thing.all_sprites.add(Wall(m * 32, n * 32))
+                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_1"]))
+                    thing.all_sprites.add(Wall(m * 32, n * 32, thing.sprite_library["wall_1"]))
                 elif y == "1":  # player 1 spawn
                     thing.player.spawnx = m * 32
                     thing.player.spawny = n * 32
@@ -201,15 +201,15 @@ class Level():
                     thing.wall_list.add(Pillar(m * 32, n * 32, 128))
                     thing.all_sprites.add(Pillar(m * 32, n * 32, 128))
                 elif y == "+":
-                    thing.upwalls.add(upWall(m*32, n*32))
-                    thing.all_sprites.add(upWall(m * 32, n * 32))
+                    thing.upwalls.add(upWall(m*32, n*32, thing.sprite_library["up_wall"]))
+                    thing.all_sprites.add(upWall(m * 32, n * 32, thing.sprite_library["up_wall"]))
 
                 elif y == "T":  # Tele walls
-                    thing.telewalls.add(teleWall(m * 32, n * 32))
-                    thing.all_sprites.add(teleWall(m * 32, n * 32))
+                    thing.telewalls.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
+                    thing.all_sprites.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
                 elif y == "t": #Tele Walls group 2
-                    thing. telewalls2.add(teleWall2(m*32, n*32))
-                    thing.all_sprites.add(teleWall2(m * 32, n * 32))
+                    thing. telewalls2.add(teleWall2(m*32, n*32, thing.sprite_library["t_wall_2"]))
+                    thing.all_sprites.add(teleWall2(m * 32, n * 32, thing.sprite_library["t_wall_2"]))
 
                 """elif y == "3":  # player 3 spawn
                     thing.player.x = m * 32
@@ -223,5 +223,5 @@ class Level():
             self.levelSize= n,m
             other.TOTAL_LEVEL_WIDTH = n * 32
             other.TOTAL_LEVEL_HEIGHT = m * 32
-            print other.TOTAL_LEVEL_WIDTH
+            #print other.TOTAL_LEVEL_WIDTH
             m = -1

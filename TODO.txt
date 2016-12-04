@@ -29,6 +29,10 @@ add sign block (hit the block and brings up a screen with words)
 
 add hitable blocks
 
+add power ups for battle mode
+
+add "tools" for story mode (aka mairo powerups)
+
 
 
 

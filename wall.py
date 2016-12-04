@@ -6,16 +6,15 @@ import spriteanim
 #WAll class, I.E. platforms
 class Wall(pygame.sprite.Sprite):
 
-    def __init__(self,x,y):
+    def __init__(self,x,y, image):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/images/wall1_small.png')
 
         self.x = x
         self.y = y
         self.width =30
         self.height = 30
 
-        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
+        self.image = image#ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
         #self.image.fill((255,255,0))
 
         self.rect = self.image.get_rect()
@@ -40,17 +39,15 @@ class longWall(pygame.sprite.Sprite):
 
 #walls that kill on impact
 class deathWall(Wall):
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/images/deathwall1_small.png')
         self.x = x
         self.y = y
         self.width = 32
         self.height = 32
 
-        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
+        self.image = image
         self.image = pygame.transform.rotate(self.image, random.randrange(0,360, 90))
-        #self.image.fill((255, 20, 0))
 
         self.rect = self.image.get_rect()
         self.rect.y = y
@@ -58,7 +55,7 @@ class deathWall(Wall):
         return
 #walls that teleport
 class teleWall(Wall):
-    def __init__(self, x, y):
+    def __init__(self, x, y,image):
         pygame.sprite.Sprite.__init__(self)
         ss = spritesheet.spritesheet('./assets/images/telewall_sheet.png')
         self.x = x
@@ -72,7 +69,7 @@ class teleWall(Wall):
         #self.strips[self.n].iter()
         #self.image = self.strips[self.n].next()
 
-        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
+        self.image = image#ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
         # self.image.fill((255, 20, 0))
 
         self.rect = self.image.get_rect()
@@ -85,7 +82,7 @@ class teleWall(Wall):
 
 
 class teleWall2(teleWall):
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
         pygame.sprite.Sprite.__init__(self)
         ss = spritesheet.spritesheet('./assets/images/telewall2_sheet.png')
         self.x = x
@@ -99,7 +96,7 @@ class teleWall2(teleWall):
         # self.strips[self.n].iter()
         # self.image = self.strips[self.n].next()
 
-        self.image = ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
+        self.image = image#ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
         # self.image.fill((255, 20, 0))
 
         self.rect = self.image.get_rect()
@@ -108,7 +105,7 @@ class teleWall2(teleWall):
         return
 
 class upWall(Wall):
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
         pygame.sprite.Sprite.__init__(self)
         ss = spritesheet.spritesheet('./assets/images/upwall.png')
 
@@ -117,7 +114,7 @@ class upWall(Wall):
         self.width = 30
         self.height = 30
 
-        self.image = ss.image_at((0, 0, 32, 32), (254, 254, 254)).convert_alpha()
+        self.image = image#ss.image_at((0, 0, 32, 32), (254, 254, 254)).convert_alpha()
         #self.image.fill((255,255,0))
 
         self.rect = self.image.get_rect()

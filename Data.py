@@ -19,6 +19,7 @@ class Data:
         self.width = width
         self.height = height
         self.img = pygame.image.load('./assets/images/Background_1.png')
+        self.sprite_library = other.load_images()
         self.bimgs = [ pygame.image.load('./assets/images/background_2.png').convert_alpha()]
         """pygame.image.load('./assets/imagas/B_04.png').convert_alpha(),
             pygame.image.load('./assets/images/B_03.png').convert_alpha(),
@@ -35,10 +36,10 @@ class Data:
 
 
         self.emptysprite = Empty()
-        self.player = Player()
+        self.player = Player(self.sprite_library["player1"])
         #self.playersprite = pygame.sprite.GroupSingle()
         #self.player2sprite = pygame.sprite.GroupSingle()
-        self.player2 = Player2()
+        self.player2 = Player2(self.sprite_library["player2"])
         self.player3 = self.emptysprite
         self.player4 = self.emptysprite
 
@@ -58,15 +59,17 @@ class Data:
         #self.player2sprite.add(self.player2)
         self.players.add(self.player, self.player2, self.player3, self.player4)
 
-
         for x in self.players:
             if x != self.emptysprite:
+
                 self.player.otherplayers.add(x)
                 self.player2.otherplayers.add(x)
                 if x == self.player:
+
                     self.player.otherplayers.remove(self.player)
                 elif x == self.player2:
-                    self.player.otherplayers.remove(self.player2)
+
+                    self.player2.otherplayers.remove(self.player2)
 
 
 
@@ -84,6 +87,15 @@ class Data:
 
         self.player.upwalls = self.upwalls
         self.player2.upwalls = self.upwalls
+
+        self.player.getfimage((#self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
+                               self.sprite_library["frag1_2"]
+                               , self.sprite_library["frag2_1"],self.sprite_library["frag3_1"]
+                               , self.sprite_library["frag2_2"],self.sprite_library["frag3_2"]))
+        self.player2.getfimage((#self.sprite_library["frag1"], self.sprite_library["frag2"], self.sprite_library["frag3"],
+                                self.sprite_library["frag1_2"]
+                               , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
+                               , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
 
         self.diedfirst = 0
         self.p1score = 0
@@ -144,9 +156,7 @@ class Data:
             """elif pygame.K_s in keys:
                 self.player.stunt()
                 self.player.stunting = True
-                self.player.image.fill((0,0,255))
             else:
-                self.player.image.fill((255,255,255))
                 self.player.stunting = False"""
 
             if pygame.K_a in keys:
@@ -176,32 +186,11 @@ class Data:
                 self.player2.moveLeft()
             elif pygame.K_l in keys:
                 self.player2.moveRight()
-            if pygame.sprite.collide_circle(self.player, self.player2):
+            # pygame.sprite.collide_circle(self.player, self.player2):
 
-                for _ in range(20):
-                    self.fragmentgroup.add(custFrag((self.player.rect.x,self.player.rect.y),(1,3),(255,255,0)))
-                if self.player.rect.x <= self.player2.rect.x:
-                    self.player.xvel = -3 + self.player.xvel * -self.player2.pushfactor
-                    self.player2.xvel = 3 + self.player2.xvel * -self.player.pushfactor
-                if self.player2.rect.x <= self.player.rect.x:
-                    self.player.xvel = 3 + self.player.xvel * -self.player2.pushfactor
-                    self.player2.xvel = -3 + self.player2.xvel * -self.player.pushfactor
+                #for _ in range(20):
+                #    self.fragmentgroup.add(custFrag((self.player.rect.x,self.player.rect.y),(1,3),(255,255,0)))
 
-                if self.player.rect.y - self.player2.rect.y > 1: # if p1 is above p2
-                    if self.player.stunting:
-                        self.player2.yvel *= 30
-                        self.player.yvel = -3
-                    else:
-                        self.player2.yvel = 5
-                        self.player.yvel = -3
-
-                if self.player2.rect.y - self.player.rect.y > 1:  # if p2 is above p1
-                    if self.player2.stunting:
-                        self.player.yvel *= 30
-                        self.player2.yvel = -3
-                    else:
-                        self.player.yvel = 5
-                        self.player2.yvel = -3
 
             if self.p1score >= 5:
                 self.p1vic = True
@@ -225,6 +214,7 @@ class Data:
     #wipes sprite lists, and puts in players + adding new level
 
     def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
+
         if self.isLoaded == False:
             self.initLevel()
 
@@ -244,9 +234,9 @@ class Data:
                 self.lives -= 1
 
 
-            if self.player2 != self.emptysprite:
-                self.all_sprites.remove(self.player2)
-                self.player2 = self.emptysprite
+            #if self.player2 != self.emptysprite:
+              #  self.all_sprites.remove(self.player2)
+              #  self.player2 = self.emptysprite
 
 
             if pygame.K_w in newkeys:
@@ -318,7 +308,7 @@ class Data:
             self.player2.jumps = 1
             self.player2.alive = True
 
-            self.time = 30
+            self.time = 60
 
             self.level.gameLev(self)
     #draws all the stuff, also button functionality
