@@ -1,3 +1,4 @@
+import math
 import pygame
 from fragment import *
 import fragment
@@ -18,6 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.hitHeightVel = False
         self.onGround = False
         self.dir = "right"
+        self.name = "p1"
 
         self.width = 32
         self.height = 32
@@ -37,6 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.teles = None
         self.teles2 = None
         self.upwalls = None
+        self.finish = None
         self.otherplayers = pygame.sprite.Group()
 
         self.down = False
@@ -73,11 +76,14 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
         if self.jumps > 0:
-            if self.onGround:
-                if not self.hitHeightVel:
-                    self.dir = "up"
-                    self.yvel = 15
-                    self.jumps = 0
+
+            #if self.onGround == True:
+            self.onGround = False
+            self.dir = "up"
+            self.rect.y -= 1
+            self.yvel = 15
+            self.jumps = 0
+
         return
 
     def stunt(self):
@@ -100,21 +106,17 @@ class Player(pygame.sprite.Sprite):
         if self.teletime > 0:
             self.teletime -= 1
 
+        self.applyDrag("air")
+
         #movement control
-        self.rect.x += self.xvel
-        if self.dir == "up":
-            self.rect.y -= self.yvel*1.1
-        else:
-            self.rect.y -= self.yvel
+
         #x velocity control
         if self.xvel > self.maxxvel:
             self.xvel = self.maxxvel
         if self.xvel < -self.maxxvel:
             self.xvel = -self.maxxvel
-        if self.xvel >=.1:
-            self.xvel -=.1
-        if self.xvel <= -.1:
-            self.xvel += .1
+        if self.xvel < 0.21 and self.xvel > -0.21:
+            self.xvel = 0.0
 
         #y velocity control
         if self.yvel > self.maxyvel:
@@ -123,12 +125,23 @@ class Player(pygame.sprite.Sprite):
         elif self.yvel < -self.maxyvel:
             self.yvel = -self.maxyvel
 
-        #gravity
-        self.yvel-=.0066*self.mass
-        #if self.yvel != 0:
-         #   self.onGround = False
+        self.rect.x += self.xvel
+        self.wallColl(self.xvel, 0, self.walls)
+        self.rect.y -= self.yvel
+        self.onGround = False
+        self.wallColl(0, self.yvel, self.walls)
+
+
         self.wallCollisions()
-        self.playerCollisions()
+        if self.otherplayers!= None:self.playerCollisions()
+
+        #gravity
+        if self.onGround == False:
+            self.yvel-=.0066*self.mass
+
+
+
+
 
         self.boundries(highbound, lowbound, leftbound, rightbound)
         self.down = False
@@ -162,42 +175,52 @@ class Player(pygame.sprite.Sprite):
 
 
                 if bro.rect.y - self.rect.y >= 1:  # if p1 is above p2
-                        #self.yvel = 12
+                        self.rect.bottom = bro.rect.top
                         if self.onGround == False:
                             bro.yvel = self.ymom
-                        #else:s
+                        else:
+                            bro.yvel = .2
                         self.yvel = 12
-                        bro.yvel -= 3
+                        if bro.yvel > bro.maxyvel:
+                            bro.yvel = bro.maxyvel/3
+                        elif bro.yvel < -bro.maxyvel:
+                            bro.yvel = -bro.maxyvel/3
+
 
 
                 bro.xvel = self.xmom
+                bro.rect.x +=1
 
                 self.xvel = 0
+            #else:
+            #    self.onGround = False
 
     #Collisions with walls
-    def wallCollisions(self):
-        block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
-        for block in block_hit_list:
-
-
-            if self.rect.bottom >= block.rect.top and self.rect.bottom <= block.rect.top + 15:  # Moving down; Hit the top side of the wall
-                if self.rect.right > block.rect.left:
-                    self.rect.bottom = block.rect.top
-                    self.yvel = 0
-                    self.onGround = True
-                    self.jumps = 1
-            elif self.rect.top <= block.rect.bottom and self.rect.top >= block.rect.bottom - 15:  # Moving up; Hit the bottom side of the wall
-                self.rect.top = block.rect.bottom
-                self.yvel = 0
-            elif self.rect.right >= block.rect.left and self.rect.right <= block.rect.left + 15:  # Moving right; Hit the left side of the wall
-                if self.rect.bottom > block.rect.top+15:
-                    self.rect.right = block.rect.left#+1
+    def wallColl(self, xvel, yvel, colliders):
+        for collider in colliders:
+            if pygame.sprite.collide_rect(self, collider):
+                if xvel > 0:
+                    self.rect.right = collider.rect.left
                     self.xvel = 0
-            elif self.rect.left <= block.rect.right and self.rect.left >= block.rect.right - 15:  # Moving left; Hit the right side of the wall
-                self.rect.left = block.rect.right#-1
-                self.xvel = 0
+                if xvel < 0:
+                    self.rect.left = collider.rect.right
+                    self.xvel = 0
+                if yvel < 0:
+                    self.rect.bottom = collider.rect.top
+                    self.onGround = True
+                    self.jumps = 3
+                    self.yvel = 0
+                if yvel > 0:
+                    self.yvel = 0
+                    self.rect.top = collider.rect.bottom
+        return
 
 
+    def wallCollisions(self):
+
+
+        if pygame.sprite.spritecollide(self, self.finish, False):
+            print "Win"
 
 
         if pygame.sprite.spritecollide(self, self.deaths, False):
@@ -233,16 +256,27 @@ class Player(pygame.sprite.Sprite):
                 self.onGround = True
                 self.jumps = 1
 
-
     #death by explosion
     def getfimage(self, images):
         self.fimgs = images
+
     def die(self):
         for _ in range(random.randint(8,24)):
             fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
         self.alive = False
         self.rect.x = self.spanwx
         self.rect.y = self.spawny
+
+    def applyDrag(self, medium):
+        a = 0.003
+        n = self.xvel * -1.0
+        if self.xvel > 0.0:
+            drag = math.floor(n* a)/ 5
+        else:
+            drag = math.ceil(n * a)/5
+
+
+        self.xvel += drag
 
 
 
@@ -253,7 +287,6 @@ class Player2(Player):
 
     def __init__(self, image):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/images/Player2_small.png')
 
         self.xvel = 0
         self.yvel = 0
@@ -262,6 +295,7 @@ class Player2(Player):
         self.hitHeightVel = False
         self.onGround = False
         self.dir = "left"
+        self.name = "p2"
 
         self.width = 32
         self.height = 32

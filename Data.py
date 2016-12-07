@@ -52,6 +52,7 @@ class Data:
         self.telewalls2 = pygame.sprite.Group()
         self.upwalls = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
+        self.finish = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -88,6 +89,9 @@ class Data:
         self.player.upwalls = self.upwalls
         self.player2.upwalls = self.upwalls
 
+        self.player.finish = self.finish
+        self.player2.finish = self.finish
+
         self.player.getfimage((#self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
                                self.sprite_library["frag1_2"]
                                , self.sprite_library["frag2_1"],self.sprite_library["frag3_1"]
@@ -106,6 +110,7 @@ class Data:
         self.p2vic = False
 
         self.time = 0
+        self.overtime = 0
 
         self.fragmentgroup = fragment.fragmentgroup
         Fragment.groups = self.fragmentgroup, self.all_sprites
@@ -124,6 +129,8 @@ class Data:
 
         if self.isLoaded == False:
             self.initLevel()
+
+
 
 
 
@@ -217,6 +224,10 @@ class Data:
 
         if self.isLoaded == False:
             self.initLevel()
+            self.all_sprites.remove(self.player2)
+            self.player2 = self.emptysprite
+            self.all_sprites.remove(self.player2)
+            print "Load "
 
         if pygame.K_ESCAPE in newkeys:
             if other.MINISTATE == 0:
@@ -226,7 +237,11 @@ class Data:
         if other.MINISTATE == 0:
             a = 0
             a += 1
+
             self.camera.update(self.player)
+
+
+
 
 
             if self.player.alive == False:
@@ -255,6 +270,17 @@ class Data:
 
             self.all_sprites.update()
             self.fragmentgroup.update(a)
+            if self.lives <= 0:
+                other.GAMESTATE = 3
+                if self.overtime <= 0:
+                    self.overtime = 60
+
+
+            if self.overtime > 0:
+                self.overtime -= 1
+            if self.overtime <= 0:
+                #other.GAMESTATE = 0
+                self.lives = 3
         if other.MINISTATE == 1:
             return
 
@@ -434,22 +460,32 @@ class Data:
 
     #menu activity
     def mainDraw(self, surface):
+
         rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((55, 55, 55), rect)  # back
+        surface.fill((55, 55, 255), rect)  # back
         for e in self.all_sprites:
             surface.blit(e.image, self.camera.apply(e))
 
         if other.MINISTATE ==1:
             self.pauseMenu(surface)
 
+        self.drawTextLeft(surface, "Lives  " + str(self.lives), (250, 250, 250), 2, 35, self.font)
+
 
         #self.all_sprites.draw(surface)
+
+    def GameOverDraw(self, surface):
+        rect = pygame.Rect(0, 0, self.width, self.height)
+        surface.fill((55, 55, 55), rect)  # back
+        print self.overtime
+
+        self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
     def initLevel(self):
         if other.GAMESTATE == 1:
             self.level = Level("level_01")
         elif other.GAMESTATE == 2:
-            self.level =  Level("level_0", "./assets/long_levels/")
+            self.level =  Level("level_1", "./assets/long_levels/")
             self.lives = 3
         self.level.gameLev(self)
         self.isLoaded = True
@@ -461,6 +497,7 @@ class Data:
         return
     #menu drawing
     def menuDraw(self,surface):
+
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((0, 0, 0), rect)  # back
 
@@ -470,6 +507,7 @@ class Data:
 
         r = pygame.Rect(200,400, 100,100)
         pygame.draw.rect(surface,(255,255,255),r)
+        print "EH"
 
         if ((self.mouse_position[0] <= r[0]+r[2] and self.mouse_position[0] >= r[0]) and (
                 self.mouse_position[1] <= r[1]+r[3] and self.mouse_position[1] >= r[1])):  # If mouse is in the rectangle

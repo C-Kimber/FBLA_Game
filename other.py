@@ -1,6 +1,6 @@
 import spritesheet
 
-GAMESTATE = 0
+GAMESTATE = 1
 MINISTATE = 0
 
 WIDTH = 800
@@ -37,6 +37,7 @@ def load_images():
         "t_wall_1": spritesheet.spritesheet('./assets/images/telewall_sheet.png').image_at((0, 0, 32, 32),(255,255, 255)).convert_alpha(),#14
         "t_wall_2": spritesheet.spritesheet('./assets/images/telewall2_sheet.png').image_at((0, 0, 32, 32), (255, 255,255)).convert_alpha(),#15
         "lava": spritesheet.spritesheet('./assets/images/deathwall1_small.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#16
+        "finish": spritesheet.spritesheet('./assets/images/finish.png').image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha(),
     }
     return images
 

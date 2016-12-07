@@ -140,6 +140,9 @@ class Level():
                     pygame.draw.rect(surface, (155, 0, 155), r)
                     r = pygame.Rect((m * multi) + 8+camx, (n * multi) + 8+camy, 16, 16)
                     pygame.draw.rect(surface, (255, 0, 255), r)
+                elif y == 'E':
+                    r = pygame.Rect((m * multi)  + camx, (n * multi)  + camy, 32, 32)
+                    pygame.draw.rect(surface, (0, 255, 155), r)
                 else:#empty
                     l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
@@ -210,6 +213,9 @@ class Level():
                 elif y == "t": #Tele Walls group 2
                     thing. telewalls2.add(teleWall2(m*32, n*32, thing.sprite_library["t_wall_2"]))
                     thing.all_sprites.add(teleWall2(m * 32, n * 32, thing.sprite_library["t_wall_2"]))
+                elif y == 'E':
+                    thing.finish.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
+                    thing.all_sprites.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
 
                 """elif y == "3":  # player 3 spawn
                     thing.player.x = m * 32
