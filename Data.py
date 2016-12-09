@@ -60,47 +60,14 @@ class Data:
         #self.player2sprite.add(self.player2)
         self.players.add(self.player, self.player2, self.player3, self.player4)
 
-        for x in self.players:
-            if x != self.emptysprite:
-
-                self.player.otherplayers.add(x)
-                self.player2.otherplayers.add(x)
-                if x == self.player:
-
-                    self.player.otherplayers.remove(self.player)
-                elif x == self.player2:
-
-                    self.player2.otherplayers.remove(self.player2)
+        self.resetLists()
 
 
 
-        self.player.walls = self.wall_list
-        self.player2.walls =self.wall_list
 
-        self.player.deaths = self.deathwalls
-        self.player2.deaths = self.deathwalls
+        self.mouse_position = [0,0]
 
-        self.player.teles = self.telewalls
-        self.player2.teles = self.telewalls
-
-        self.player.teles2 = self.telewalls2
-        self.player2.teles2 = self.telewalls2
-
-        self.player.upwalls = self.upwalls
-        self.player2.upwalls = self.upwalls
-
-        self.player.finish = self.finish
-        self.player2.finish = self.finish
-
-        self.player.getfimage((#self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
-                               self.sprite_library["frag1_2"]
-                               , self.sprite_library["frag2_1"],self.sprite_library["frag3_1"]
-                               , self.sprite_library["frag2_2"],self.sprite_library["frag3_2"]))
-        self.player2.getfimage((#self.sprite_library["frag1"], self.sprite_library["frag2"], self.sprite_library["frag3"],
-                                self.sprite_library["frag1_2"]
-                               , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
-                               , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
-
+        self.current_level = 0
         self.diedfirst = 0
         self.p1score = 0
         self.p1win = 0
@@ -108,9 +75,10 @@ class Data:
         self.p2win = 0
         self.p1vic = False
         self.p2vic = False
+        self.lives = 3
 
         self.time = 0
-        self.overtime = 0
+        self.overtime = -1
 
         self.fragmentgroup = fragment.fragmentgroup
         Fragment.groups = self.fragmentgroup, self.all_sprites
@@ -226,7 +194,6 @@ class Data:
             self.initLevel()
             self.all_sprites.remove(self.player2)
             self.player2 = self.emptysprite
-            self.all_sprites.remove(self.player2)
             print "Load "
 
         if pygame.K_ESCAPE in newkeys:
@@ -239,14 +206,10 @@ class Data:
             a += 1
 
             self.camera.update(self.player)
-
-
-
-
-
             if self.player.alive == False:
-                self.player.alive  = True
                 self.lives -= 1
+                self.player.alive  = True
+
 
 
             #if self.player2 != self.emptysprite:
@@ -266,25 +229,34 @@ class Data:
             elif pygame.K_d in keys:
                 self.player.moveRight()
 
-
+            if pygame.sprite.spritecollide(self.player, self.player.finish, False):
+                self.current_level += 1
+                self.newMainLev()
 
             self.all_sprites.update()
             self.fragmentgroup.update(a)
-            if self.lives <= 0:
-                other.GAMESTATE = 3
-                if self.overtime <= 0:
-                    self.overtime = 60
 
 
-            if self.overtime > 0:
-                self.overtime -= 1
-            if self.overtime <= 0:
-                #other.GAMESTATE = 0
-                self.lives = 3
+
+
+
         if other.MINISTATE == 1:
             return
 
+        if self.overtime > 0:
+            self.overtime -= 1
+        if self.overtime == 0:
+            other.GAMESTATE = 0
+            self.lives = 3
+
+        if self.lives <= 0:
+            other.GAMESTATE = 3
+            if self.overtime == -1:
+                self.overtime = 60
+
+
     def newLevel(self):
+        self.deathwalls.empty()
         self.wall_list.empty()
         self.telewalls.empty()
         self.telewalls2.empty()
@@ -338,6 +310,16 @@ class Data:
 
             self.level.gameLev(self)
     #draws all the stuff, also button functionality
+    def newMainLev(self):
+        self.deathwalls.empty()
+        self.wall_list.empty()
+        self.telewalls.empty()
+        self.telewalls2.empty()
+        self.all_sprites.empty()
+        self.all_sprites.add(self.player)
+        self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
+        self.level.gameLev(self)
+
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((55,55,55), rect)#back
@@ -404,6 +386,24 @@ class Data:
                     pygame.quit()
             self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
 
+            r = pygame.Rect(200, 400, 100, 100)
+            pygame.draw.rect(surface, (255, 255, 255), r)
+
+            if ((self.mouse_position[0] <= r[0] + r[2] and self.mouse_position[0] >= r[0]) and (
+                            self.mouse_position[1] <= r[1] + r[3] and self.mouse_position[1] >= r[
+                        1])):  # If mouse is in the rectangle
+                pygame.draw.rect(surface, (155, 155, 155), r)
+                if 1 in self.newbuttons:
+                    other.GAMESTATE = 0
+                    other.MINISTATE = 0
+                    self.p1score = 0
+                    self.p2score = 0
+                    self.p1vic = False
+                    self.p2vic = False
+                    self.newRound()
+                    self.newbuttons.remove(1)
+            self.drawTextLeft(surface, "Menu", (0, 0, 255), 220, 480, self.font)
+
         if self.p1vic :
 
             self.drawTextLeft(surface, "PLAYER 1 WON!", (0, 255, 0), 150, 150, self.font2)
@@ -425,6 +425,7 @@ class Data:
         #self.level.display(surface)
 
         return
+
     def pauseMenu(self, surface):
         rect = pygame.Rect(100, 50, self.width - 200, self.height - 100)
         pygame.draw.rect(surface, (25, 25, 25), rect)
@@ -455,6 +456,7 @@ class Data:
         self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
 
         return
+
     def singlePlay(self):
         self.all_sprites.remove(self.player2)
 
@@ -477,16 +479,28 @@ class Data:
     def GameOverDraw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((55, 55, 55), rect)  # back
-        print self.overtime
-
         self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
     def initLevel(self):
         if other.GAMESTATE == 1:
             self.level = Level("level_01")
+            self.player2 = Player2(self.sprite_library["player2"])
+            self.player = Player(self.sprite_library["player1"])
+            self.resetLists()
+
         elif other.GAMESTATE == 2:
-            self.level =  Level("level_1", "./assets/long_levels/")
-            self.lives = 3
+            self.all_sprites.remove(self.player2)
+            self.player2 = self.emptysprite
+            self.deathwalls.empty()
+            self.wall_list.empty()
+            self.telewalls.empty()
+            self.telewalls2.empty()
+            self.all_sprites.empty()
+            self.all_sprites.add(self.player)
+            self.player.finish = self.finish
+            self.player2.finish = self.finish
+
+            self.level =  Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
         self.isLoaded = True
 
@@ -497,7 +511,6 @@ class Data:
         return
     #menu drawing
     def menuDraw(self,surface):
-
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((0, 0, 0), rect)  # back
 
@@ -507,13 +520,14 @@ class Data:
 
         r = pygame.Rect(200,400, 100,100)
         pygame.draw.rect(surface,(255,255,255),r)
-        print "EH"
 
         if ((self.mouse_position[0] <= r[0]+r[2] and self.mouse_position[0] >= r[0]) and (
                 self.mouse_position[1] <= r[1]+r[3] and self.mouse_position[1] >= r[1])):  # If mouse is in the rectangle
             pygame.draw.rect(surface, (155, 155, 155), r)
             if 1 in self.newbuttons:
                 other.GAMESTATE = 1
+                self.initLevel()
+                self.newbuttons.remove(1)
         self.drawTextLeft(surface, "Battle", (0, 0, 255), 220, 480, self.font)
 
         r = pygame.Rect(200, 200, 100, 100)
@@ -524,7 +538,12 @@ class Data:
                     1])):  # If mouse is in the rectangle
             pygame.draw.rect(surface, (155, 155, 155), r)
             if 1 in self.newbuttons:
+                print "BEGINNING STORY MODE"
                 other.GAMESTATE = 2
+                self.overtime = -1
+                self.current_level = 0
+                self.initLevel()
+                self.newbuttons.remove(1)
 
         self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
 
@@ -556,3 +575,54 @@ class Data:
         textrect.bottomright = (x, y)
         surface.blit(textobj, textrect)
         return
+
+    def resetLists(self):
+        self.deathwalls.empty()
+        self.wall_list.empty()
+        self.telewalls.empty()
+        self.telewalls2.empty()
+        self.all_sprites.empty()
+        self.players.empty()
+        self.players.add(self.player, self.player2, self.player3, self.player4)
+        for x in self.players:
+            if x != self.emptysprite:
+                print x
+                self.player.otherplayers.add(x)
+                self.player2.otherplayers.add(x)
+                if x == self.player:
+
+                    self.player.otherplayers.remove(self.player)
+                elif x == self.player2:
+
+                    self.player2.otherplayers.remove(self.player2)
+        self.all_sprites.add(self.player)
+        self.all_sprites.add(self.player2)
+        self.player.walls = self.wall_list
+        self.player2.walls = self.wall_list
+
+        self.player.deaths = self.deathwalls
+        self.player2.deaths = self.deathwalls
+
+        self.player.teles = self.telewalls
+        self.player2.teles = self.telewalls
+
+        self.player.teles2 = self.telewalls2
+        self.player2.teles2 = self.telewalls2
+
+        self.player.upwalls = self.upwalls
+        self.player2.upwalls = self.upwalls
+
+        self.player.finish = self.finish
+        self.player2.finish = self.finish
+
+        self.player.getfimage(
+            (  # self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
+                self.sprite_library["frag1_2"]
+                , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
+                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
+
+        self.player2.getfimage(
+            (  # self.sprite_library["frag1"], self.sprite_library["frag2"], self.sprite_library["frag3"],
+                self.sprite_library["frag1_2"]
+                , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
+                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))

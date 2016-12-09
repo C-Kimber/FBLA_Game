@@ -139,10 +139,6 @@ class Player(pygame.sprite.Sprite):
         if self.onGround == False:
             self.yvel-=.0066*self.mass
 
-
-
-
-
         self.boundries(highbound, lowbound, leftbound, rightbound)
         self.down = False
         return
@@ -219,8 +215,6 @@ class Player(pygame.sprite.Sprite):
     def wallCollisions(self):
 
 
-        if pygame.sprite.spritecollide(self, self.finish, False):
-            print "Win"
 
 
         if pygame.sprite.spritecollide(self, self.deaths, False):
@@ -277,7 +271,6 @@ class Player(pygame.sprite.Sprite):
 
 
         self.xvel += drag
-
 
 
 
