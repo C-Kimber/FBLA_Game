@@ -12,7 +12,7 @@ class DataD:
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
-        self.level = Level("level_1",'./assets/long_levels/')
+        self.level = Level("level_0",'./assets/long_levels/')
         #self.level = Level("level_01")
         self.num_files = len([f for f in os.listdir("./assets/levels")
                               if os.path.isfile(os.path.join("./assets/levels", f))])
@@ -44,13 +44,13 @@ class DataD:
                 block[1] = 24
 
         if pygame.K_a in keys:
-            self.cameraX += 16
+            self.cameraX += 32
         if pygame.K_d in keys:
-            self.cameraX -= 16
+            self.cameraX -= 32
         if pygame.K_w in keys:
-            self.cameraY += 16
+            self.cameraY += 32
         if pygame.K_s in keys:
-            self.cameraY -= 16
+            self.cameraY -= 32
 
         if self.cameraY > 0:
             self.cameraY = 0

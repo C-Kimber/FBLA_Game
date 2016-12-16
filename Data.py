@@ -76,6 +76,7 @@ class Data:
         self.p1vic = False
         self.p2vic = False
         self.lives = 3
+        self.alph_1 = 255
 
         self.time = 0
         self.overtime = -1
@@ -189,21 +190,21 @@ class Data:
     #wipes sprite lists, and puts in players + adding new level
 
     def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
-
+        a = 0
+        a += 1
         if self.isLoaded == False:
             self.initLevel()
             self.all_sprites.remove(self.player2)
             self.player2 = self.emptysprite
-            print "Load "
+            print "LOADING "
 
         if pygame.K_ESCAPE in newkeys:
             if other.MINISTATE == 0:
                 other.MINISTATE = 1
             elif other.MINISTATE == 1:
                 other.MINISTATE = 0
-        if other.MINISTATE == 0:
-            a = 0
-            a += 1
+        if other.MINISTATE == 0 and self.player.state == "NORMAL":
+
 
             self.camera.update(self.player)
             if self.player.alive == False:
@@ -231,17 +232,25 @@ class Data:
 
             if pygame.sprite.spritecollide(self.player, self.player.finish, False):
                 self.current_level += 1
-                self.newMainLev()
+                self.player.yvel = 10
+                self.player.xvel = 3
+                self.player.state = "WIN"
+                #
 
             self.all_sprites.update()
-            self.fragmentgroup.update(a)
 
 
 
 
+        elif self.player.state == "DYING":
+            self.player.dying(a)
+            #self.player.state = "NORMAL"
+        elif self.player.state == "WIN":
+            self.player.beatLvl(self)
 
-        if other.MINISTATE == 1:
+        elif other.MINISTATE == 1:
             return
+        self.fragmentgroup.update(a)
 
         if self.overtime > 0:
             self.overtime -= 1
@@ -316,6 +325,7 @@ class Data:
         self.telewalls.empty()
         self.telewalls2.empty()
         self.all_sprites.empty()
+        self.finish.empty()
         self.all_sprites.add(self.player)
         self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
@@ -473,12 +483,36 @@ class Data:
 
         self.drawTextLeft(surface, "Lives  " + str(self.lives), (250, 250, 250), 2, 35, self.font)
 
+        if self.player.state == "STARTING_B":
+
+            s = pygame.Surface((other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH), pygame.SRCALPHA)
+            rect = pygame.Rect(0,0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)# per-pixel alpha
+            surface.fill((self.alph_1,0, 0, self.alph_1), rect)  # notice the alpha value in the color
+            #rect.blit(surface, (0, 0))
+            self.alph_1 -= 5
+            self.camera.update(self.player)
+            if self.alph_1 <= 0:
+                self.player.state = "NORMAL"
+                self.alph_1 = 255
+        elif self.player.state == "STARTING_G":
+            rect = pygame.Rect(0,0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)# per-pixel alpha
+            surface.fill((0,self.alph_1, 0, self.alph_1), rect)  # notice the alpha value in the color
+            #rect.blit(surface, (0, 0))
+            self.alph_1 -= 5
+            self.camera.update(self.player)
+            if self.alph_1 <= 0:
+                self.player.state = "NORMAL"
+                self.alph_1 = 255
+
+
+
+
 
         #self.all_sprites.draw(surface)
 
     def GameOverDraw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((55, 55, 55), rect)  # back
+        surface.fill((0,0,0), rect)  # back
         self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
     def initLevel(self):
@@ -495,6 +529,7 @@ class Data:
             self.wall_list.empty()
             self.telewalls.empty()
             self.telewalls2.empty()
+            self.finish.empty()
             self.all_sprites.empty()
             self.all_sprites.add(self.player)
             self.player.finish = self.finish
@@ -582,6 +617,7 @@ class Data:
         self.telewalls.empty()
         self.telewalls2.empty()
         self.all_sprites.empty()
+        self.finish.empty()
         self.players.empty()
         self.players.add(self.player, self.player2, self.player3, self.player4)
         for x in self.players:

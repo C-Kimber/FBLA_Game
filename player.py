@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, image):
         pygame.sprite.Sprite.__init__(self)
 
-
+        self.state = "NORMAL" #STATE INCLUDE: NORMAL, DYING, WINNING, STARTING
         self.xvel = 0
         self.yvel = 0
 
@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.color = (255,255,255)
 
         self.image = image
+        self.imageH = image
         #self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
@@ -150,8 +151,10 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.x <= leftbound:
             self.rect.x = leftbound + 1
             self.xvel = 0
-        if self.rect.y >= lowbound:
+        if self.rect.y >= lowbound+96:
+            self.rect.y -= 3
             self.die()
+
 
             #self.yvel = 0
         elif self.rect.y <= highbound:
@@ -214,9 +217,6 @@ class Player(pygame.sprite.Sprite):
 
     def wallCollisions(self):
 
-
-
-
         if pygame.sprite.spritecollide(self, self.deaths, False):
 
             self.die()
@@ -257,9 +257,48 @@ class Player(pygame.sprite.Sprite):
     def die(self):
         for _ in range(random.randint(8,24)):
             fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
-        self.alive = False
-        self.rect.x = self.spanwx
-        self.rect.y = self.spawny
+        if other.GAMESTATE == 2:
+            self.state = "DYING"
+            self.yvel = 15
+        else:
+            self.alive = False
+            self.rect.x = self.spanwx
+            self.rect.y = self.spawny
+
+
+    def dying(self, a):
+        self.rect.y -= self.yvel
+        self.yvel -= .0066 * self.mass
+        self.image = pygame.transform.rotate(self.imageH, math.floor(self.yvel*10))
+
+        if self.rect.top > other.TOTAL_LEVEL_WIDTH+96:
+            self.alive = False
+            self.yvel = 0
+            self.xvel = 0
+            self.rect.x = self.spanwx - 256
+            self.rect.y = self.spawny
+            self.state = "STARTING_B"
+            self.image = self.imageH
+            print "PLAYER HAS DIED"
+        return
+
+    def beatLvl(self, data):
+        self.rect.y -= self.yvel
+        self.rect.x += self.xvel
+        if self.yvel <= -10:
+            self.image = pygame.transform.rotate(self.imageH, random.randrange(-45,45,15))
+            self.yvel = 10
+        self.yvel -= .0066 * self.mass
+        if self.rect.x > other.TOTAL_LEVEL_HEIGHT+32:
+            print "LEVEL COMPLETE"
+            self.yvel = 0
+            self.xvel = 0
+            self.rect.x = self.spanwx - 256
+            self.rect.y = self.spawny
+            self.state = "STARTING_G"
+            self.image = self.imageH
+            data.newMainLev()
+
 
     def applyDrag(self, medium):
         a = 0.003
