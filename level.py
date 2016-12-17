@@ -171,8 +171,8 @@ class Level():
                     thing.deathwalls.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
                     thing.all_sprites.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
                 elif y == "-":
-                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_1"]))
-                    thing.all_sprites.add(Wall(m * 32, n * 32, thing.sprite_library["wall_1"]))
+                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_5"]))
+                    thing.all_sprites.add(Wall(m * 32, n * 32, thing.sprite_library["wall_5"]))
                 elif y == "1":  # player 1 spawn
                     thing.player.spawnx = m * 32
                     thing.player.spawny = n * 32

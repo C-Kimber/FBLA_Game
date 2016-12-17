@@ -47,7 +47,7 @@ class deathWall(Wall):
         self.height = 32
 
         self.image = image
-        self.image = pygame.transform.rotate(self.image, random.randrange(0,360, 90))
+        #self.image = pygame.transform.rotate(self.image, random.randrange(0,360, 90))
 
         self.rect = self.image.get_rect()
         self.rect.y = y

@@ -265,11 +265,7 @@ class Data:
 
 
     def newLevel(self):
-        self.deathwalls.empty()
-        self.wall_list.empty()
-        self.telewalls.empty()
-        self.telewalls2.empty()
-        self.all_sprites.empty()
+        self.emptyLists()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
         n = str(random.randint(1,self.num_files-1))
@@ -320,15 +316,11 @@ class Data:
             self.level.gameLev(self)
     #draws all the stuff, also button functionality
     def newMainLev(self):
-        self.deathwalls.empty()
-        self.wall_list.empty()
-        self.telewalls.empty()
-        self.telewalls2.empty()
-        self.all_sprites.empty()
-        self.finish.empty()
+        self.emptyLists()
         self.all_sprites.add(self.player)
         self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
+        self.walldecide()
 
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
@@ -525,18 +517,14 @@ class Data:
         elif other.GAMESTATE == 2:
             self.all_sprites.remove(self.player2)
             self.player2 = self.emptysprite
-            self.deathwalls.empty()
-            self.wall_list.empty()
-            self.telewalls.empty()
-            self.telewalls2.empty()
-            self.finish.empty()
-            self.all_sprites.empty()
+            self.emptyLists()
             self.all_sprites.add(self.player)
             self.player.finish = self.finish
             self.player2.finish = self.finish
 
             self.level =  Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
+        self.walldecide()
         self.isLoaded = True
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
@@ -611,14 +599,18 @@ class Data:
         surface.blit(textobj, textrect)
         return
 
-    def resetLists(self):
+    def emptyLists(self):
         self.deathwalls.empty()
         self.wall_list.empty()
         self.telewalls.empty()
         self.telewalls2.empty()
         self.all_sprites.empty()
+        self.upwalls.empty()
         self.finish.empty()
         self.players.empty()
+
+    def resetLists(self):
+        self.emptyLists()
         self.players.add(self.player, self.player2, self.player3, self.player4)
         for x in self.players:
             if x != self.emptysprite:
@@ -662,3 +654,16 @@ class Data:
                 self.sprite_library["frag1_2"]
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
                 , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
+
+    def walldecide(self):
+        comparator = self.wall_list
+        new = pygame.sprite.Group()
+        i = 0
+        for w in self.wall_list:
+            for l in comparator:
+                if isinstance(w, wall.Wall) == True and isinstance(l, wall.Wall):
+                    self.wall_list.remove(w)
+                    if w.y-32 == l.y:
+                        w.image = self.sprite_library["wall_9"]#str(random.randint(1,9))]
+                    self.wall_list.add(w)
+
