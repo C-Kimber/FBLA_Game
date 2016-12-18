@@ -81,6 +81,7 @@ class DataD:
             self.button(mouse_position, (832 + 113, 49, 16, 16), "|")  # longwall large
             self.button(mouse_position, ((832 + 113, 67, 32, 16)),'+')
             self.button(mouse_position, ((880, 96, 32, 32)), 'E') #Finish block
+            self.button(mouse_position, ((880, 160, 32, 32)), 'b')  # Finish block
             if mouse_position[0] > 0 and mouse_position[0] < 800:
                 self.level.write(block,self.selected)
 
@@ -170,7 +171,7 @@ class DataD:
         pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.width - 70, self.height - 37, 32, 32), 4)  # clear
 
         pygame.draw.rect(surface, (0, 255, 155), pygame.Rect(880, 96, 32, 32)) # finish
-
+        pygame.draw.rect(surface, (255, 185, 55), pygame.Rect(880, 160, 32, 32)) # enemy
 
         self.drawTextLeft(surface, "Level "+ str(self.l), (55,0,55), 832, 35, self.font)
 
@@ -228,7 +229,9 @@ class DataD:
                     pygame.draw.rect(surface, (55, 55, 55), pygame.Rect(self.b[1] *32+self.cameraX, self.b[0] *32+self.cameraY, 32, 32), 3)
                 elif self.selected == "E":
                     pygame.draw.rect(surface, (0, 255, 155), (self.b[1] *32+self.cameraX, self.b[0] *32+self.cameraY, 32, 32))
-
+                elif self.selected == "b":
+                    pygame.draw.rect(surface, (255, 185, 55),
+                                     (self.b[1] * 32 + self.cameraX, self.b[0] * 32 + self.cameraY, 32, 32))
 
         return
 

@@ -283,13 +283,11 @@ class Player(pygame.sprite.Sprite):
         return
 
     def beatLvl(self, data):
-        self.rect.y -= self.yvel
+        self.rect.y += self.yvel
         self.rect.x += self.xvel
-        if self.yvel <= -10:
-            self.image = pygame.transform.rotate(self.imageH, random.randrange(-45,45,15))
-            self.yvel = 10
         self.yvel -= .0066 * self.mass
-        if self.rect.x > other.TOTAL_LEVEL_HEIGHT+32:
+        self.image = pygame.transform.rotozoom(self.image, math.floor(self.yvel*.25), .97)
+        if self.yvel < -30:
             print "LEVEL COMPLETE"
             self.yvel = 0
             self.xvel = 0

@@ -1,5 +1,6 @@
 from player import *
 import wall
+from enemy import Base
 from fragment import *
 import fragment
 import other
@@ -47,12 +48,14 @@ class Data:
 
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
+        self.allwalls = pygame.sprite.Group()
         self.deathwalls =pygame.sprite.Group()
         self.telewalls = pygame.sprite.Group()
         self.telewalls2 = pygame.sprite.Group()
         self.upwalls = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.finish = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -61,9 +64,6 @@ class Data:
         self.players.add(self.player, self.player2, self.player3, self.player4)
 
         self.resetLists()
-
-
-
 
         self.mouse_position = [0,0]
 
@@ -191,6 +191,7 @@ class Data:
 
     def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         a = 0
+
         a += 1
         if self.isLoaded == False:
             self.initLevel()
@@ -204,6 +205,8 @@ class Data:
             elif other.MINISTATE == 1:
                 other.MINISTATE = 0
         if other.MINISTATE == 0 and self.player.state == "NORMAL":
+
+
 
 
             self.camera.update(self.player)
@@ -230,6 +233,9 @@ class Data:
             elif pygame.K_d in keys:
                 self.player.moveRight()
 
+            if pygame.K_3 in newkeys:
+                self.all_sprites.add(Base((self.player.rect.x, self.player.rect.y)))
+
             if pygame.sprite.spritecollide(self.player, self.player.finish, False):
                 self.current_level += 1
                 self.player.yvel = 10
@@ -237,7 +243,26 @@ class Data:
                 self.player.state = "WIN"
                 #
 
+            live_e = []
+            for e in self.all_sprites:
+                if hasattr(e, 'alive'):
+
+                    if e.alive:
+
+                        live_e.append(e)
+                    else:
+                        print "Enemy Killed"
+                        self.all_sprites.remove(e)
+                else:
+                    live_e.append(e)
+            self.enemies.add(live_e)
+            self.all_sprites.add(live_e)
+
+
+
+
             self.all_sprites.update()
+
 
 
 
@@ -321,6 +346,7 @@ class Data:
         self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
         self.walldecide()
+
 
     def draw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
@@ -459,16 +485,18 @@ class Data:
 
         return
 
-    def singlePlay(self):
-        self.all_sprites.remove(self.player2)
-
     #menu activity
     def mainDraw(self, surface):
 
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((55, 55, 255), rect)  # back
+
+
         for e in self.all_sprites:
             surface.blit(e.image, self.camera.apply(e))
+        for w in self.wall_list:
+            surface.blit(w.image, self.camera.apply(w))
+
 
         if other.MINISTATE ==1:
             self.pauseMenu(surface)
@@ -608,6 +636,8 @@ class Data:
         self.upwalls.empty()
         self.finish.empty()
         self.players.empty()
+        self.enemies.empty()
+        self.allwalls.empty()
 
     def resetLists(self):
         self.emptyLists()
@@ -625,8 +655,11 @@ class Data:
                     self.player2.otherplayers.remove(self.player2)
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        self.player.walls = self.wall_list
-        self.player2.walls = self.wall_list
+        self.allwalls.add(self.wall_list)
+        self.player.walls = self.allwalls
+        self.player2.walls = self.allwalls
+        for e in self.enemies:
+            e.walls = self.allwalls
 
         self.player.deaths = self.deathwalls
         self.player2.deaths = self.deathwalls
@@ -658,12 +691,46 @@ class Data:
     def walldecide(self):
         comparator = self.wall_list
         new = pygame.sprite.Group()
-        i = 0
+        i = 1
         for w in self.wall_list:
             for l in comparator:
-                if isinstance(w, wall.Wall) == True and isinstance(l, wall.Wall):
+                if isinstance(w, wall.Wall) == True and isinstance(l, wall.Wall) == True:
                     self.wall_list.remove(w)
-                    if w.y-32 == l.y:
-                        w.image = self.sprite_library["wall_9"]#str(random.randint(1,9))]
+
+
+                    if w.y-32 == l.y: #above
+                        if w.y + 32 == l.y:
+                            i = 5
+                        i = 8
+                        #w.image = self.sprite_library["wall_5"]#str(random.randint(1,9))]
+
+                    elif w.y + 32 == l.y:#below
+                        if w.y - 32 == l.y:
+                            i = 5
+                        else:
+                            i = 2
+
+                    elif w.x - 32 == l.x:#Left
+                        if w.y -32 == l.y:#above
+                            i= 6
+                        if w.y + 32 == l.y:  # Below
+                                i = 3
+
+                    elif w.x + 32 == l.x:  # Right
+                        if w.y - 32 == l.y:  # above
+                            i = 6
+                        if w.y + 32 == l.y:#Below
+                            i = 3
+
+                    w.image = self.sprite_library["wall_"+str(i)]
+
+
                     self.wall_list.add(w)
+                else:
+                    print "not Wall object"
+        self.allwalls.add(self.wall_list)
+        #m = self.allwalls + self.wall_list
+        #print m
+        #self.player.walls = m
+        print "TILES DONE TEXTURING"
 

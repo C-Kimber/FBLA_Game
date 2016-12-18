@@ -3,7 +3,7 @@ import os
 
 import sys
 from wall import *
-
+from enemy import *
 import other
 
 
@@ -143,6 +143,9 @@ class Level():
                 elif y == 'E':
                     r = pygame.Rect((m * multi)  + camx, (n * multi)  + camy, 32, 32)
                     pygame.draw.rect(surface, (0, 255, 155), r)
+                elif y == "b":
+                    r = pygame.Rect((m * multi) + camx, (n * multi) + camy, 32, 32)
+                    pygame.draw.rect(surface, (255, 185, 55), r)
                 else:#empty
                     l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
@@ -171,8 +174,7 @@ class Level():
                     thing.deathwalls.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
                     thing.all_sprites.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
                 elif y == "-":
-                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_5"]))
-                    thing.all_sprites.add(Wall(m * 32, n * 32, thing.sprite_library["wall_5"]))
+                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_2"]))
                 elif y == "1":  # player 1 spawn
                     thing.player.spawnx = m * 32
                     thing.player.spawny = n * 32
@@ -185,23 +187,23 @@ class Level():
                     thing.player2.rect.y = n * 32
 
                 elif y == "_":  # long walls
-                    thing.wall_list.add(longWall(m*32, n*32, 512))
+                    thing.allwalls.add(longWall(m*32, n*32, 512))
                     thing.all_sprites.add(longWall(m*32, n*32, 512))
                 elif y == "[":  # medium walls
-                    thing.wall_list.add(longWall(m * 32, n * 32, 256))
+                    thing.allwalls.add(longWall(m * 32, n * 32, 256))
                     thing.all_sprites.add(longWall(m * 32, n * 32, 256))
 
                 elif y == "=":  # small walls
-                    thing.wall_list.add(longWall(m * 32, n * 32, 128))
+                    thing.allwalls.add(longWall(m * 32, n * 32, 128))
                     thing.all_sprites.add(longWall(m * 32, n * 32, 128))
                 elif y == "|":  # Tall wall
-                    thing.wall_list.add(Pillar(m * 32, n * 32, 512))
+                    thing.allwalls.add(Pillar(m * 32, n * 32, 512))
                     thing.all_sprites.add(Pillar(m * 32, n * 32, 512))
                 elif y == "/":  # Tall wall mid
-                    thing.wall_list.add(Pillar(m * 32, n * 32, 256))
+                    thing.allwalls.add(Pillar(m * 32, n * 32, 256))
                     thing.all_sprites.add(Pillar(m * 32, n * 32, 256))
                 elif y == ";":  # Tall wall small
-                    thing.wall_list.add(Pillar(m * 32, n * 32, 128))
+                    thing.allwalls.add(Pillar(m * 32, n * 32, 128))
                     thing.all_sprites.add(Pillar(m * 32, n * 32, 128))
                 elif y == "+":
                     thing.upwalls.add(upWall(m*32, n*32, thing.sprite_library["up_wall"]))
@@ -216,6 +218,11 @@ class Level():
                 elif y == 'E':
                     thing.finish.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
                     thing.all_sprites.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
+                    
+                elif y == "b":
+                    thing.enemies.add(Base((m * 32, n * 32),thing.sprite_library["frag1"]))
+                    thing.all_sprites.add(Base((m * 32, n * 32),thing.sprite_library["frag1"]))
+
 
                 """elif y == "3":  # player 3 spawn
                     thing.player.x = m * 32
