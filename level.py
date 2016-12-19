@@ -208,7 +208,6 @@ class Level():
                 elif y == "+":
                     thing.upwalls.add(upWall(m*32, n*32, thing.sprite_library["up_wall"]))
                     thing.all_sprites.add(upWall(m * 32, n * 32, thing.sprite_library["up_wall"]))
-
                 elif y == "T":  # Tele walls
                     thing.telewalls.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
                     thing.all_sprites.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
@@ -220,8 +219,8 @@ class Level():
                     thing.all_sprites.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
                     
                 elif y == "b":
-                    thing.enemies.add(Base((m * 32, n * 32),thing.sprite_library["frag1"]))
-                    thing.all_sprites.add(Base((m * 32, n * 32),thing.sprite_library["frag1"]))
+                    thing.enemies.add(Base((m * 32, n * 32),thing.sprite_library["enemy"]))
+                    thing.all_sprites.add(Base((m * 32, n * 32),thing.sprite_library["enemy"]))
 
 
                 """elif y == "3":  # player 3 spawn

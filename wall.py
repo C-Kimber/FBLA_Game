@@ -25,12 +25,12 @@ class Wall(pygame.sprite.Sprite):
 class longWall(pygame.sprite.Sprite):
     def __init__(self, x, y, width=512):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/images/wall1_small_long.png')
+        ss = spritesheet.spritesheet('./assets/images/FallenPillar.png')
 
         self.width = width
         self.height = 32
 
-        self.image = ss.image_at((0, 0, self.width, 32), (255, 255, 255)).convert_alpha()
+        self.image = ss.image_at((0, 0, self.width, 32), (254, 254, 254)).convert_alpha()
 
         self.rect = self.image.get_rect()
         self.rect.y = y
@@ -125,14 +125,14 @@ class upWall(Wall):
 class Pillar(Wall):
     def __init__(self,x,y,height=512):
         pygame.sprite.Sprite.__init__(self)
-        ss = spritesheet.spritesheet('./assets/images/wall1_small_tall.png')
+        ss = spritesheet.spritesheet('./assets/images/Pillar.png')
 
         self.x = x
         self.y = y
         self.width = 30
         self.height = 30
 
-        self.image = ss.image_at((0, 0, 32, height), (255, 255, 255)).convert_alpha()
+        self.image = ss.image_at((0, 0, 32, height), (254, 254, 254)).convert_alpha()
         # self.image.fill((255,255,0))
 
         self.rect = self.image.get_rect()

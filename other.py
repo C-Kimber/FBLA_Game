@@ -28,7 +28,7 @@ def load_images():
         "frag3_1": spritesheet.spritesheet('./assets/images/frag_3_1.png').image_at((0, 0, 32, 32),(0, 0, 0,)).convert_alpha(),  # 6
         "frag2_2":spritesheet.spritesheet('./assets/images/frag_2_2.png').image_at((0, 0, 16, 16),      (0, 0, 0,)).convert_alpha(),#%
         "frag3_2":spritesheet.spritesheet('./assets/images/frag_3_2.png').image_at((0, 0, 16, 16),    (0, 0, 0,)).convert_alpha(),#6
-        "player1":spritesheet.spritesheet('./assets/images/Player1_small.png').image_at((0, 0, 32, 32),  (255, 255, 255)).convert_alpha(),#8
+        "player1":spritesheet.spritesheet('./assets/images/Player1.png').image_at((0, 0, 32, 32),  (254, 254, 254)).convert_alpha(),#8
         "player2":spritesheet.spritesheet('./assets/images/Player2_small.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#9
         "wall_1":spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32*0, 32*0, 32, 32),(255, 255, 255)).convert_alpha(),#10
         "wall_2": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 1, 32 * 0, 32, 32),(255, 255, 255)).convert_alpha(),
@@ -41,12 +41,22 @@ def load_images():
         "wall_9": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 2, 32 * 2, 32, 32),(255, 255, 255)).convert_alpha(),
 
         "wall_1_tall": spritesheet.spritesheet('./assets/images/wall1_small_tall.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#11
-        "wall_1_long": spritesheet.spritesheet('./assets/images/wall1_small_long.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#12
+        "wall_1_long": spritesheet.spritesheet('./assets/images/fallenPillar.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#12
         "up_wall": spritesheet.spritesheet('./assets/images/upwall.png').image_at((0, 0, 32, 32), (254, 254, 254)).convert_alpha(),#13
         "t_wall_1": spritesheet.spritesheet('./assets/images/telewall_sheet.png').image_at((0, 0, 32, 32),(255,255, 255)).convert_alpha(),#14
         "t_wall_2": spritesheet.spritesheet('./assets/images/telewall2_sheet.png').image_at((0, 0, 32, 32), (255, 255,255)).convert_alpha(),#15
         "lava": spritesheet.spritesheet('./assets/images/lava.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#16
         "finish": spritesheet.spritesheet('./assets/images/finish.png').image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha(),
+        "enemy": spritesheet.spritesheet('./assets/images/enemy.png').image_at((0, 0, 32, 32),(254, 254, 254)).convert_alpha(),
     }
     return images
+
+
+def unitNum(value):
+    if value > 0:
+        return 1
+    elif value < 0:
+        return -1
+    else:
+        return 0
 

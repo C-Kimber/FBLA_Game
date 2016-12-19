@@ -1,6 +1,7 @@
 from player import *
 import wall
 from enemy import Base
+import enemy
 from fragment import *
 import fragment
 import other
@@ -43,8 +44,6 @@ class Data:
         self.player2 = Player2(self.sprite_library["player2"])
         self.player3 = self.emptysprite
         self.player4 = self.emptysprite
-
-
 
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
@@ -98,10 +97,6 @@ class Data:
 
         if self.isLoaded == False:
             self.initLevel()
-
-
-
-
 
         if pygame.K_ESCAPE in newkeys:
             if  other.MINISTATE == 0:
@@ -251,7 +246,6 @@ class Data:
 
                         live_e.append(e)
                     else:
-                        print "Enemy Killed"
                         self.all_sprites.remove(e)
                 else:
                     live_e.append(e)
@@ -346,6 +340,10 @@ class Data:
         self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
         self.level.gameLev(self)
         self.walldecide()
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
 
 
     def draw(self, surface):
@@ -513,6 +511,15 @@ class Data:
             self.camera.update(self.player)
             if self.alph_1 <= 0:
                 self.player.state = "NORMAL"
+                self.emptyLists()
+                self.level.gameLev(self)
+                self.allwalls.add(self.wall_list)
+                self.all_sprites.add(self.player)
+                for e in self.all_sprites:
+                    if isinstance(e, enemy.Base) == True:
+                        e.walls = self.allwalls
+                        e.deaths = self.deathwalls
+                        e.player = self.player
                 self.alph_1 = 255
         elif self.player.state == "STARTING_G":
             rect = pygame.Rect(0,0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)# per-pixel alpha
@@ -536,6 +543,7 @@ class Data:
         self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
     def initLevel(self):
+
         if other.GAMESTATE == 1:
             self.level = Level("level_01")
             self.player2 = Player2(self.sprite_library["player2"])
@@ -554,6 +562,12 @@ class Data:
         self.level.gameLev(self)
         self.walldecide()
         self.isLoaded = True
+
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+                e.player = self.player
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
@@ -642,6 +656,7 @@ class Data:
     def resetLists(self):
         self.emptyLists()
         self.players.add(self.player, self.player2, self.player3, self.player4)
+        self.allwalls.add(self.wall_list)
         for x in self.players:
             if x != self.emptysprite:
                 print x
@@ -653,13 +668,18 @@ class Data:
                 elif x == self.player2:
 
                     self.player2.otherplayers.remove(self.player2)
+        for e in self.all_sprites:
+            print self.allwalls
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.player = self.player
+
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        self.allwalls.add(self.wall_list)
+
         self.player.walls = self.allwalls
         self.player2.walls = self.allwalls
-        for e in self.enemies:
-            e.walls = self.allwalls
+
 
         self.player.deaths = self.deathwalls
         self.player2.deaths = self.deathwalls

@@ -30,10 +30,10 @@ class Player(pygame.sprite.Sprite):
         #self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
-        self.spanwx = 400
-        self.spawny = 400
+        self.spawnx = 1000
+        self.spawny = 50
         self.rect.y = self.spawny
-        self.rect.x = self.spanwx
+        self.rect.x = self.spawnx
 
         self.walls = None
         self.deaths = None
@@ -262,7 +262,7 @@ class Player(pygame.sprite.Sprite):
             self.yvel = 15
         else:
             self.alive = False
-            self.rect.x = self.spanwx
+            self.rect.x = self.spawnx
             self.rect.y = self.spawny
 
 
@@ -275,7 +275,7 @@ class Player(pygame.sprite.Sprite):
             self.alive = False
             self.yvel = 0
             self.xvel = 0
-            self.rect.x = self.spanwx - 256
+            self.rect.x = self.spawnx
             self.rect.y = self.spawny
             self.state = "STARTING_B"
             self.image = self.imageH
@@ -291,7 +291,7 @@ class Player(pygame.sprite.Sprite):
             print "LEVEL COMPLETE"
             self.yvel = 0
             self.xvel = 0
-            self.rect.x = self.spanwx - 256
+            self.rect.x = self.spawnx
             self.rect.y = self.spawny
             self.state = "STARTING_G"
             self.image = self.imageH
