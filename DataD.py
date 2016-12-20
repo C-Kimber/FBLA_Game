@@ -12,6 +12,7 @@ class DataD:
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
+        self.sprite_library = other.load_images()
         self.level = Level("level_0",'./assets/long_levels/')
         #self.level = Level("level_01")
         self.num_files = len([f for f in os.listdir("./assets/levels")
