@@ -72,7 +72,7 @@ class Level():
         txt.close()
         return
 
-    def display(self, surface, data):
+    def display(self, surface, data, imgs):
         txt = open(self.file)
         camx, camy = data
 
@@ -94,8 +94,7 @@ class Level():
                     pygame.draw.rect(surface, (255, 255, 0), r)
 
                 elif y == "-":# one unit walls
-                    r = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
-                    pygame.draw.rect(surface, (155, 155, 155), r)
+                    surface.blit(imgs["wall"], pygame.Rect(m * multi+camx, n * multi+camy, multi, multi))
                 elif y == "_":#long walls
                     r = pygame.Rect(m * multi+camx, n * multi+camy, 16*multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
