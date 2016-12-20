@@ -90,6 +90,13 @@ class DataD:
             self.level.clear()
         elif 3 in buttons :
             self.level.write(block)
+            
+        if pygame.K_SHIFT in keys: #Scrolling the side bar
+            if self.mp[0] > 640:
+                if self.mp[1] >= self.height/2:
+                    print "Scroll down"
+                elif self.mp[1] < self.height/2:
+                    print "Scroll Up"
 
 
 
@@ -140,7 +147,7 @@ class DataD:
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((255, 255, 255), rect)  # back
 
-        self.level.display(surface,(self.cameraX,self.cameraY))
+        self.level.display(surface,(self.cameraX,self.cameraY),self.sprite_library)
 
 
         r = pygame.Rect(800,0,180, 640)
