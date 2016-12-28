@@ -54,6 +54,7 @@ class Data:
         self.upwalls = pygame.sprite.Group()
         self.players = pygame.sprite.Group()
         self.finish = pygame.sprite.Group()
+        self.hitwalls = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
@@ -283,67 +284,7 @@ class Data:
                 self.overtime = 60
 
 
-    def newLevel(self):
-        self.emptyLists()
-        self.all_sprites.add(self.player)
-        self.all_sprites.add(self.player2)
-        n = str(random.randint(1,self.num_files-1))
-        self.level = Level("level_0"+n)
 
-    #end of a single battle
-    def endRound(self,surface):
-        if self.player.alive and not self.player2.alive:
-            self.diedfirst = 2
-        elif self.player2.alive and not self.player.alive:
-            self.diedfirst = 1
-        else:
-            self.diedfirst = 0
-            self.newRound()
-
-        if self.diedfirst == 1:
-            self.p2score +=1
-            self.p2win = 60
-        elif self.diedfirst == 2:
-            self.p1score +=1
-            self.p1win = 60
-        else:
-            return
-
-
-        self.diedfirst = 0
-        wall.clearwalls(self)
-        wall.cleartel(self)
-        self.newRound()
-
-        return
-    #begins new battle
-    def newRound(self):
-            self.newLevel()
-            self.player.xvel = 0
-            self.player.yvel = 0
-            self.player.jumps = 1
-            self.player.alive = True
-
-
-            self.player2.xvel = 0
-            self.player2.yvel = 0
-            self.player2.jumps = 1
-            self.player2.alive = True
-
-            self.time = 60
-
-            self.level.gameLev(self)
-    #draws all the stuff, also button functionality
-    def newMainLev(self):
-        self.emptyLists()
-        self.all_sprites.add(self.player)
-        self.level = Level("level_"+str(self.current_level), "./assets/long_levels/")
-        self.level.gameLev(self)
-        self.walldecide()
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
-                e.deaths = self.deathwalls
 
 
     def draw(self, surface):
@@ -492,7 +433,8 @@ class Data:
 
         for e in self.all_sprites:
             surface.blit(e.image, self.camera.apply(e))
-        for w in self.wall_list:
+
+        for w in self.allwalls:
             surface.blit(w.image, self.camera.apply(w))
 
 
@@ -542,32 +484,7 @@ class Data:
         surface.fill((0,0,0), rect)  # back
         self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
-    def initLevel(self):
 
-        if other.GAMESTATE == 1:
-            self.level = Level("level_01")
-            self.player2 = Player2(self.sprite_library["player2"])
-            self.player = Player(self.sprite_library["player1"])
-            self.resetLists()
-
-        elif other.GAMESTATE == 2:
-            self.all_sprites.remove(self.player2)
-            self.player2 = self.emptysprite
-            self.emptyLists()
-            self.all_sprites.add(self.player)
-            self.player.finish = self.finish
-            self.player2.finish = self.finish
-
-            self.level =  Level("level_"+str(self.current_level), "./assets/long_levels/")
-        self.level.gameLev(self)
-        self.walldecide()
-        self.isLoaded = True
-
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
-                e.deaths = self.deathwalls
-                e.player = self.player
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
@@ -641,6 +558,114 @@ class Data:
         surface.blit(textobj, textrect)
         return
 
+    def initLevel(self):
+
+        if other.GAMESTATE == 1:
+            self.level = Level("level_01")
+            self.player2 = Player2(self.sprite_library["player2"])
+            self.player = Player(self.sprite_library["player1"])
+            self.resetLists()
+
+        elif other.GAMESTATE == 2:
+            self.all_sprites.remove(self.player2)
+            self.player2 = self.emptysprite
+            self.emptyLists()
+            self.all_sprites.add(self.player)
+            self.player.finish = self.finish
+            self.player2.finish = self.finish
+
+            self.level = Level("level_" + str(self.current_level), "./assets/long_levels/")
+        self.player.state = "NORMAL"
+        self.emptyLists()
+        self.level.gameLev(self)
+        self.allwalls.add(self.wall_list)
+        self.all_sprites.add(self.player)
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+                e.player = self.player
+        #self.walldecide()
+        self.isLoaded = True
+
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+                e.player = self.player
+
+
+    def newLevel(self):
+        self.emptyLists()
+        self.all_sprites.add(self.player)
+        self.all_sprites.add(self.player2)
+        n = str(random.randint(1, self.num_files - 1))
+        self.level = Level("level_0" + n)
+
+    # end of a single battle
+    def endRound(self, surface):
+        if self.player.alive and not self.player2.alive:
+            self.diedfirst = 2
+        elif self.player2.alive and not self.player.alive:
+            self.diedfirst = 1
+        else:
+            self.diedfirst = 0
+            self.newRound()
+
+        if self.diedfirst == 1:
+            self.p2score += 1
+            self.p2win = 60
+        elif self.diedfirst == 2:
+            self.p1score += 1
+            self.p1win = 60
+        else:
+            return
+
+        self.diedfirst = 0
+        wall.clearwalls(self)
+        wall.cleartel(self)
+        self.newRound()
+
+        return
+
+    # begins new battle
+    def newRound(self):
+        self.newLevel()
+        self.player.xvel = 0
+        self.player.yvel = 0
+        self.player.jumps = 1
+        self.player.alive = True
+
+        self.player2.xvel = 0
+        self.player2.yvel = 0
+        self.player2.jumps = 1
+        self.player2.alive = True
+
+        self.time = 60
+
+        self.level.gameLev(self)
+
+    # draws all the stuff, also button functionality
+    def newMainLev(self):
+        self.emptyLists()
+        self.all_sprites.add(self.player)
+        self.level = Level("level_" + str(self.current_level), "./assets/long_levels/")
+        self.player.state = "NORMAL"
+        self.emptyLists()
+        self.level.gameLev(self)
+        self.allwalls.add(self.wall_list)
+        self.all_sprites.add(self.player)
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+                e.player = self.player
+        #self.walldecide()
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+
     def emptyLists(self):
         self.deathwalls.empty()
         self.wall_list.empty()
@@ -651,11 +676,13 @@ class Data:
         self.finish.empty()
         self.players.empty()
         self.enemies.empty()
+        self.hitwalls.empty()
         self.allwalls.empty()
 
     def resetLists(self):
         self.emptyLists()
         self.players.add(self.player, self.player2, self.player3, self.player4)
+        self.allwalls.add(self.hitwalls)
         self.allwalls.add(self.wall_list)
         for x in self.players:
             if x != self.emptysprite:
@@ -669,7 +696,6 @@ class Data:
 
                     self.player2.otherplayers.remove(self.player2)
         for e in self.all_sprites:
-            print self.allwalls
             if isinstance(e, enemy.Base) == True:
                 e.walls = self.allwalls
                 e.player = self.player
@@ -707,50 +733,4 @@ class Data:
                 self.sprite_library["frag1_2"]
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
                 , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
-
-    def walldecide(self):
-        comparator = self.wall_list
-        new = pygame.sprite.Group()
-        i = 1
-        for w in self.wall_list:
-            for l in comparator:
-                if isinstance(w, wall.Wall) == True and isinstance(l, wall.Wall) == True:
-                    self.wall_list.remove(w)
-
-
-                    if w.y-32 == l.y: #above
-                        if w.y + 32 == l.y:
-                            i = 5
-                        i = 8
-                        #w.image = self.sprite_library["wall_5"]#str(random.randint(1,9))]
-
-                    elif w.y + 32 == l.y:#below
-                        if w.y - 32 == l.y:
-                            i = 5
-                        else:
-                            i = 2
-
-                    elif w.x - 32 == l.x:#Left
-                        if w.y -32 == l.y:#above
-                            i= 6
-                        if w.y + 32 == l.y:  # Below
-                                i = 3
-
-                    elif w.x + 32 == l.x:  # Right
-                        if w.y - 32 == l.y:  # above
-                            i = 6
-                        if w.y + 32 == l.y:#Below
-                            i = 3
-
-                    w.image = self.sprite_library["wall_"+str(i)]
-
-
-                    self.wall_list.add(w)
-                else:
-                    print "not Wall object"
-        self.allwalls.add(self.wall_list)
-        #m = self.allwalls + self.wall_list
-        #print m
-        #self.player.walls = m
-        print "TILES DONE TEXTURING"
 

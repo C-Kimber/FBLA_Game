@@ -145,6 +145,9 @@ class Level():
                 elif y == "b":
                     r = pygame.Rect((m * multi) + camx, (n * multi) + camy, 32, 32)
                     pygame.draw.rect(surface, (255, 185, 55), r)
+                elif y == "h":
+                    r = pygame.Rect((m * multi) + camx, (n * multi) + camy, 32, 32)
+                    pygame.draw.rect(surface, (155, 155, 55), r)
                 else:#empty
                     l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
                     pygame.draw.rect(surface, (0, 0, 0), l, 1)
@@ -165,61 +168,13 @@ class Level():
         txt = open(self.file)
         n = -1
         m = -1
+        self.connectTextures(thing, txt)
         for x in txt:
             n += 1
             for y in x:
                 m += 1
-                if y == "X" or y == "x":
-                    thing.deathwalls.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
-                    thing.all_sprites.add(deathWall(m*32, n*32, thing.sprite_library["lava"]))
-                elif y == "-":
-                    thing.wall_list.add(Wall(m * 32, n * 32, thing.sprite_library["wall_2"]))
-                elif y == "1":  # player 1 spawn
-                    thing.player.spawnx = m * 32
-                    thing.player.spawny = n * 32
-                    thing.player.rect.x = m* 32
-                    thing.player.rect.y = n*32
-                elif y == "2":  # player 2 spawn
-                    thing.player2.spawnx = m * 32
-                    thing.player2.spawny = n * 32
-                    thing.player2.rect.x = m * 32
-                    thing.player2.rect.y = n * 32
 
-                elif y == "_":  # long walls
-                    thing.allwalls.add(longWall(m*32, n*32, 512))
-                    thing.all_sprites.add(longWall(m*32, n*32, 512))
-                elif y == "[":  # medium walls
-                    thing.allwalls.add(longWall(m * 32, n * 32, 256))
-                    thing.all_sprites.add(longWall(m * 32, n * 32, 256))
-
-                elif y == "=":  # small walls
-                    thing.allwalls.add(longWall(m * 32, n * 32, 128))
-                    thing.all_sprites.add(longWall(m * 32, n * 32, 128))
-                elif y == "|":  # Tall wall
-                    thing.allwalls.add(Pillar(m * 32, n * 32, 512))
-                    thing.all_sprites.add(Pillar(m * 32, n * 32, 512))
-                elif y == "/":  # Tall wall mid
-                    thing.allwalls.add(Pillar(m * 32, n * 32, 256))
-                    thing.all_sprites.add(Pillar(m * 32, n * 32, 256))
-                elif y == ";":  # Tall wall small
-                    thing.allwalls.add(Pillar(m * 32, n * 32, 128))
-                    thing.all_sprites.add(Pillar(m * 32, n * 32, 128))
-                elif y == "+":
-                    thing.upwalls.add(upWall(m*32, n*32, thing.sprite_library["up_wall"]))
-                    thing.all_sprites.add(upWall(m * 32, n * 32, thing.sprite_library["up_wall"]))
-                elif y == "T":  # Tele walls
-                    thing.telewalls.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
-                    thing.all_sprites.add(teleWall(m * 32, n * 32, thing.sprite_library["t_wall_1"]))
-                elif y == "t": #Tele Walls group 2
-                    thing. telewalls2.add(teleWall2(m*32, n*32, thing.sprite_library["t_wall_2"]))
-                    thing.all_sprites.add(teleWall2(m * 32, n * 32, thing.sprite_library["t_wall_2"]))
-                elif y == 'E':
-                    thing.finish.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
-                    thing.all_sprites.add(Finish(m * 32, n * 32, thing.sprite_library["finish"]))
-                    
-                elif y == "b":
-                    thing.enemies.add(Base((m * 32, n * 32),thing.sprite_library["enemy"]))
-                    thing.all_sprites.add(Base((m * 32, n * 32),thing.sprite_library["enemy"]))
+                
 
 
                 """elif y == "3":  # player 3 spawn
@@ -232,7 +187,213 @@ class Level():
 
 
             self.levelSize= n,m
-            other.TOTAL_LEVEL_WIDTH = n * 32
-            other.TOTAL_LEVEL_HEIGHT = m * 32
+            #other.TOTAL_LEVEL_WIDTH = n * 32
+            #other.TOTAL_LEVEL_HEIGHT = m * 32
             #print other.TOTAL_LEVEL_WIDTH
             m = -1
+
+
+
+    def connectTextures(self,data, txt):
+        txt = txt
+        text = []
+        col = []
+        for x in txt:  # Rows
+            for y in x:  # Collums
+                if y == "\n":
+                    continue
+                col.append(y)
+            text.append(col)
+            col = []
+            # print text
+        m = 0
+        n = 0
+        for y in text:
+            for x in y:
+
+                if m - 1 >= 0 and m + 1 <= 38:
+                    if n - 1 >= 0 and n + 1 < 120:  #
+                        cur = y[n]  # current AKA Middle
+                        left = y[n - 1]
+                        right = y[n + 1]
+                        top = text[m - 1][n]
+                        bot = text[m + 1][n]
+
+                        if cur == "-":
+
+                            if left == "-":
+                                if right == "-":
+                                    if bot == "-":
+                                        if top == "-":
+                                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_5"]))
+                                        else:
+                                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                    elif top == "-":
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                                    else:
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                elif top == "-":
+                                    if bot == "-":
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_6"]))
+                                    else:
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_9"]))
+                                elif bot == "-":
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_3"]))
+                                else:
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_3"]))
+                                    # elif:
+                            elif right == "-":  # NO LEFT
+                                if top == '-':
+                                    if bot == "-":
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_4"]))
+                                    else:
+                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_7"]))
+                                elif bot == "-":
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_1"]))
+                                else:
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_1"]))
+                            elif top == "-":  # NO LEFT OR RIGHT
+                                if bot == "-":
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_5"]))
+                                else:
+                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                            elif bot == "-":  # NO LEFT, RIGHT, OR UP
+                                data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+
+                            else:
+                                data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+
+                        if x == "1":  # player 1 spawn
+                            data.player.spawnx = n * 32
+                            data.player.spawny = m * 32
+                            data.player.rect.x = n * 32
+                            data.player.rect.y = m * 32
+                        if x == "X" or x == "x":
+                            print "don deaths"
+                            data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                            data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                            # elif x == "-":
+
+                            # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                        elif x == "1":  # player 1 spawn
+                            data.player.spawnx = n * 32
+                            data.player.spawny = m * 32
+                            data.player.rect.x = n * 32
+                            data.player.rect.x = m * 32
+                        elif x == "2":  # player 2 spawn
+                            data.player2.spawnx = n * 32
+                            data.player2.spawny = m * 32
+                            data.player2.rect.x = n * 32
+                            data.player2.rect.x = m * 32
+
+                        elif x == "_":  # long walls
+                            data.allwalls.add(longWall(n * 32, m * 32, 512))
+                            data.all_sprites.add(longWall(n * 32, m * 32, 512))
+                        elif x == "[":  # medium walls
+                            data.allwalls.add(longWall(n * 32, m * 32, 256))
+                            data.all_sprites.add(longWall(n * 32, m * 32, 256))
+
+                        elif x == "=":  # small walls
+                            data.allwalls.add(longWall(n * 32, m * 32, 128))
+                            data.all_sprites.add(longWall(n * 32, m * 32, 128))
+                        elif x == "|":  # Tall wall
+                            data.allwalls.add(Pillar(n * 32, m * 32, 512))
+                            data.all_sprites.add(Pillar(n * 32, m * 32, 512))
+                        elif x == "/":  # Tall wall mid
+                            data.allwalls.add(Pillar(n * 32, m * 32, 256))
+                            data.all_sprites.add(Pillar(n * 32, m * 32, 256))
+                        elif x == ";":  # Tall wall small
+                            data.allwalls.add(Pillar(n * 32, m * 32, 128))
+                            data.all_sprites.add(Pillar(n * 32, m * 32, 128))
+                        elif x == "+":
+                            data.upwalls.add(upWall(n * 32, m * 32, data.sprite_library["up_wall"]))
+                            data.all_sprites.add(upWall(n * 32, m * 32, data.sprite_library["up_wall"]))
+                        elif x == "T":  # Tele walls
+                            data.telewalls.add(teleWall(n * 32, m * 32, data.sprite_library["t_wall_1"]))
+                            data.all_sprites.add(teleWall(n * 32, m * 32, data.sprite_library["t_wall_1"]))
+                        elif x == "t":  # Tele Walls group 2
+                            data.telewalls2.add(teleWall2(n * 32, m * 32, data.sprite_library["t_wall_2"]))
+                            data.all_sprites.add(teleWall2(n * 32, m * 32, data.sprite_library["t_wall_2"]))
+                        elif x == 'E':
+                            data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
+                            data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
+                        elif x == "b":
+                            data.enemies.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
+                            data.all_sprites.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
+                        elif x == "h":
+                            data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
+                            data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
+
+                else:
+                    if x == '-':
+                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                    if x == "1":  # player 1 spawn
+                        data.player.spawnx = n * 32
+                        data.player.spawny = m * 32
+                        data.player.rect.x = n * 32
+                        data.player.rect.y = m * 32
+                    if x == "X" or x == "x":
+                        print "don deaths"
+                        data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                        data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                        # elif x == "-":
+
+                        # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                    elif x == "1":  # player 1 spawn
+                        data.player.spawnx = n * 32
+                        data.player.spawny = m * 32
+                        data.player.rect.x = n * 32
+                        data.player.rect.x = m * 32
+                    elif x == "2":  # player 2 spawn
+                        data.player2.spawnx = n * 32
+                        data.player2.spawny = m * 32
+                        data.player2.rect.x = n * 32
+                        data.player2.rect.x = m * 32
+
+                    elif x == "_":  # long walls
+                        data.allwalls.add(longWall(n * 32, m * 32, 512))
+                        data.all_sprites.add(longWall(n * 32, m * 32, 512))
+                    elif x == "[":  # medium walls
+                        data.allwalls.add(longWall(n * 32, m * 32, 256))
+                        data.all_sprites.add(longWall(n * 32, m * 32, 256))
+
+                    elif x == "=":  # small walls
+                        data.allwalls.add(longWall(n * 32, m * 32, 128))
+                        data.all_sprites.add(longWall(n * 32, m * 32, 128))
+                    elif x == "|":  # Tall wall
+                        data.allwalls.add(Pillar(n * 32, m * 32, 512))
+                        data.all_sprites.add(Pillar(n * 32, m * 32, 512))
+                    elif x == "/":  # Tall wall mid
+                        data.allwalls.add(Pillar(n * 32, m * 32, 256))
+                        data.all_sprites.add(Pillar(n * 32, m * 32, 256))
+                    elif x == ";":  # Tall wall small
+                        data.allwalls.add(Pillar(n * 32, m * 32, 128))
+                        data.all_sprites.add(Pillar(n * 32, m * 32, 128))
+                    elif x == "+":
+                        data.upwalls.add(upWall(n * 32, m * 32, data.sprite_library["up_wall"]))
+                        data.all_sprites.add(upWall(n * 32, m * 32, data.sprite_library["up_wall"]))
+                    elif x == "T":  # Tele walls
+                        data.telewalls.add(teleWall(n * 32, m * 32, data.sprite_library["t_wall_1"]))
+                        data.all_sprites.add(teleWall(n * 32, m * 32, data.sprite_library["t_wall_1"]))
+                    elif x == "t":  # Tele Walls group 2
+                        data.telewalls2.add(teleWall2(n * 32, m * 32, data.sprite_library["t_wall_2"]))
+                        data.all_sprites.add(teleWall2(n * 32, m * 32, data.sprite_library["t_wall_2"]))
+                    elif x == 'E':
+                        data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
+                        data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
+                    elif x == "b":
+                        data.enemies.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
+                        data.all_sprites.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
+                    elif x == "h":
+                        data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
+                        data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
+                n += 1
+            m += 1
+            other.TOTAL_LEVEL_WIDTH = n * 32 - 128
+            other.TOTAL_LEVEL_HEIGHT = m * 32
+
+            n = 0
+        print "Complete"
+
+
+

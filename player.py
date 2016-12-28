@@ -96,7 +96,7 @@ class Player(pygame.sprite.Sprite):
         return
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
+        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH
 
         self.xmom = self.xvel * self.mass/64
         self.ymom = self.yvel * self.mass/64

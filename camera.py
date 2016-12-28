@@ -26,8 +26,8 @@ def complex_camera(camera, target_rect):
     _, _, w, h = camera
     l, t, _, _ = -l+other.HALF_WIDTH, -t+other.HALF_HEIGHT, w, h
 
-    l = min(0, l)                           # stop scrolling at the left edge
-    l = max(-(camera.width+other.TOTAL_LEVEL_WIDTH*2.5), l)   # stop scrolling at the right edge
+    l = min(-32, l)                           # stop scrolling at the left edge
+    l = max(-(camera.width+other.TOTAL_LEVEL_WIDTH-768), l)  # stop scrolling at the right edge
     t = max((-608), t) # stop scrolling at the bottom
     t = min(0, t)                           # stop scrolling at the top
     return Rect(l, t, w, h)

@@ -140,6 +140,21 @@ class Pillar(Wall):
         self.rect.x = x
         return
 
+class invWall(Wall):
+    def __init__(self,pos,image):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.width = 32
+        self.height = 32
+
+        self.image = image  # ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
+        # self.image.fill((255,255,0))
+
+        self.rect = self.image.get_rect()
+        self.rect.y = pos[0]
+        self.rect.x = pos[1]
+        return
+
 class Finish(Wall):
     def __init__(self, x, y, image):
         pygame.sprite.Sprite.__init__(self)
@@ -165,6 +180,9 @@ def clearwalls(thing):
     for _ in thing.upwalls:
         if thing.upwalls.has(_):
             thing.upwalls.remove(_)
+    for _ in thing.hitwalls:
+        if thing.hitwalls.has(_):
+            thing.hitwalls.remove(_)
 
 def cleartel(thing):
     for _ in thing.telewalls:
