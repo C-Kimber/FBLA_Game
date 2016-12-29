@@ -77,43 +77,49 @@ class Base(pygame.sprite.Sprite):
 
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_WIDTH, 0, other.TOTAL_LEVEL_HEIGHT
+        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH
+
+
         if self.state == 'NORMAL':
-            self.applyDrag("air")
-            # movement control
+            distance = math.sqrt((self.player.rect.x - self.rect.x) ** 2 + (self.player.rect.y - self.rect.y) ** 2)
+            if distance < 500:
+                self.applyDrag("air")
+                # movement control
 
-            # x velocity control
-            if self.xvel > self.maxxvel:
-                self.xvel = self.maxxvel
-            if self.xvel < -self.maxxvel:
-                self.xvel = -self.maxxvel
-            if self.xvel < 0.21 and self.xvel > -0.21:
-                self.xvel = 0.0
+                # x velocity control
+                if self.xvel > self.maxxvel:
+                    self.xvel = self.maxxvel
+                if self.xvel < -self.maxxvel:
+                    self.xvel = -self.maxxvel
+                if self.xvel < 0.21 and self.xvel > -0.21:
+                    self.xvel = 0.0
 
-            # y velocity control
-            if self.yvel > self.maxyvel:
-                self.yvel = self.maxyvel
-                self.hitHeightVel = True
-            elif self.yvel < -self.maxyvel:
-                self.yvel = -self.maxyvel
+                # y velocity control
+                if self.yvel > self.maxyvel:
+                    self.yvel = self.maxyvel
+                    self.hitHeightVel = True
+                elif self.yvel < -self.maxyvel:
+                    self.yvel = -self.maxyvel
 
-            self.rect.x += self.xvel
-            self.wallColl(self.xvel, 0, self.walls)
-            self.rect.y -= self.yvel
-            self.onGround = False
-            self.wallColl(0, self.yvel, self.walls)
+                self.rect.x += self.xvel
+                self.wallColl(self.xvel, 0, self.walls)
+                self.rect.y -= self.yvel
+                self.onGround = False
+                self.wallColl(0, self.yvel, self.walls)
 
-            self.wallCollisions()
-            self.playerColl()
-            #if self.otherplayers != None: self.playerCollisions()
+                self.wallCollisions()
+                self.playerColl()
+                #if self.otherplayers != None: self.playerCollisions()
 
-            # gravity
-            if self.onGround == False:
-                self.yvel -= .66# * self.mass
+                # gravity
+                if self.onGround == False:
+                    self.yvel -= .66# * self.mass
 
-            self.boundries(highbound, lowbound, leftbound, rightbound)
-            self.movementAI()
-            self.down = False
+                self.boundries(highbound, lowbound, leftbound, rightbound)
+                self.movementAI()
+                self.down = False
+
+
         elif self.state == "DYING":
             self.dying()
         return
@@ -173,8 +179,10 @@ class Base(pygame.sprite.Sprite):
     def boundries(self, highbound, lowbound, leftbound, rightbound):
         if self.rect.x - 33 + self.width >= rightbound:
             self.rect.x = rightbound - self.width + 32
+            self.dir = "LEFT"
             self.xvel *= -1
         elif self.rect.x <= leftbound:
+            self.dir = "RIGHT"
             self.rect.x = leftbound + 1
             self.xvel  *= -1
         if self.rect.y >= lowbound + 96:
@@ -196,23 +204,24 @@ class Base(pygame.sprite.Sprite):
     def wallColl(self, xvel, yvel, colliders):
         if self.walls != None:
             for collider in colliders:
-                if pygame.sprite.collide_rect(self, collider):
-                    if xvel > 0:
-                        self.rect.right = collider.rect.left
-                        self.xvel = 0
-                        self.dir = "LEFT"
-                    if xvel < 0:
-                        self.rect.left = collider.rect.right
-                        self.xvel = 0
-                        self.dir = "RIGHT"
-                    if yvel < 0:
-                        self.rect.bottom = collider.rect.top
-                        self.onGround = True
-                        self.jumps = 3
-                        self.yvel = 0
-                    if yvel > 0:
-                        self.yvel = 0
-                        self.rect.top = collider.rect.bottom
+
+                    if pygame.sprite.collide_rect(self, collider):
+                        if xvel > 0:
+                            self.rect.right = collider.rect.left
+                            self.xvel = 0
+                            self.dir = "LEFT"
+                        if xvel < 0:
+                            self.rect.left = collider.rect.right
+                            self.xvel = 0
+                            self.dir = "RIGHT"
+                        if yvel < 0:
+                            self.rect.bottom = collider.rect.top
+                            self.onGround = True
+                            self.jumps = 3
+                            self.yvel = 0
+                        if yvel > 0:
+                            self.yvel = 0
+                            self.rect.top = collider.rect.bottom
 
         return
 

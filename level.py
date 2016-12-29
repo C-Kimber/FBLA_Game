@@ -94,7 +94,7 @@ class Level():
                     pygame.draw.rect(surface, (255, 255, 0), r)
 
                 elif y == "-":# one unit walls
-                    surface.blit(imgs["wall"], pygame.Rect(m * multi+camx, n * multi+camy, multi, multi))
+                    surface.blit(imgs["wall_2"], pygame.Rect(m * multi+camx, n * multi+camy, multi, multi))
                 elif y == "_":#long walls
                     r = pygame.Rect(m * multi+camx, n * multi+camy, 16*multi, multi)
                     pygame.draw.rect(surface, (155, 155, 155), r)
@@ -150,9 +150,29 @@ class Level():
                     pygame.draw.rect(surface, (155, 155, 55), r)
                 else:#empty
                     l = pygame.Rect(m * multi+camx, n * multi+camy, multi, multi)
-                    pygame.draw.rect(surface, (0, 0, 0), l, 1)
+                    pygame.draw.rect(surface, (200, 200, 200), l, 1)
 
+                """l = pygame.Rect(430 + m * 3, 520 + n * 3, 5, 5)
+                if y != ".":
+
+                    pygame.draw.rect(surface, (0, 0, 0), l)
+                pygame.draw.rect(surface, (0, 0, 0), (pygame.Rect(430-camx/9, 520-camy/9, 50, 40)), 2)"""
             m=-1
+
+        """# BLOCK
+        for i in range(0, 55):  # 5, 14, 41
+            for j in range(0, 18):  # 3,5,14
+                pygame.draw.rect(surface, (55, 155, 55), (pygame.Rect(camx + i * 96, camy + j * 96, 96, 96)),2)  # 96, 288, 864
+        # CHUNK
+        for i in range(0, 15):  # 5, 14, 41
+            for j in range(0, 6):  # 3,5,14
+                pygame.draw.rect(surface, (55, 55, 155), (pygame.Rect(camx + i * 288, camy + j * 288, 288, 288)),3)  # 96, 288, 864
+        #REGION
+        for i in range(0, 5):#5, 14, 41
+            for j in range(0, 3): #3,5,14
+                pygame.draw.rect(surface, (155, 55, 55), (pygame.Rect(camx + i * 864, camy+j *864, 864,864)), 5)#96, 288, 864"""
+
+
 
         if self.levelMeasured == False:
             other.TOTAL_LEVEL_WIDTH = w
@@ -211,75 +231,75 @@ class Level():
         for y in text:
             for x in y:
 
-                if m - 1 >= 0 and m + 1 <= 38:
-                    if n - 1 >= 0 and n + 1 < 120:  #
+
+                if m - 1 >= 0 and m + 1 <= 53:
+                    if n - 1 >= 0 and n + 1 < 135:  #
                         cur = y[n]  # current AKA Middle
                         left = y[n - 1]
                         right = y[n + 1]
                         top = text[m - 1][n]
                         bot = text[m + 1][n]
-
+                        f = 7
                         if cur == "-":
 
                             if left == "-":
                                 if right == "-":
                                     if bot == "-":
                                         if top == "-":
-                                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_5"]))
+                                            f = 4
+
                                         else:
-                                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                            f = 1
                                     elif top == "-":
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                                        f= 7
                                     else:
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                        f=1
                                 elif top == "-":
                                     if bot == "-":
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_6"]))
+                                        f=5
                                     else:
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_9"]))
+                                        f = 8
                                 elif bot == "-":
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_3"]))
+                                    f = 2
                                 else:
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_3"]))
+                                    f = 2
                                     # elif:
                             elif right == "-":  # NO LEFT
                                 if top == '-':
                                     if bot == "-":
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_4"]))
+                                        f = 3
                                     else:
-                                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_7"]))
+                                        f= 6
                                 elif bot == "-":
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_1"]))
+                                    f= 0
                                 else:
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_1"]))
+                                    f=0
                             elif top == "-":  # NO LEFT OR RIGHT
                                 if bot == "-":
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_5"]))
+                                    f = 9
                                 else:
-                                    data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                                    f= 7
                             elif bot == "-":  # NO LEFT, RIGHT, OR UP
-                                data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                f=10
 
                             else:
-                                data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                                f=1
+                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_"+str(f+1)],
+                                                    f,(math.floor(n * 32/864),math.floor(m * 32/864)) ))
+
 
                         if x == "1":  # player 1 spawn
                             data.player.spawnx = n * 32
                             data.player.spawny = m * 32
                             data.player.rect.x = n * 32
                             data.player.rect.y = m * 32
+
                         if x == "X" or x == "x":
-                            print "don deaths"
                             data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                             data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                             # elif x == "-":
 
                             # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
-                        elif x == "1":  # player 1 spawn
-                            data.player.spawnx = n * 32
-                            data.player.spawny = m * 32
-                            data.player.rect.x = n * 32
-                            data.player.rect.x = m * 32
                         elif x == "2":  # player 2 spawn
                             data.player2.spawnx = n * 32
                             data.player2.spawny = m * 32
@@ -325,25 +345,20 @@ class Level():
                             data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
 
                 else:
+
                     if x == '-':
-                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"]))
+                        data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_8"],7))
                     if x == "1":  # player 1 spawn
                         data.player.spawnx = n * 32
                         data.player.spawny = m * 32
                         data.player.rect.x = n * 32
                         data.player.rect.y = m * 32
                     if x == "X" or x == "x":
-                        print "don deaths"
                         data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         # elif x == "-":
 
                         # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
-                    elif x == "1":  # player 1 spawn
-                        data.player.spawnx = n * 32
-                        data.player.spawny = m * 32
-                        data.player.rect.x = n * 32
-                        data.player.rect.x = m * 32
                     elif x == "2":  # player 2 spawn
                         data.player2.spawnx = n * 32
                         data.player2.spawny = m * 32
@@ -394,6 +409,5 @@ class Level():
 
             n = 0
         print "Complete"
-
 
 

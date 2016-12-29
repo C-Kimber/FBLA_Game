@@ -6,13 +6,15 @@ import spriteanim
 #WAll class, I.E. platforms
 class Wall(pygame.sprite.Sprite):
 
-    def __init__(self,x,y, image):
+    def __init__(self,x,y, image, type, region=(0,0)):
         pygame.sprite.Sprite.__init__(self)
 
         self.x = x
         self.y = y
         self.width =30
         self.height = 30
+        self.type = type
+        self.region = region
 
         self.image = image#ss.image_at((0, 0, 32, 32), (255, 255, 255)).convert_alpha()
         #self.image.fill((255,255,0))

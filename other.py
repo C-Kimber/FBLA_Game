@@ -39,6 +39,8 @@ def load_images():
         "wall_7": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 0, 32 * 2, 32, 32),(254, 254, 254)).convert_alpha(),
         "wall_8": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 1, 32 * 2, 32, 32),(254, 254, 254)).convert_alpha(),
         "wall_9": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 2, 32 * 2, 32, 32),(254, 254, 254)).convert_alpha(),
+        "wall_10": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 0, 32 * 0, 32, 32),(254, 254, 254)).convert_alpha(),
+        "wall_11": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 1, 32 * 0, 32, 32), ( 254, 254, 254)).convert_alpha(),
 
         "wall_1_tall": spritesheet.spritesheet('./assets/images/wall1_small_tall.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#11
         "wall_1_long": spritesheet.spritesheet('./assets/images/fallenPillar.png').image_at((0, 0, 32, 32),(255, 255, 255)).convert_alpha(),#12

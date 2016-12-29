@@ -24,14 +24,16 @@ class Player(pygame.sprite.Sprite):
         self.width = 32
         self.height = 32
         self.color = (255,255,255)
+        self.region = (0.0, 1.0)
+        self.oldregion =(0.0, 1.0)
 
         self.image = image
         self.imageH = image
         #self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
-        self.spawnx = 1000
-        self.spawny = 50
+        self.spawnx =  288
+        self.spawny = 128
         self.rect.y = self.spawny
         self.rect.x = self.spawnx
 
@@ -59,6 +61,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
 
         self.teletime = 0
+        self.data = None
 
     def moveLeft(self):
         self.dir = "left"
@@ -96,8 +99,8 @@ class Player(pygame.sprite.Sprite):
         return
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH
 
+        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH
         self.xmom = self.xvel * self.mass/64
         self.ymom = self.yvel * self.mass/64
         #self.playerCollisions()
@@ -126,6 +129,7 @@ class Player(pygame.sprite.Sprite):
         elif self.yvel < -self.maxyvel:
             self.yvel = -self.maxyvel
 
+        self.getRegion()
         self.rect.x += self.xvel
         self.wallColl(self.xvel, 0, self.walls)
         self.rect.y -= self.yvel
@@ -141,6 +145,7 @@ class Player(pygame.sprite.Sprite):
             self.yvel-=.0066*self.mass
 
         self.boundries(highbound, lowbound, leftbound, rightbound)
+
         self.down = False
         return
     #stays onscreen
@@ -151,9 +156,9 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.x <= leftbound:
             self.rect.x = leftbound + 1
             self.xvel = 0
-        if self.rect.y >= lowbound+96:
+        if self.rect.y >= lowbound+32:
             self.rect.y -= 3
-            self.die()
+            self.state = "DYING"
 
 
             #self.yvel = 0
@@ -197,21 +202,23 @@ class Player(pygame.sprite.Sprite):
     #Collisions with walls
     def wallColl(self, xvel, yvel, colliders):
         for collider in colliders:
-            if pygame.sprite.collide_rect(self, collider):
-                if xvel > 0:
-                    self.rect.right = collider.rect.left
-                    self.xvel = 0
-                if xvel < 0:
-                    self.rect.left = collider.rect.right
-                    self.xvel = 0
-                if yvel < 0:
-                    self.rect.bottom = collider.rect.top
-                    self.onGround = True
-                    self.jumps = 3
-                    self.yvel = 0
-                if yvel > 0:
-                    self.yvel = 0
-                    self.rect.top = collider.rect.bottom
+            distance = math.sqrt((self.rect.x - collider.x) ** 2 + (self.rect.y - collider.rect.y) ** 2)
+            if distance < 160:
+                if pygame.sprite.collide_rect(self, collider):
+                    if xvel > 0:
+                        self.rect.right = collider.rect.left
+                        self.xvel = 0
+                    if xvel < 0:
+                        self.rect.left = collider.rect.right
+                        self.xvel = 0
+                    if yvel < 0:
+                        self.rect.bottom = collider.rect.top
+                        self.onGround = True
+                        self.jumps = 3
+                        self.yvel = 0
+                    if yvel > 0:
+                        self.yvel = 0
+                        self.rect.top = collider.rect.bottom
         return
 
 
@@ -308,6 +315,16 @@ class Player(pygame.sprite.Sprite):
 
 
         self.xvel += drag
+
+    def getRegion(self):
+        self.region = math.floor((self.rect.right+self.rect.left)/(864*2)),math.floor((self.rect.top+self.rect.bottom)/(864*2))
+        print self.region
+        if self.region != self.oldregion:
+            print "NEW REGION: " + str(self.region)
+            self.data.getCollidables(self.region)
+            self.oldregion = self.region
+
+        return
 
 
 

@@ -23,6 +23,9 @@ class DataD:
 
         self.cameraX = 0
         self.cameraY = 0
+
+        self.scrollx = 0
+        self.scrolly = 0
         return
 
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
@@ -52,38 +55,38 @@ class DataD:
             self.cameraY += 32
         if pygame.K_s in keys:
             self.cameraY -= 32
-
+        print self.cameraX
         if self.cameraY > 0:
             self.cameraY = 0
-        if self.cameraY < -608:
-            self.cameraY = -608
+        if self.cameraY < -1088:
+            self.cameraY = -1088
         if self.cameraX > 0:
             self.cameraX = 0
-        if self.cameraX < -1*other.TOTAL_LEVEL_WIDTH/1.5:
-            self.cameraX = -1*other.TOTAL_LEVEL_WIDTH/1.5
+        if self.cameraX < -3520:
+            self.cameraX = -3520
 
 
         if 1 in buttons:
             self.button(mouse_position,(self.width-37, self.height-37, 32, 32),".")#clear selected
             #self.clearbutton(mouse_position, (self.width - 69, self.height - 37, 32, 32))  # clear
-            self.button(mouse_position, (832,32,32, 32),'-') #wall
-            self.button(mouse_position, (832, 96, 32, 32),"X")  # lava
-            self.button(mouse_position,(832, 160, 32, 32),"1")  #p1
-            self.button(mouse_position,(832, 224, 32, 32),"2")  #p2
-            self.button(mouse_position,(832, 288, 32, 32),"3")  #p3
-            self.button(mouse_position,(832, 352, 32, 32),"4")  #p4
-            self.button(mouse_position,(832, 416, 32, 32),"T")   #telewall 1
-            self.button(mouse_position,(832, 480, 32, 32), "t")   #telewall 2
-            self.button(mouse_position,(832 + 49, 32, 16, 16),"=") #longwall small
-            self.button(mouse_position,(832 + 81, 32, 16, 16),"[") #longwall medium
-            self.button(mouse_position, (832 +113, 32, 16, 16),"_") #longwall large
-            self.button(mouse_position, (832 + 49, 49, 16, 16), ";")  # longwall small
-            self.button(mouse_position, (832 + 81, 49, 16, 16), "/")  # longwall medium
-            self.button(mouse_position, (832 + 113, 49, 16, 16), "|")  # longwall large
-            self.button(mouse_position, ((832 + 113, 67, 32, 16)),'+')
-            self.button(mouse_position, ((880, 96, 32, 32)), 'E') #Finish block
-            self.button(mouse_position, ((880, 160, 32, 32)), 'b')  # enemy
-            self.button(mouse_position, ((880, 224, 32, 32)), 'h')
+            self.button(mouse_position, (832,32+self.scrolly,32, 32),'-') #wall
+            self.button(mouse_position, (832, 96+self.scrolly, 32, 32),"X")  # lava
+            self.button(mouse_position,(832, 160+self.scrolly, 32, 32),"1")  #p1
+            self.button(mouse_position,(832, 224+self.scrolly, 32, 32),"2")  #p2
+            self.button(mouse_position,(832, 288+self.scrolly, 32, 32),"3")  #p3
+            self.button(mouse_position,(832, 352+self.scrolly, 32, 32),"4")  #p4
+            self.button(mouse_position,(832, 416+self.scrolly, 32, 32),"T")   #telewall 1
+            self.button(mouse_position,(832, 480+self.scrolly, 32, 32), "t")   #telewall 2
+            self.button(mouse_position,(832 + 49, 32+self.scrolly, 16, 16),"=") #longwall small
+            self.button(mouse_position,(832 + 81, 32+self.scrolly, 16, 16),"[") #longwall medium
+            self.button(mouse_position, (832 +113, 32+self.scrolly, 16, 16),"_") #longwall large
+            self.button(mouse_position, (832 + 49, 49+self.scrolly, 16, 16), ";")  # longwall small
+            self.button(mouse_position, (832 + 81, 49+self.scrolly, 16, 16), "/")  # longwall medium
+            self.button(mouse_position, (832 + 113, 49+self.scrolly, 16, 16), "|")  # longwall large
+            self.button(mouse_position, ((832 + 113, 67+self.scrolly, 32, 16)),'+')
+            self.button(mouse_position, ((880, 96+self.scrolly, 32, 32)), 'E') #Finish block
+            self.button(mouse_position, ((880, 160+self.scrolly, 32, 32)), 'b')  # enemy
+            self.button(mouse_position, ((880, 224+self.scrolly, 32, 32)), 'h')
             if mouse_position[0] > 0 and mouse_position[0] < 800:
                 self.level.write(block,self.selected)
 
@@ -92,12 +95,15 @@ class DataD:
         elif 3 in buttons :
             self.level.write(block)
             
-        if pygame.K_SHIFT in keys: #Scrolling the side bar
-            if self.mp[0] > 640:
+        if pygame.K_SPACE in keys: #Scrolling the side bar
+
+            if self.mp[0] > 800:
                 if self.mp[1] >= self.height/2:
-                    print "Scroll down"
+                    self.scrolly += (self.height/2 - self.mp[1])/9
                 elif self.mp[1] < self.height/2:
-                    print "Scroll Up"
+                     self.scrolly += (self.height/2 - self.mp[1])/9
+        if self.scrolly > 0:
+            self.scrolly = 0
 
 
 
@@ -145,6 +151,7 @@ class DataD:
                 self.level.clear()
 
     def draw(self, surface):
+        print self.scrolly
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((255, 255, 255), rect)  # back
 
@@ -154,37 +161,40 @@ class DataD:
         r = pygame.Rect(800,0,180, 640)
         pygame.draw.rect(surface, (255, 255, 255), r)
         pygame.draw.rect(surface, (25, 25, 25), r,5)
-        pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(832,32,32, 32))#wall
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+49, 32, 16, 16))  # Lwall s
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+81, 32, 16, 16))  # lwall m
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+113, 32, 16, 16))  # lwall l
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 49, 49, 16, 16))  # Twall s
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 81, 49, 16, 16))  # Twall m
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 113, 49, 16, 16))  # Twall l
-        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 113, 67, 32, 16))
+        surface.blit(self.sprite_library["wall_2"], pygame.Rect(832,32+self.scrolly,32, 32)) #wall
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+49, 32+self.scrolly, 16, 16))  # Lwall s
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+81, 32+self.scrolly, 16, 16))  # lwall m
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+113, 32+self.scrolly, 16, 16))  # lwall l
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 49, 49+self.scrolly, 16, 16))  # Twall s
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 81, 49+self.scrolly, 16, 16))  # Twall m
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 113, 49+self.scrolly, 16, 16))  # Twall l
+        pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 113, 67+self.scrolly, 32, 16))
 
 
-        pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(832, 96, 32, 32))#lava
-        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(832, 160, 32, 32))#p1
-        pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(832, 224, 32, 32))#p2
-        pygame.draw.rect(surface, (0, 0, 255), pygame.Rect(832, 288, 32, 32))#p3
-        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(832, 352, 32, 32))#p4
+        surface.blit(self.sprite_library["lava"], pygame.Rect(832, 96+self.scrolly, 32, 32))#lava
+        surface.blit(self.sprite_library["player1"], pygame.Rect(832, 160+self.scrolly, 32, 32))#player 1
+        surface.blit(self.sprite_library["player2"], pygame.Rect(832, 224+self.scrolly, 32, 32))#player2
 
-        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(832, 416, 32, 32))#Telewall 1
-        pygame.draw.rect(surface, (155, 0, 155), pygame.Rect((832) + 8, (416) + 8, 16, 16))
+        pygame.draw.rect(surface, (0, 0, 255), pygame.Rect(832, 288+self.scrolly, 32, 32))#p3
+        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(832, 352+self.scrolly, 32, 32))#p4
 
-        pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(832, 480, 32, 32))# Telewall 2
-        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect((832) + 8, (480) + 8, 16, 16))
+        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect(832, 416+self.scrolly, 32, 32))#Telewall 1
+        pygame.draw.rect(surface, (155, 0, 155), pygame.Rect((832) + 8, (416) + 8+self.scrolly, 16, 16))
 
-        pygame.draw.rect(surface, (255, 0,0), pygame.Rect(self.width-37, self.height-37, 32, 32),4)  # clear selected
-        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.width - 70, self.height - 37, 32, 32), 4)  # clear
+        pygame.draw.rect(surface, (155, 0, 155), pygame.Rect(832, 480+self.scrolly, 32, 32))# Telewall 2
+        pygame.draw.rect(surface, (255, 0, 255), pygame.Rect((832) + 8, (480) + 8+self.scrolly, 16, 16))
 
-        pygame.draw.rect(surface, (0, 255, 155), pygame.Rect(880, 96, 32, 32)) # finish
-        pygame.draw.rect(surface, (255, 185, 55), pygame.Rect(880, 160, 32, 32)) # enemy
-        pygame.draw.rect(surface, (155, 155, 55), pygame.Rect(880, 224, 32, 32)) # hitwall
+        pygame.draw.rect(surface, (255, 0,0), pygame.Rect(self.width-37, self.height-37+self.scrolly, 32, 32),4)  # clear selected
+        pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.width - 70, self.height - 37+self.scrolly, 32, 32), 4)  # clear
+
+        pygame.draw.rect(surface, (0, 255, 155), pygame.Rect(880, 96+self.scrolly, 32, 32)) # finish
+        surface.blit(self.sprite_library["enemy"], pygame.Rect(880, 160+self.scrolly, 32, 32))#enemy
+
+        surface.blit(self.sprite_library["hitwall"], pygame.Rect(880, 224+self.scrolly, 32, 32))#hitwall
 
 
-        self.drawTextLeft(surface, "Level "+ str(self.l), (55,0,55), 832, 35, self.font)
+        self.drawTextLeft(surface, "Level "+ str(self.l), (55,0,55), 832-self.scrolly, 35, self.font)
+
 
 
         #follow mouse

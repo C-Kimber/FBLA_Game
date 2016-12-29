@@ -39,6 +39,7 @@ class Data:
 
         self.emptysprite = Empty()
         self.player = Player(self.sprite_library["player1"])
+        self.player.data = self
         #self.playersprite = pygame.sprite.GroupSingle()
         #self.player2sprite = pygame.sprite.GroupSingle()
         self.player2 = Player2(self.sprite_library["player2"])
@@ -48,6 +49,7 @@ class Data:
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
         self.allwalls = pygame.sprite.Group()
+        self.collidables = pygame.sprite.Group()
         self.deathwalls =pygame.sprite.Group()
         self.telewalls = pygame.sprite.Group()
         self.telewalls2 = pygame.sprite.Group()
@@ -430,12 +432,17 @@ class Data:
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((55, 55, 255), rect)  # back
 
-
+        cx, cy, cw, ch = self.camera.state
         for e in self.all_sprites:
-            surface.blit(e.image, self.camera.apply(e))
+
+            if e.rect.x > -32 - cx and e.rect.right < -cx + 832 and e.rect.top > -cy - 32 and e.rect.bottom < -cy + 672:
+
+                surface.blit(e.image, self.camera.apply(e))
 
         for w in self.allwalls:
-            surface.blit(w.image, self.camera.apply(w))
+            if w.rect.x > -32-cx and w.rect.right < -cx +832 and w.rect.top > -cy-32 and w.rect.bottom < -cy + 672:
+                surface.blit(w.image, self.camera.apply(w))
+
 
 
         if other.MINISTATE ==1:
@@ -578,21 +585,17 @@ class Data:
         self.player.state = "NORMAL"
         self.emptyLists()
         self.level.gameLev(self)
+        self.getCollidables()
         self.allwalls.add(self.wall_list)
+        self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
+                e.walls = self.collidables
                 e.deaths = self.deathwalls
                 e.player = self.player
         #self.walldecide()
         self.isLoaded = True
-
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
-                e.deaths = self.deathwalls
-                e.player = self.player
 
 
     def newLevel(self):
@@ -654,17 +657,14 @@ class Data:
         self.emptyLists()
         self.level.gameLev(self)
         self.allwalls.add(self.wall_list)
+        self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
+                e.walls = self.collidables
                 e.deaths = self.deathwalls
                 e.player = self.player
-        #self.walldecide()
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
-                e.deaths = self.deathwalls
+
 
     def emptyLists(self):
         self.deathwalls.empty()
@@ -672,6 +672,7 @@ class Data:
         self.telewalls.empty()
         self.telewalls2.empty()
         self.all_sprites.empty()
+        self.collidables.empty()
         self.upwalls.empty()
         self.finish.empty()
         self.players.empty()
@@ -697,14 +698,14 @@ class Data:
                     self.player2.otherplayers.remove(self.player2)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
+                e.walls = self.collidables
                 e.player = self.player
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
 
-        self.player.walls = self.allwalls
-        self.player2.walls = self.allwalls
+        self.player.walls = self.collidables
+        self.player2.walls = self.collidables
 
 
         self.player.deaths = self.deathwalls
@@ -733,4 +734,12 @@ class Data:
                 self.sprite_library["frag1_2"]
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
                 , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
+
+    def getCollidables(self, region=(0.0, 1.0)):
+        self.collidables.empty()
+        for w in self.wall_list:
+            if isinstance(w,wall.Wall):
+                if w.type != 4:#if is surrounded by tiles
+                    if w.region == region:
+                        self.collidables.add(w)
 

@@ -33,7 +33,7 @@ class Game:
         buttons = set()
         mouse_position = (1,1)
 
-        while True:
+        while self.on:
             clock.tick(self.frames_per_second)
 
 
@@ -42,7 +42,8 @@ class Game:
             for e in pygame.event.get():
 
                 if e.type == pygame.QUIT:
-                    sys.exit(0)
+                    self.on = False
+                    #sys.exit(0)
 
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     buttons.add(e.button)

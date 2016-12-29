@@ -1,7 +1,8 @@
 import pygame
+import main
 from Adventure import Design
 
-def main():
+def editor():
     pygame.font.init()
     c = Design(980, 640, 60)
     #in 32 chunks it is 25X20
@@ -13,4 +14,6 @@ def main():
 
 if __name__ == "__main__":
     print "RUNNING LEVEL EDITOR"
-    main()
+    editor()
+    print "CLOSE EDITOR"
+    main.main()
