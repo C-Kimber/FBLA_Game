@@ -12,15 +12,18 @@ import camera
 
 
 
-class Data:
+class Data():
     #intitialisez sprites, and other data
+    rs = (0,0,800,640)
+    allwalls = None
+
     def __init__(self, width, height, frame_rate):
         self.font = pygame.font.SysFont("Times New Roman", 36)
         self.font2 = pygame.font.SysFont("Times New Roman", 72)
         self.frame_rate = frame_rate
         self.width = width
         self.height = height
-        self.img = pygame.image.load('./assets/images/Background_1.png')
+        self.img = pygame.image.load('./assets/images/back_project_1_big.png')
         self.sprite_library = other.load_images()
         self.bimgs = [ pygame.image.load('./assets/images/background_2.png').convert_alpha()]
         """pygame.image.load('./assets/imagas/B_04.png').convert_alpha(),
@@ -49,7 +52,6 @@ class Data:
         self.all_sprites = pygame.sprite.Group()
         self.wall_list = pygame.sprite.Group()
         self.allwalls = pygame.sprite.Group()
-        self.collidables = pygame.sprite.Group()
         self.deathwalls =pygame.sprite.Group()
         self.telewalls = pygame.sprite.Group()
         self.telewalls2 = pygame.sprite.Group()
@@ -58,6 +60,8 @@ class Data:
         self.finish = pygame.sprite.Group()
         self.hitwalls = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.back_sprites = pygame.sprite.Group()
+        self.displayTiles = pygame.sprite.Group()
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -90,7 +94,9 @@ class Data:
 
         self.isLoaded = False
 
+
         self.camera = Camera(camera.complex_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
+
 
 
     #active stuff
@@ -123,10 +129,12 @@ class Data:
                 for _ in range(30):
                     self.fragmentgroup.add(custFrag((400,400),(25,50),(255,255,255)))
 
-            if pygame.K_w in newkeys:
+            if pygame.K_w in keys:
                 self.player.jump()
-            elif pygame.K_s in keys:
-                self.player.moveDown()
+
+            #if pygame.K_s in keys:
+            #    self.player.moveDown()
+
             """elif pygame.K_s in keys:
                 self.player.stunt()
                 self.player.stunting = True
@@ -188,6 +196,9 @@ class Data:
     #wipes sprite lists, and puts in players + adding new level
 
     def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
+        self.mouse_position = mouse_position
+        self.newbuttons = newbuttons
+        #print other.distance((0,32),(0,32))
         a = 0
 
         a += 1
@@ -195,7 +206,6 @@ class Data:
             self.initLevel()
             self.all_sprites.remove(self.player2)
             self.player2 = self.emptysprite
-            print "LOADING "
 
         if pygame.K_ESCAPE in newkeys:
             if other.MINISTATE == 0:
@@ -204,13 +214,11 @@ class Data:
                 other.MINISTATE = 0
         if other.MINISTATE == 0 and self.player.state == "NORMAL":
 
-
-
-
             self.camera.update(self.player)
             if self.player.alive == False:
                 self.lives -= 1
                 self.player.alive  = True
+
 
 
 
@@ -219,10 +227,12 @@ class Data:
               #  self.player2 = self.emptysprite
 
 
-            if pygame.K_w in newkeys:
+            if pygame.K_w in keys:
                 self.player.jump()
-            elif pygame.K_s in keys:
-                self.player.moveDown()
+            else:
+                self.player.jump_cut()
+            if pygame.K_s in keys:
+                    self.player.moveDown()
 
             if pygame.K_a in keys:
                 self.player.moveLeft()
@@ -230,6 +240,8 @@ class Data:
 
             elif pygame.K_d in keys:
                 self.player.moveRight()
+
+
 
             if pygame.K_3 in newkeys:
                 self.all_sprites.add(Base((self.player.rect.x, self.player.rect.y)))
@@ -396,52 +408,65 @@ class Data:
         return
 
     def pauseMenu(self, surface):
-        rect = pygame.Rect(100, 50, self.width - 200, self.height - 100)
+        x,y,w,h = self.width/4, self.height/8, self.width - self.width/2, self.height - self.height/4
+        rect = pygame.Rect(x,y,w,h)
         pygame.draw.rect(surface, (25, 25, 25), rect)
 
-        r = pygame.Rect(200, 200, 100, 100)
-        pygame.draw.rect(surface, (25, 25, 25), rect)
+        rx,ry,rw,rh = (x+w/5, y+h/4, w/5, h/5)
+        r = pygame.Rect(rx,ry,rw,rh)
         pygame.draw.rect(surface, (255, 255, 255), r)
-        self.drawTextLeft(surface, "Menu", (255, 255, 255), 350, 150, self.font)
+        self.drawTextLeft(surface, "Menu", (255, 255, 255), x+w/2, y+h/5, self.font)
 
-        if ((self.mouse_position[0] <= 300 and self.mouse_position[0] >= 200) and (
-                        self.mouse_position[1] <= 300 and self.mouse_position[
-                    1] >= 200)):  # If mouse is in the rectangle
+        if other.button(self.mouse_position,r):
             pygame.draw.rect(surface, (155, 155, 155), r)
-            #if 1 in self.newbuttons:
-
-                #other.MINISTATE = 0
-        self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
-
-        r = pygame.Rect(500, 200, 100, 100)
-        pygame.draw.rect(surface, (255, 255, 255), r)
-        if ((self.mouse_position[0] <= 600 and self.mouse_position[0] >= 500) and (
-                        self.mouse_position[1] <= 300 and self.mouse_position[
-                    1] >= 200)):  # If mouse is in the rectangle
-            pygame.draw.rect(surface, (155, 155, 155), r)
-
             if 1 in self.newbuttons:
-                pygame.quit()
-        self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
+                other.MINISTATE = 0
+
+        self.drawTextLeft(surface, "Play", (0, 0, 255), rx+30, ry+80, self.font)
+
+        rx, ry, rw, rh = (x +w - w / 3, y + h / 4, w / 5, h / 5)
+        r = pygame.Rect(rx,ry, rw,rh)
+        pygame.draw.rect(surface, (255, 255, 255), r)
+
+        if other.button(self.mouse_position, r):
+            pygame.draw.rect(surface, (155, 155, 155), r)
+            if 1 in self.newbuttons:
+                other.ON = False
+
+        self.drawTextLeft(surface, "Quit", (255, 0, 0), rx+30, ry+80, self.font)
 
         return
 
     #menu activity
     def mainDraw(self, surface):
-
-        rect = pygame.Rect(0, 0, self.width, self.height)
+        #surface.blit(self.img,(0-self.player.rect.x,-320))
+        rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
         surface.fill((55, 55, 255), rect)  # back
 
         cx, cy, cw, ch = self.camera.state
+
+
+
+
+        #draw background tiles/sprites
+        for b in self.back_sprites:
+            if b.rect.x > -32 - cx and b.rect.right < -cx + other.WIDTH+32 and b.rect.top > -cy - 32 and b.rect.bottom < -cy + other.HEIGHT+32:
+                surface.blit(b.image, self.camera.apply(b))
+
+        #draw sprites
         for e in self.all_sprites:
 
-            if e.rect.x > -32 - cx and e.rect.right < -cx + 832 and e.rect.top > -cy - 32 and e.rect.bottom < -cy + 672:
+            if e.rect.x > -32 - cx and e.rect.right < -cx + other.WIDTH + 32 and e.rect.top > -cy - 32 and e.rect.bottom < -cy + other.HEIGHT + 32:
 
                 surface.blit(e.image, self.camera.apply(e))
 
+
         for w in self.allwalls:
-            if w.rect.x > -32-cx and w.rect.right < -cx +832 and w.rect.top > -cy-32 and w.rect.bottom < -cy + 672:
-                surface.blit(w.image, self.camera.apply(w))
+            if w.rect.x > -32 - cx and w.rect.right < -cx + other.WIDTH + 32 and w.rect.top > -cy - 32 and w.rect.bottom < -cy + other.HEIGHT + 32:
+                rs = surface.blit(w.image, self.camera.apply(w))
+        allwalls = self.allwalls
+
+
 
 
 
@@ -481,10 +506,9 @@ class Data:
                 self.alph_1 = 255
 
 
-
-
-
         #self.all_sprites.draw(surface)
+
+        self.drawTextLeft(surface, str(other.FPS), (250, 250, 250), 800-40, 35, self.font)
 
     def GameOverDraw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
@@ -585,13 +609,12 @@ class Data:
         self.player.state = "NORMAL"
         self.emptyLists()
         self.level.gameLev(self)
-        self.getCollidables()
+        #self.getCollidables()
         self.allwalls.add(self.wall_list)
-        self.getCollidables()
+        #self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.collidables
                 e.deaths = self.deathwalls
                 e.player = self.player
         #self.walldecide()
@@ -657,11 +680,9 @@ class Data:
         self.emptyLists()
         self.level.gameLev(self)
         self.allwalls.add(self.wall_list)
-        self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.collidables
                 e.deaths = self.deathwalls
                 e.player = self.player
 
@@ -672,7 +693,7 @@ class Data:
         self.telewalls.empty()
         self.telewalls2.empty()
         self.all_sprites.empty()
-        self.collidables.empty()
+        self.back_sprites.empty
         self.upwalls.empty()
         self.finish.empty()
         self.players.empty()
@@ -698,14 +719,12 @@ class Data:
                     self.player2.otherplayers.remove(self.player2)
         for e in self.all_sprites:
             if isinstance(e, enemy.Base) == True:
-                e.walls = self.collidables
                 e.player = self.player
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
 
-        self.player.walls = self.collidables
-        self.player2.walls = self.collidables
+
 
 
         self.player.deaths = self.deathwalls
@@ -735,11 +754,13 @@ class Data:
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
                 , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
 
-    def getCollidables(self, region=(0.0, 1.0)):
-        self.collidables.empty()
+    def getCollidables(self, obj, region=(0.0, 1.0)):
+        obj.collidables.empty()
         for w in self.wall_list:
             if isinstance(w,wall.Wall):
                 if w.type != 4:#if is surrounded by tiles
-                    if w.region == region:
-                        self.collidables.add(w)
+                    distance = math.sqrt((obj.rect.x - w.rect.x) ** 2 + (obj.rect.y - w.rect.y) ** 2)
+                    if distance < 50:
+                        #if w.region == region:
+                        obj.collidables.add(w)
 

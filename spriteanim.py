@@ -1,5 +1,6 @@
 import spritesheet
 
+
 class SpriteStripAnim(object):
     """sprite strip animator
 
@@ -7,6 +8,7 @@ class SpriteStripAnim(object):
     __add__() method for joining strips which comes in handy when a
     strip wraps to the next row.
     """
+
     def __init__(self, filename, rect, count, colorkey=None, loop=False, frames=1):
         """construct a SpriteStripAnim
 
@@ -26,10 +28,12 @@ class SpriteStripAnim(object):
         self.loop = loop
         self.frames = frames
         self.f = frames
+
     def iter(self):
         self.i = 0
         self.f = self.frames
         return self
+
     def next(self):
         if self.i >= len(self.images):
             if not self.loop:
@@ -42,6 +46,7 @@ class SpriteStripAnim(object):
             self.i += 1
             self.f = self.frames
         return image
+
     def __add__(self, ss):
         self.images.extend(ss.images)
         return self

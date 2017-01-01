@@ -1,82 +1,223 @@
-def neighborhood(iterable):
-    iterator = iter(iterable)
-    prev_item = None
-    current_item = next(iterator)  # throws StopIteration if empty.
-    for next_item in iterator:
-        yield (prev_item, current_item, next_item)
-        prev_item = current_item
-        current_item = next_item
-    yield (prev_item, current_item, None)
+from math import ceil
+from weakref import WeakKeyDictionary
+
+import pygame
+from pygame.locals import Rect
 
 
-def connectTextures(txt = open("./assets/long_levels/level_0")):
-    txt = txt
-    text = []
-    col = []
-    for x in txt: #Rows
-        for y in x: #Collums
-            if y == "\n":
+class SpatialHash(object):
+
+    def __init__(self, world_rect, cell_size):
+        self.rect = Rect(world_rect)
+        self.cell_size = int(cell_size)
+
+        self.rows = int(ceil(world_rect.h / float(cell_size)))
+        self.cols = int(ceil(world_rect.w / float(cell_size)))
+        self.buckets = [[] for i in range(self.rows*self.cols)]
+        self.cell_ids = WeakKeyDictionary()
+
+        self.coll_tests = 0
+
+    @property
+    def objects(self):
+        """Return the entire list of objects.
+        """
+        return self.cell_ids.keys()
+
+    def add(self, obj):
+        """Add or re-add obj. Return True if in bounds, else return False.
+
+        If this method returns False then the object is completely out of
+        bounds and cannot be stored in this space.
+
+        Note that when obj changes its position, you must add it again so that
+        its cell membership is updated. This method first removes the object if
+        it is already in the spatial hash.
+        """
+        self.remove(obj)
+        buckets = self.buckets
+        cell_ids = self.intersect_indices(obj.rect)
+        for idx in cell_ids:
+            buckets[idx].append(obj)
+        self.cell_ids[obj] = cell_ids
+        return cell_ids == True
+
+    def remove(self, obj):
+        """Remove obj.
+        """
+        buckets = self.buckets
+        cell_ids = self.cell_ids
+        if obj in cell_ids:
+            for cell_id in cell_ids[obj]:
+                buckets[cell_id].remove(obj)
+
+    def get_nearby_objects(self, obj):
+        """Return a list of objects that share the same cells as obj.
+        """
+        nearby_objs = []
+        cell_ids = self.intersect_indices(obj.rect)
+        buckets = self.buckets
+        for cell_id in cell_ids:
+            nearby_objs.extend(buckets[cell_id])
+        return list(set(nearby_objs))
+
+    def get_cell(self, cell_id):
+        """Return the cell stored at bucket index cell_id.
+
+        The returned cell is a list of objects.
+        """
+        return self.buckets[cell_id]
+
+    def index(self, cell):
+        """Return the bucket index of cell.
+
+        Returns None if cell does not exist in buckets.
+
+        Note that SpatialHash.buckets.index(cell) does *NOT* work because
+        list.index() tests equality, not identity.
+        """
+        for i,c in enumerate(self.buckets):
+            if c is cell:
+                return i
+
+    def index_at(self, x, y):
+        """Return the cell_id of the cell that contains point (x,y).
+
+        None is returned if point (x,y) is not in bounds.
+        """
+        cell_size = self.cell_size
+        rect = self.rect
+        idx = ((x-rect.left)//cell_size) + ((y-rect.top)//cell_size) * self.cols
+        return idx if -1/ cols
+        y = cell_id - x * cols
+        return x,y
+
+    def get_cell_pos(self, cell_id):
+        """Return the world coordinates for topleft corner of cell.
+        """
+        x,y = self.get_cell_grid(cell_id)
+        cell_size = self.cell_size
+        rect = self.rect
+        return x*cell_size+rect.left, y*cell_size+rect.top
+
+    def collideany(self, obj):
+        """Return True if obj collides with any other object, else False.
+        """
+        collided = self._extended_collided
+        for other in self.get_nearby_objects(obj):
+            if other is obj:
                 continue
-            col.append(y)
-        text.append(col)
-        col = []
-        #print text
-    m =0
-    n = 0
-    for y in text:
-        for x in y:
-            if m - 1 >= 0 and m + 1 <= 37:
-                if n-1 >= 0 and n+1 <= 119:#
-                    cur = y[n] #current AKA Middle
-                    left = y[n - 1]
-                    right = y[n + 1]
-                    top = text[m - 1][n]
-                    bot = text[m + 1][n]
-                    f = "."
-                    if cur == "-":
-                        if left == "-":
-                            if right == "-":
-                                if bot == "-":
-                                    if top == "-":
-                                        f = "4" #Surrounded
-                                    else:
-                                        f = "1"
-                                elif top == "-":
-                                    f = "7"
-                                else:
-                                    f = "1"
-                            elif top == "-":
-                                f = "8"
-                            elif bot == "-":
-                                f = "2"
-                            else:
-                                f = "2"
-                            #elif:
-                        elif right == "-": #NO LEFT
-                            if top == '-':
-                                if bot == "-":
-                                    f = "3"
-                                else:
-                                    f = "6"
-                            elif bot == "-":
-                                f = "0"
-                            else:
-                                f = "0"
-                        elif top == "-": #NO LEFT OR RIGHT
-                            if bot == "-":
-                                f = "4"
-                            else:
-                                f = "7"
-                        elif bot == "-": #NO LEFT, RIGHT, OR UP
-                            f = "1"
+            if collided(obj, other):
+                return True
+        return False
 
-                        else:
-                            f = "1"
-                    print y[n + 1], f, y[n-1]
-                    print text[m + 1][n - 1], text[m + 1][n], text[m + 1][n + 1]
+    def collide(self, obj):
+        """Return list of objects that collide with obj.
+        """
+        collisions = []
+        collided = self._extended_collided
+        for other in self.get_nearby_objects(obj):
+            if other is obj:
+                continue
+            if collided(obj, other):
+                collisions.append(other)
+        return collisions
 
-            n += 1
-        m += 1
+    def collidealldict(self, rect=None):
+        """Return dict of all collisions.
 
-        n = 0
+        If rect is specified, only the cells that intersect rect will be
+        checked.
 
+        The contents of the returned dict are: {obj : [other1,other2,...],...}
+        """
+        collisions = {}
+        self.coll_tests = 0
+        collided = self._extended_collided
+        if rect:
+            cells = [self.get_cell(i) for i in self.intersect_indices(rect)]
+        else:
+            cells = self.buckets
+        for cell in cells:
+            for obj in cell:
+                for other in cell:
+                    if other is obj:
+                        continue
+                    self.coll_tests += 1
+                    if collided(obj, other):
+                        if obj not in collisions:
+                            collisions[obj] = []
+                        collisions[obj].append(other)
+        return collisions
+
+    def collidealllist(self, rect=None):
+        """Return list of all collisions.
+
+        If rect is specified, only the cells that intersect rect will be
+        checked.
+
+        The contents of the returned list are: [(obj,other),...]
+        """
+        collisions = set()
+        self.coll_tests = 0
+        collided = self._extended_collided
+        if rect:
+            cells = [self.get_cell(i) for i in self.intersect_indices(rect)]
+        else:
+            cells = self.buckets
+        for cell in cells:
+            for obj in cell:
+                for other in cell:
+                    if other is obj:
+                        continue
+                    self.coll_tests += 1
+                    if collided(obj, other):
+                        c1 = (obj,other)
+                        c2 = (other,obj)
+                        collisions.add(c1)
+                        collisions.add(c2)
+        return list(collisions)
+
+    @staticmethod
+    def _extended_collided(obj, other):
+        if obj.rect.colliderect(other.rect):
+            if hasattr(obj, 'collided') and hasattr(other, 'collided'):
+                return obj.collided(obj, other)
+            else:
+                return True
+        else:
+            return False
+
+    def clear(self):
+        """Clear all objects.
+        """
+        for cell in self.buckets.values():
+            del cell[:]
+
+    def iterobjects(self):
+        """Returns a generator that iterates over all objects.
+
+        Invoking a SpatialHash object as an iterator produces the same behavior
+        as iterobjects().
+        """
+        for obj in self.cell_ids:
+            yield obj
+
+    def itercells(self):
+        """Returns a generator that iterates over all cells.
+        """
+        for cell in self.buckets:
+            yield cell
+
+    def __iter__(self):
+        for obj in self.cell_ids:
+            yield obj
+
+    def __contains__(self, obj):
+        return obj in self.cell_ids
+
+    def __len__(self):
+        return len(self.objects)
+
+    def __str__(self):
+        return

@@ -1,28 +1,29 @@
-import pygame
 import random
-import spritesheet
-import other
+
+import pygame
 
 fragmentgroup = pygame.sprite.Group()
-#sprites that fly every which-way
+
+
+# sprites that fly every which-way
 class Fragment(pygame.sprite.Sprite):
     gravity = True
+
     def __init__(self, pos, image):
         pygame.sprite.Sprite.__init__(self)
 
-        self.pos = [0.0,0.0]
+        self.pos = [0.0, 0.0]
         self.pos[0] = pos[0]
         self.pos[1] = pos[1]
-        self.image = image#pygame.Surface((50,50))
-        n = random.randrange(0,64,8)
-        #self.image = pygame.transform.scale(self.image, (n,n)  )
+        self.image = image  # pygame.Surface((50,50))
+        # self.image = pygame.transform.scale(self.image, (n,n)  )
         self.rect = self.image.get_rect()
-        self.rect.center =self.pos
-        self.lifetime = 60 +random.random()*5
+        self.rect.center = self.pos
+        self.lifetime = 60 + random.random() * 5
         self.time = 0.0
-        self.fragmentmaxspeed= 4
+        self.fragmentmaxspeed = 4
         self.dx = random.randint(-self.fragmentmaxspeed, self.fragmentmaxspeed)
-        self.dy =random.randint(-self.fragmentmaxspeed, self.fragmentmaxspeed)
+        self.dy = random.randint(-self.fragmentmaxspeed, self.fragmentmaxspeed)
 
     def update(self, seconds):
         self.time += seconds
@@ -32,14 +33,15 @@ class Fragment(pygame.sprite.Sprite):
         self.pos[1] += self.dy * seconds
         if Fragment.gravity:
             self.dy += .66
-        self.rect.centerx = round(self.pos[0],0)
-        self.rect.centery = round(self.pos[1],1)
+        self.rect.centerx = round(self.pos[0], 0)
+        self.rect.centery = round(self.pos[1], 1)
 
-#more custom fragments
+
+# more custom fragments
 class custFrag(Fragment):
     gravity = True
 
-    def __init__(self, pos, size,color):
+    def __init__(self, pos, size, color):
         pygame.sprite.Sprite.__init__(self)
         self.pos = [0.0, 0.0]
         self.pos[0] = pos[0]

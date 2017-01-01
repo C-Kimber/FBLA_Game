@@ -2,15 +2,10 @@ Add mass to players for better bouncing
 
 check other surrounding walls to created mearged tiles
 
+change goal
+
 use vector with random variables to create elevevation in random background (#less important)
 
-fix tile collisions  (#not quite working)
-
-fix fragment class  (#causes major lag)
-
-optimize fragment class to not cause lag, when using png's
-
-add goal at end of level
 
 add enemies
 		*ground enemy, flying enemy, jumping enemy
@@ -32,6 +27,10 @@ add hitable blocks
 add power ups for battle mode
 
 add "tools" for story mode (aka mairo powerups)
+
+
+map(lambda x: x-50, pygame.mouse.get_pos()))
+refer to map function in p.5 and processing (daniel riffman/nature of code)
 
 
 

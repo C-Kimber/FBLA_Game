@@ -26,6 +26,8 @@ class DataD:
 
         self.scrollx = 0
         self.scrolly = 0
+
+        self.is_back = False
         return
 
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
@@ -55,15 +57,14 @@ class DataD:
             self.cameraY += 32
         if pygame.K_s in keys:
             self.cameraY -= 32
-        print self.cameraX
         if self.cameraY > 0:
             self.cameraY = 0
-        if self.cameraY < -1088:
-            self.cameraY = -1088
+        if self.cameraY < -608:
+            self.cameraY = -608
         if self.cameraX > 0:
             self.cameraX = 0
-        if self.cameraX < -3520:
-            self.cameraX = -3520
+        if self.cameraX < -16384:
+            self.cameraX = -16384
 
 
         if 1 in buttons:
@@ -88,12 +89,12 @@ class DataD:
             self.button(mouse_position, ((880, 160+self.scrolly, 32, 32)), 'b')  # enemy
             self.button(mouse_position, ((880, 224+self.scrolly, 32, 32)), 'h')
             if mouse_position[0] > 0 and mouse_position[0] < 800:
-                self.level.write(block,self.selected)
+                self.level.write(block,self.selected,self.is_back)
 
         elif 2 in buttons:
             self.level.clear()
         elif 3 in buttons :
-            self.level.write(block)
+            self.level.write(block,".",self.is_back)
             
         if pygame.K_SPACE in keys: #Scrolling the side bar
 
@@ -115,6 +116,10 @@ class DataD:
             print 'FILE  level_0'+str(self.l) +" HAS BEEN DELETED"
             pygame.quit()
             sys.exit(0)
+        if pygame.K_MINUS in newkeys:
+            self.is_back = not self.is_back
+            print self.is_back
+
 
 
         if pygame.K_RIGHT in newkeys:
@@ -151,16 +156,17 @@ class DataD:
                 self.level.clear()
 
     def draw(self, surface):
-        print self.scrolly
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((255, 255, 255), rect)  # back
 
-        self.level.display(surface,(self.cameraX,self.cameraY),self.sprite_library)
+        self.level.display(surface,(self.cameraX,self.cameraY),self.is_back)
+
 
 
         r = pygame.Rect(800,0,180, 640)
         pygame.draw.rect(surface, (255, 255, 255), r)
         pygame.draw.rect(surface, (25, 25, 25), r,5)
+
         surface.blit(self.sprite_library["wall_2"], pygame.Rect(832,32+self.scrolly,32, 32)) #wall
         pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+49, 32+self.scrolly, 16, 16))  # Lwall s
         pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832+81, 32+self.scrolly, 16, 16))  # lwall m

@@ -5,10 +5,8 @@ import math
 import other
 
 
-
 class Base(pygame.sprite.Sprite):
-
-    def __init__(self, pos, image=pygame.Surface((32,32))):
+    def __init__(self, data, pos, image=pygame.Surface((32, 32))):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = image
@@ -29,7 +27,7 @@ class Base(pygame.sprite.Sprite):
         self.image = image
         self.imageH = image
 
-        #self.image.fill((255,0,0))
+        # self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
         self.spanwx = pos[0]
@@ -42,17 +40,18 @@ class Base(pygame.sprite.Sprite):
         self.player = None
 
         self.otherplayers = pygame.sprite.Group()
+        self.collidables = pygame.sprite.Group()
 
         self.down = False
 
         self.jumps = 1
 
-
-
         self.maxyvel = 15  # * (self.mass / 100)
         self.maxxvel = 3
 
         self.alive = True
+        self.data = data
+        self.tick = 0
 
     def moveLeft(self):
 
@@ -75,14 +74,14 @@ class Base(pygame.sprite.Sprite):
 
         return
 
-
     def update(self):
         highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH
 
 
         if self.state == 'NORMAL':
             distance = math.sqrt((self.player.rect.x - self.rect.x) ** 2 + (self.player.rect.y - self.rect.y) ** 2)
-            if distance < 500:
+            d2 = other.distance((0,other.WIDTH),(0, other.HEIGHT))
+            if distance < d2:
                 self.applyDrag("air")
                 # movement control
 
@@ -91,7 +90,7 @@ class Base(pygame.sprite.Sprite):
                     self.xvel = self.maxxvel
                 if self.xvel < -self.maxxvel:
                     self.xvel = -self.maxxvel
-                if self.xvel < 0.21 and self.xvel > -0.21:
+                if 0.21 > self.xvel > -0.21:
                     self.xvel = 0.0
 
                 # y velocity control
@@ -101,19 +100,20 @@ class Base(pygame.sprite.Sprite):
                 elif self.yvel < -self.maxyvel:
                     self.yvel = -self.maxyvel
 
+                self.data.getCollidables(self)
                 self.rect.x += self.xvel
-                self.wallColl(self.xvel, 0, self.walls)
+                self.wallColl(self.xvel, 0, self.collidables)
                 self.rect.y -= self.yvel
                 self.onGround = False
-                self.wallColl(0, self.yvel, self.walls)
+                self.wallColl(0, self.yvel, self.collidables)
 
                 self.wallCollisions()
                 self.playerColl()
-                #if self.otherplayers != None: self.playerCollisions()
+                # if self.otherplayers != None: self.playerCollisions()
 
                 # gravity
-                if self.onGround == False:
-                    self.yvel -= .66# * self.mass
+                if not self.onGround:
+                    self.yvel -= .66  # * self.mass
 
                 self.boundries(highbound, lowbound, leftbound, rightbound)
                 self.movementAI()
@@ -122,6 +122,7 @@ class Base(pygame.sprite.Sprite):
 
         elif self.state == "DYING":
             self.dying()
+
         return
 
     def wallCollisions(self):
@@ -129,7 +130,7 @@ class Base(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, self.deaths, False):
             self.rect.y -= 3
             self.state = "DYING"
-            self.die(10,(2-random.randrange(-4, 8, 2)))
+            self.die(10, (2 - random.randrange(-4, 8, 2)))
 
         """hit_teles2 = pygame.sprite.spritecollide(self, self.teles2, False)
         hit_teles = pygame.sprite.spritecollide(self, self.teles, False)
@@ -168,13 +169,14 @@ class Base(pygame.sprite.Sprite):
 
     def playerColl(self):
         if pygame.sprite.collide_rect(self, self.player):
-            if self.player.rect.bottom < self.rect.bottom-16:
+            if self.player.rect.bottom < self.rect.bottom - 16:
                 self.player.jumps = 1
                 self.player.yvel = 5
 
-                self.die((random.randrange(-6, 6, 2)),7)
+                self.die((random.randrange(-6, 6, 2)), 7)
             else:
                 self.player.die()
+
     # stays onscreen
     def boundries(self, highbound, lowbound, leftbound, rightbound):
         if self.rect.x - 33 + self.width >= rightbound:
@@ -184,12 +186,12 @@ class Base(pygame.sprite.Sprite):
         elif self.rect.x <= leftbound:
             self.dir = "RIGHT"
             self.rect.x = leftbound + 1
-            self.xvel  *= -1
+            self.xvel *= -1
         if self.rect.y >= lowbound + 96:
             self.rect.y -= 3
             self.state = "DYING"
             self.yvel = 10
-            self.xvel = random.randrange(-6,6,2)
+            self.xvel = random.randrange(-6, 6, 2)
 
 
             # self.yvel = 0
@@ -199,33 +201,32 @@ class Base(pygame.sprite.Sprite):
 
         return
 
-
     # Collisions with walls
     def wallColl(self, xvel, yvel, colliders):
-        if self.walls != None:
-            for collider in colliders:
-
-                    if pygame.sprite.collide_rect(self, collider):
-                        if xvel > 0:
-                            self.rect.right = collider.rect.left
-                            self.xvel = 0
-                            self.dir = "LEFT"
-                        if xvel < 0:
-                            self.rect.left = collider.rect.right
-                            self.xvel = 0
-                            self.dir = "RIGHT"
-                        if yvel < 0:
-                            self.rect.bottom = collider.rect.top
-                            self.onGround = True
-                            self.jumps = 3
-                            self.yvel = 0
-                        if yvel > 0:
-                            self.yvel = 0
-                            self.rect.top = collider.rect.bottom
+        #if colliders is not None:
+        for collider in colliders:
+            if pygame.sprite.collide_rect(self, collider):
+                #print "colliding"
+                if xvel > 0:
+                    self.rect.right = collider.rect.left
+                    self.xvel = 0
+                    self.dir = "LEFT"
+                if xvel < 0:
+                    self.rect.left = collider.rect.right
+                    self.xvel = 0
+                    self.dir = "RIGHT"
+                if yvel < 0:
+                    self.rect.bottom = collider.rect.top
+                    self.onGround = True
+                    self.jumps = 3
+                    self.yvel = 0
+                if yvel > 0:
+                    self.yvel = 0
+                    self.rect.top = collider.rect.bottom
 
         return
 
-    def die(self,xvel,yvel):
+    def die(self, xvel, yvel):
         if xvel == 0:
             xvel = -2
         self.xvel = xvel
@@ -238,8 +239,9 @@ class Base(pygame.sprite.Sprite):
         self.rect.x += self.xvel
 
         self.yvel -= .66
-        #self.image = pygame.transform.rotate(self.imageH, math.floor(self.yvel*10))
-        self.image = pygame.transform.rotozoom(self.imageH, math.floor(self.zed*-200*other.unitNum(self.xvel)), 1+self.zed*self.xvel/6)
+        # self.image = pygame.transform.rotate(self.imageH, math.floor(self.yvel*10))
+        self.image = pygame.transform.rotozoom(self.imageH, math.floor(self.zed * -200 * other.unitNum(self.xvel)),
+                                               1 + self.zed * self.xvel / 6)
         # like throwing at player ##self.image = pygame.transform.rotozoom(self.imageH, math.floor(self.yvel), -self.yvel / 10)
         if self.rect.top > other.TOTAL_LEVEL_WIDTH + 96:
             self.alive = False
@@ -257,4 +259,3 @@ class Base(pygame.sprite.Sprite):
             drag = math.ceil(n * a) / 5
 
         self.xvel += drag
-

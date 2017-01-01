@@ -1,13 +1,12 @@
 from game_mouse import Game
-from Data import Data
+from data import Data
 from DataD import DataD
 import other
 
 
 class Design(Game):
-
     def __init__(self, width, height, frame_rate):
-        self.newGame(width,height, frame_rate)
+        self.newGame(width, height, frame_rate)
         return
 
     def game_logic(self, keys, newkeys, buttons, newbuttons, mouse_position):
@@ -28,13 +27,12 @@ class Design(Game):
 
 
 class Adventure(Game):
-
     def __init__(self, width, height, frame_rate):
-        self.newGame(width,height, frame_rate)
+        self.newGame(width, height, frame_rate)
         return
 
     def game_logic(self, keys, newkeys, buttons, newbuttons, mouse_position):
-        #switch between modes I.E. menu and game
+        # switch between modes I.E. menu and game
         if other.GAMESTATE == 0:
             self.data.menuve(keys, newkeys, buttons, newbuttons, mouse_position)
         if other.GAMESTATE == 1:
@@ -59,5 +57,5 @@ class Adventure(Game):
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
-        Game.__init__(self, "THE GAME", width, height, frame_rate)
+        Game.__init__(self, "Uukukoa", width, height, frame_rate)
         self.data = Data(width, height, frame_rate)
