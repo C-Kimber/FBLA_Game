@@ -30,7 +30,7 @@ class Game:
             (other.WIDTH, other.HEIGHT),
 
             flags
-            , 32)
+            , 8)
 
         pygame.display.set_caption(name)
         #pygame.display.toggle_fullscreen()

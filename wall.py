@@ -6,7 +6,7 @@ import spritesheet
 
 # WAll class, I.E. platforms
 class Wall(pygame.sprite.DirtySprite):
-    def __init__(self, x, y, image, type, region=(0, 0)):
+    def __init__(self, x, y, image, type=5, region=(0, 0)):
         pygame.sprite.DirtySprite.__init__(self)
 
         self.x = x
@@ -24,6 +24,12 @@ class Wall(pygame.sprite.DirtySprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+        return
+
+class TWall(pygame.sprite.DirtySprite):
+    def __init__(self, x, y,):
+        pygame.sprite.DirtySprite.__init__(self)
+        self.rect = (x,y,32,32)
         return
 
 

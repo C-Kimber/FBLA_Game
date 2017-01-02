@@ -266,6 +266,8 @@ class Level:
         btxt = open(self.bfile)
         self.connectBackTextures(thing, btxt)
         self.connectTextures(thing, txt)
+
+
         txt.close()
         btxt.close()
         print "LEVEL LOADED"
@@ -537,7 +539,7 @@ class Level:
 
                             else:
                                 f = 15
-                            data.back_sprites.add( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
+                            data.allwalls.add( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
                                                    f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
                             #walllist.append ( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
                              #                          f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))

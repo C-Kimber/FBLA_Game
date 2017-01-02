@@ -52,6 +52,8 @@ class Player(pygame.sprite.Sprite):
         self.mass = 100  # at mass 190, goes down through walls
         self.xmom = 0
         self.ymom = 0
+        self.current_chunk  = (0,1)
+        self.prev_chunk = self.current_chunk
 
         self.maxyvel = 15  # * (self.mass / 100)
         self.maxxvel = 11
@@ -147,6 +149,9 @@ class Player(pygame.sprite.Sprite):
             self.yvel -= .0066 * self.mass
 
         self.boundries(highbound, lowbound, leftbound, rightbound)
+        #self.getChunk()
+        self.current_chunk = math.floor((self.rect.x) / (256)), math.floor(
+            (self.rect.y) / 256)
 
         self.down = False
         return
@@ -309,13 +314,11 @@ class Player(pygame.sprite.Sprite):
 
         self.xvel += drag
 
-    def getRegion(self):
-        self.region = math.floor((self.rect.right + self.rect.left) / (864 * 2)), math.floor(
-            (self.rect.top + self.rect.bottom) / (864 * 2))
-        if self.region != self.oldregion:
-            print "NEW REGION: " + str(self.region)
-            self.data.getCollidables(self)
-            self.oldregion = self.region
+    def getChunk(self):
+        self.current_chunk = math.floor((self.rect.right + self.rect.left) / (256 )), math.floor(( self.rect.top + self.rect.bottom) / 256 )
+        if self.current_chunk != self.prev_chunk:
+            print "NEW CHUNK " + str(self.current_chunk)
+            self.prev_chunk = self.current_chunk
 
         return
 

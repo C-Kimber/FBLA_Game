@@ -9,6 +9,7 @@ from level import Level
 import os
 from camera import Camera
 import camera
+from hashmap import HashMap
 
 
 
@@ -62,6 +63,9 @@ class Data():
         self.enemies = pygame.sprite.Group()
         self.back_sprites = pygame.sprite.Group()
         self.displayTiles = pygame.sprite.Group()
+
+        self.hashedwalls = ""
+        self.displayhaswall = []
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -271,6 +275,7 @@ class Data():
 
 
             self.all_sprites.update()
+            self.chunkUpdate()
 
 
 
@@ -449,9 +454,11 @@ class Data():
 
 
         #draw background tiles/sprites
-        for b in self.back_sprites:
+        """for b in self.back_sprites:
             if b.rect.x > -32 - cx and b.rect.right < -cx + other.WIDTH+32 and b.rect.top > -cy - 32 and b.rect.bottom < -cy + other.HEIGHT+32:
-                surface.blit(b.image, self.camera.apply(b))
+                surface.blit(b.image, self.camera.apply(b))"""
+
+        self.renderChunk(surface)
 
         #draw sprites
         for e in self.all_sprites:
@@ -461,10 +468,15 @@ class Data():
                 surface.blit(e.image, self.camera.apply(e))
 
 
+        """for d in self.allwalls:
+            if d:
+                for c in d:
+                    surface.blit(c.image, self.camera.apply(c))
         for w in self.allwalls:
+            #print w
             if w.rect.x > -32 - cx and w.rect.right < -cx + other.WIDTH + 32 and w.rect.top > -cy - 32 and w.rect.bottom < -cy + other.HEIGHT + 32:
                 rs = surface.blit(w.image, self.camera.apply(w))
-        allwalls = self.allwalls
+        #allwalls = self.allwalls"""
 
 
 
@@ -488,6 +500,8 @@ class Data():
                 self.emptyLists()
                 self.level.gameLev(self)
                 self.allwalls.add(self.wall_list)
+                self.hashedwalls.hashmap.from_objects(32,self.allwalls)
+                print hashmap.query(wall.Wall(32,32,self.sprite_library["wall_5"],4))
                 self.all_sprites.add(self.player)
                 for e in self.all_sprites:
                     if isinstance(e, enemy.Base) == True:
@@ -611,6 +625,8 @@ class Data():
         self.level.gameLev(self)
         #self.getCollidables()
         self.allwalls.add(self.wall_list)
+        self.hashedwalls = HashMap.from_objects(256, self.allwalls)
+        self.allwalls = self.getChunk()
         #self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
@@ -699,7 +715,7 @@ class Data():
         self.players.empty()
         self.enemies.empty()
         self.hitwalls.empty()
-        self.allwalls.empty()
+        #self.allwalls.empty()
 
     def resetLists(self):
         self.emptyLists()
@@ -763,4 +779,89 @@ class Data():
                     if distance < 50:
                         #if w.region == region:
                         obj.collidables.add(w)
+
+    def getChunk(self):
+        """Gets initial chunks"""
+        cell_size = 256
+        #chunkx = []
+        chunks = []
+        for a in range(-3,6):
+            for b in range(-2,4):
+                chnk = self.hashedwalls.query(wall.Wall(self.player.rect.x + a * cell_size, self.player.rect.y + b * cell_size, self.sprite_library["wall_1"], 5))
+                if chnk:
+                    chunks.append(chnk)
+            #chunks.append(chunkx)
+
+        return chunks
+
+    def chunkUpdate(self):
+        p = self.player
+        if p.current_chunk != p.prev_chunk:
+            chunks = self.allwalls
+            dx , dy = p.current_chunk[0] - p.prev_chunk[0], p.current_chunk[1] - p.prev_chunk[1]
+            print (dx, dy)
+            dir = "NUN"
+            if (dx,dy) == (0, 1):
+                dir = "DOWN"
+            if (dx,dy) == (0, -1):
+                dir = "UP"
+            if (dx,dy) == (1, 0):
+                dir = "RIGHT"
+            if (dx,dy) == (-1, 0):
+                dir = "LEFT"
+
+            if  0 > dx or dx > 0 or 0 > dy or dy > 0:
+                for x in range(1, 5):
+                    self.chunkFoo(dx * x,0)
+                    self.chunkFoo(dx * x, 1)
+                    self.chunkFoo(dx * x, -1)
+                    self.chunkFoo(dx * x, 2)
+                    self.chunkFoo(dx * x, -2)
+
+
+
+
+            p.prev_chunk = p.current_chunk
+
+
+
+
+            """elif 0 > dy or dy > 0:
+                new_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0]) * 256), int((p.current_chunk[1]+dy) * 256),
+                                                          self.sprite_library["wall_1"], 5)))
+                old_chunk = self.hashedwalls.query(
+                    (wall.Wall(int((p.current_chunk[0]) * 256), int((p.current_chunk[1] - dy) * 256),
+                               self.sprite_library["wall_1"], 5)))
+
+                if new_chunk:
+                    if old_chunk in self.allwalls:
+                        self.allwalls.remove(old_chunk)
+                    self.allwalls.append(new_chunk)"""
+    def chunkFoo(self,dx,dy):
+        p = self.player
+
+        new_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0] + dx) * 256), int((p.current_chunk[1]+dy) * 256),self.sprite_library["wall_1"], 5)))
+        old_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0] - (dx+other.unitNum((dx))*3)) * 256), int((p.current_chunk[1]+dy) * 256),self.sprite_library["wall_1"], 5)))
+
+        if old_chunk in self.allwalls:
+            self.allwalls.remove(old_chunk)
+        if new_chunk and not new_chunk in self.allwalls:
+
+            self.allwalls.append(new_chunk)
+
+
+
+
+
+    def renderChunk(self, surface):
+        for chunk in self.allwalls:
+            for row in chunk:
+                surface.blit(row.image, self.camera.apply(row))
+                #for col in row:
+                    #surface.blit(col.image, self.camera.apply(col))
+
+        return
+
+
+
 

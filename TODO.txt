@@ -28,6 +28,20 @@ add power ups for battle mode
 
 add "tools" for story mode (aka mairo powerups)
 
+#REQUIREMENTS:
+    1980S STYLE VIDOE ARCADE GAME
+    3 LEVELS OF PLAY
+    THRE LIVES OF CHANCE
+    KEEP SCORE
+    RUN ON WINDOWS 7 OR NEWER
+    STANDALONE EXECUTABLE
+    VIRUS MALWARE FREE
+    CELEBRATORY EVENT AND CONCLUSION
+    LEADERBOARD
+    AUDIO AND VISUAL INDICATOR THAT GAME IS COMPLETED
+    RUN SOLELY BY SKEYBOARD
+    MAXIMUM ESRB RATING OF E10+
+
 
 map(lambda x: x-50, pygame.mouse.get_pos()))
 refer to map function in p.5 and processing (daniel riffman/nature of code)

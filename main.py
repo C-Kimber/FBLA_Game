@@ -3,6 +3,7 @@ from Adventure import Adventure
 import other
 
 
+
 def main():
     pygame.font.init()
     other.getRes()
@@ -12,8 +13,8 @@ def main():
     "doing things"
     return
 
-
 if __name__ == "__main__":
     print "RUNNING GAME"
     main()
     print "SHUTTING DOWN GAME"
+
