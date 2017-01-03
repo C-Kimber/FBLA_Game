@@ -119,14 +119,14 @@ class teleWall2(teleWall):
 
 
 class upWall(Wall):
-    def __init__(self, x, y, image):
+    def __init__(self, x, y, image, type= 12):
         pygame.sprite.Sprite.__init__(self)
 
         self.x = x
         self.y = y
         self.width = 30
         self.height = 30
-
+        self.type = type
         self.image = image  # ss.image_at((0, 0, 32, 32), (254, 254, 254)).convert_alpha()
         # self.image.fill((255,255,0))
 

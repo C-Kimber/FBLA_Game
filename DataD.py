@@ -13,13 +13,13 @@ class DataD:
         self.height = height
         self.frame_rate = frame_rate
         self.sprite_library = other.load_images()
-        self.level = Level("level_0",'./assets/long_levels/')
+        self.level = Level("level_"+str(other.STARTING_LEVEL),'./assets/long_levels/')
         #self.level = Level("level_01")
         self.num_files = len([f for f in os.listdir("./assets/levels")
                               if os.path.isfile(os.path.join("./assets/levels", f))])
         self.l = 1
-        self.selected = "."
-        self.multi  =32
+        self.selected = "0"
+        self.multi  =16
 
         self.cameraX = 0
         self.cameraY = 0
@@ -32,8 +32,7 @@ class DataD:
 
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mp = mouse_position
-
-        block = [(self.mp[1]-self.cameraY) / 32, (self.mp[0]-self.cameraX) / 32]
+        block = [(self.mp[0]-self.cameraX/2) / 32, (self.mp[1]-self.cameraY) / 32]
         self.b = block
         #if other.GAMESTATE == 2:
             #block = [self.mp[1] / 8+self.cameraX, self.mp[0] / 8+self.cameraY]
@@ -50,17 +49,18 @@ class DataD:
                 block[1] = 24
 
         if pygame.K_a in keys:
-            self.cameraX += 32
+            self.cameraX += 4*self.multi
         if pygame.K_d in keys:
-            self.cameraX -= 32
+            self.cameraX -= 4*self.multi
         if pygame.K_w in keys:
-            self.cameraY += 32
+            self.cameraY += 4*self.multi
         if pygame.K_s in keys:
-            self.cameraY -= 32
+            self.cameraY -= 4*self.multi
+
         if self.cameraY > 0:
             self.cameraY = 0
-        if self.cameraY < -608:
-            self.cameraY = -608
+        if self.cameraY < -736:
+            self.cameraY = -736
         if self.cameraX > 0:
             self.cameraX = 0
         if self.cameraX < -16384:
@@ -68,33 +68,32 @@ class DataD:
 
 
         if 1 in buttons:
-            self.button(mouse_position,(self.width-37, self.height-37, 32, 32),".")#clear selected
+            #print block
+            self.button(mouse_position,(self.width-37, self.height-37, 32, 32),"0")#clear selected
             #self.clearbutton(mouse_position, (self.width - 69, self.height - 37, 32, 32))  # clear
-            self.button(mouse_position, (832,32+self.scrolly,32, 32),'-') #wall
-            self.button(mouse_position, (832, 96+self.scrolly, 32, 32),"X")  # lava
-            self.button(mouse_position,(832, 160+self.scrolly, 32, 32),"1")  #p1
-            self.button(mouse_position,(832, 224+self.scrolly, 32, 32),"2")  #p2
-            self.button(mouse_position,(832, 288+self.scrolly, 32, 32),"3")  #p3
-            self.button(mouse_position,(832, 352+self.scrolly, 32, 32),"4")  #p4
-            self.button(mouse_position,(832, 416+self.scrolly, 32, 32),"T")   #telewall 1
-            self.button(mouse_position,(832, 480+self.scrolly, 32, 32), "t")   #telewall 2
-            self.button(mouse_position,(832 + 49, 32+self.scrolly, 16, 16),"=") #longwall small
-            self.button(mouse_position,(832 + 81, 32+self.scrolly, 16, 16),"[") #longwall medium
-            self.button(mouse_position, (832 +113, 32+self.scrolly, 16, 16),"_") #longwall large
-            self.button(mouse_position, (832 + 49, 49+self.scrolly, 16, 16), ";")  # longwall small
-            self.button(mouse_position, (832 + 81, 49+self.scrolly, 16, 16), "/")  # longwall medium
-            self.button(mouse_position, (832 + 113, 49+self.scrolly, 16, 16), "|")  # longwall large
-            self.button(mouse_position, ((832 + 113, 67+self.scrolly, 32, 16)),'+')
-            self.button(mouse_position, ((880, 96+self.scrolly, 32, 32)), 'E') #Finish block
-            self.button(mouse_position, ((880, 160+self.scrolly, 32, 32)), 'b')  # enemy
-            self.button(mouse_position, ((880, 224+self.scrolly, 32, 32)), 'h')
+            self.button(mouse_position,( 832,  32+self.scrolly,      32, 32),'1') #wall
+            self.button(mouse_position,( 832,  96+self.scrolly,      32, 32),"3")  # lava
+            self.button(mouse_position,( 832,  160+self.scrolly,     32, 32),"5")  #p1
+            self.button(mouse_position,( 832,  224+self.scrolly,     32, 32),"6")  #p2
+            self.button(mouse_position,( 832,  416+self.scrolly,     32, 32),"4a")   #telewall 1
+            self.button(mouse_position,( 832,  480+self.scrolly,     32, 32), "4b")   #telewall 2
+            self.button(mouse_position,( 832 + 49, 32+self.scrolly, 16, 16),"=") #longwall small
+            self.button(mouse_position,( 832 + 81, 32+self.scrolly, 16, 16),"[") #longwall medium
+            self.button(mouse_position,( 832 + 113, 32+self.scrolly, 16, 16),"_") #longwall large
+            self.button(mouse_position,( 832 + 49, 49+self.scrolly,  16, 16), ";")  # longwall small
+            self.button(mouse_position,( 832 + 81, 49+self.scrolly,  16, 16), "/")  # longwall medium
+            self.button(mouse_position,( 832 + 113, 49+self.scrolly, 16, 16), "|")  # longwall large
+            self.button(mouse_position,((832 + 113, 67+self.scrolly, 32, 16)),'2')
+            self.button(mouse_position,((880,  96+self.scrolly, 32, 32)), '7') #Finish block
+            self.button(mouse_position,((880,  160+self.scrolly, 32, 32)), '8')  # enemy
+            self.button(mouse_position,((880,  224+self.scrolly, 32, 32)), '9')  #hitable/breakable block
             if mouse_position[0] > 0 and mouse_position[0] < 800:
                 self.level.write(block,self.selected,self.is_back)
 
         elif 2 in buttons:
             self.level.clear()
         elif 3 in buttons :
-            self.level.write(block,".",self.is_back)
+            self.level.write(block,"0",self.is_back)
             
         if pygame.K_SPACE in keys: #Scrolling the side bar
 
@@ -118,7 +117,6 @@ class DataD:
             sys.exit(0)
         if pygame.K_MINUS in newkeys:
             self.is_back = not self.is_back
-            print self.is_back
 
 
 
@@ -141,7 +139,7 @@ class DataD:
             self.level = Level("level_0"+str(self.l))
             print "LEVEL_0"+str(self.l)
 
-    def button(self,mp,rect,char='.'):
+    def button(self,mp,rect,char='0'):
         mx,my = mp
         x,y,w,h = rect
         if mx > x and mx < x+w:
@@ -205,8 +203,8 @@ class DataD:
 
         #follow mouse
         if self.mp[0] < 800:
-            pygame.draw.rect(surface, (55, 55, 255), pygame.Rect(self.b[1] * 32+ self.cameraX, self.b[0] * 32+self.cameraY, 32, 32), 3)
-            if self.selected != ".":
+            pygame.draw.rect(surface, (55, 55, 255), pygame.Rect(self.b[0] * 32+ (self.cameraX/2), self.b[1] * 32+self.cameraY, 32, 32), 3)
+            if self.selected != "0":
                 if self.selected == "-":
                     pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(self.b[1]*32+self.cameraX,self.b[0]*32+self.cameraY, 32, 32))  # wall
                 elif self.selected == "X":

@@ -53,6 +53,8 @@ class Adventure(Game):
 
         return
 
+
+
     def newGame(self, width, height, frame_rate):
         self.width = width
         self.height = height

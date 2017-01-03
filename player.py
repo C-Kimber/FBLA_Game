@@ -2,6 +2,7 @@ import math
 
 import fragment
 import other
+import wall
 from fragment import *
 
 
@@ -56,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         self.prev_chunk = self.current_chunk
 
         self.maxyvel = 15  # * (self.mass / 100)
-        self.maxxvel = 11
+        self.maxxvel = 10
         self.fimgs = None
 
         self.alive = True
@@ -86,12 +87,12 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
         if self.jumps > 0:
-            # if self.onGround == True:
-            self.onGround = False
-            self.dir = "up"
-            self.rect.y -= 1
-            self.yvel = 15
-            self.jumps = 0
+             if self.onGround == True:
+                self.onGround = False
+                self.dir = "up"
+                self.rect.y -= 1
+                self.yvel = 15
+                self.jumps = 0
 
         return
 
@@ -104,7 +105,7 @@ class Player(pygame.sprite.Sprite):
         return
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH - 96
+        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32, other.TOTAL_LEVEL_WIDTH + 96
         self.xmom = self.xvel * self.mass / 64
         self.ymom = self.yvel * self.mass / 64
         # self.playerCollisions()
@@ -133,6 +134,10 @@ class Player(pygame.sprite.Sprite):
         elif self.yvel < -self.maxyvel:
             self.yvel = -self.maxyvel
 
+        if self.dir == "up":
+            if self.yvel < 0:
+                self.dir = "down"
+
         # self.getRegion()
         self.newfnction()
         self.rect.x += self.xvel
@@ -142,7 +147,8 @@ class Player(pygame.sprite.Sprite):
         self.wallColl(0, self.yvel, self.collidables)
 
         self.wallCollisions()
-        if self.otherplayers is not None: self.playerCollisions()
+
+        if self.otherplayers is not None and other.GAMESTATE != 2: self.playerCollisions()
 
         # gravity
         if not self.onGround:
@@ -180,7 +186,6 @@ class Player(pygame.sprite.Sprite):
         if self.otherplayers is not None:
             hit_bros = pygame.sprite.spritecollide(self, self.otherplayers, False)
             for bro in hit_bros:
-
                 for _ in range(random.randint(5, 20)):
                     fragment.fragmentgroup.add(custFrag((self.rect.centerx, self.rect.centery), (1, 3), (255, 255, 0)))
 
@@ -206,6 +211,7 @@ class Player(pygame.sprite.Sprite):
     # Collisions with walls
     def wallColl(self, xvel, yvel, colliders):
         for collider in colliders:
+            if not isinstance(collider, wall.upWall):
               if pygame.sprite.collide_rect(self, collider):
 
                     if xvel > 0:
@@ -222,6 +228,20 @@ class Player(pygame.sprite.Sprite):
                     if yvel > 0:
                         self.yvel = 0
                         self.rect.top = collider.rect.bottom
+            else:
+                if pygame.sprite.collide_rect(self, collider):
+                    if collider.type < 3:
+                        if self.down:
+                            # self.rect.top = up.rect.bottom-4
+                            continue
+
+
+                        elif self.dir != "up" and round(self.rect.centery) < collider.rect.top:
+                            self.onGround = True
+                            self.yvel = 0
+                            self.rect.bottom = collider.rect.top
+                            self.jumps = 1
+                            print self.dir
         return
 
     def wallCollisions(self):
@@ -246,17 +266,7 @@ class Player(pygame.sprite.Sprite):
                     break
 
         hit_ups = pygame.sprite.spritecollide(self, self.upwalls, False)
-        for up in hit_ups:
-            if self.down:
-                # self.rect.top = up.rect.bottom-4
-                continue
 
-
-            elif up.rect.top < self.rect.bottom < up.rect.top + 10 and self.yvel < 0:
-                self.yvel = 0
-                self.rect.bottom = up.rect.top + 1
-                self.onGround = True
-                self.jumps = 1
 
     # death by explosion
     def getfimage(self, images):
@@ -278,7 +288,7 @@ class Player(pygame.sprite.Sprite):
         self.yvel -= .0066 * self.mass
         self.image = pygame.transform.rotate(self.imageH, math.floor(self.yvel * 10))
 
-        if self.rect.top > other.TOTAL_LEVEL_WIDTH + 96:
+        if self.rect.top > other.TOTAL_LEVEL_WIDTH - 96:
             self.alive = False
             self.yvel = 0
             self.xvel = 0

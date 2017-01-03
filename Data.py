@@ -18,21 +18,16 @@ class Data():
     rs = (0,0,800,640)
     allwalls = None
 
+
     def __init__(self, width, height, frame_rate):
         self.font = pygame.font.SysFont("Times New Roman", 36)
         self.font2 = pygame.font.SysFont("Times New Roman", 72)
+        self.font = pygame.font.Font("./assets/emulogic.ttf", 21)
         self.frame_rate = frame_rate
         self.width = width
         self.height = height
-        self.img = pygame.image.load('./assets/images/back_project_1_big.png')
         self.sprite_library = other.load_images()
-        self.bimgs = [ pygame.image.load('./assets/images/background_2.png').convert_alpha()]
-        """pygame.image.load('./assets/imagas/B_04.png').convert_alpha(),
-            pygame.image.load('./assets/images/B_03.png').convert_alpha(),
-            pygame.image.load('./assets/images/B_02.png').convert_alpha(),
-            pygame.image.load('./assets/imgaes/B_01.png').convert_alpha()"""
 
-        #other.load_images()
 
         self.menimg = pygame.image.load('./assets/images/background_3.png').convert_alpha()
         self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
@@ -46,6 +41,7 @@ class Data():
         self.player.data = self
         #self.playersprite = pygame.sprite.GroupSingle()
         #self.player2sprite = pygame.sprite.GroupSingle()
+
         self.player2 = Player2(self.sprite_library["player2"])
         self.player3 = self.emptysprite
         self.player4 = self.emptysprite
@@ -77,7 +73,7 @@ class Data():
 
         self.mouse_position = [0,0]
 
-        self.current_level = 0
+        self.current_level = other.STARTING_LEVEL
         self.diedfirst = 0
         self.p1score = 0
         self.p1win = 0
@@ -90,6 +86,8 @@ class Data():
 
         self.time = 0
         self.overtime = -1
+        self.level_time = 200
+        self.l_t_increment = 0
 
         self.fragmentgroup = fragment.fragmentgroup
         Fragment.groups = self.fragmentgroup, self.all_sprites
@@ -100,6 +98,13 @@ class Data():
 
 
         self.camera = Camera(camera.complex_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
+
+        self.chunksurface = pygame.Surface((other.WIDTH,other.HEIGHT))
+
+        #self.chunksurface.set_colorkey((0,0,0))
+
+
+
 
 
 
@@ -218,6 +223,13 @@ class Data():
                 other.MINISTATE = 0
         if other.MINISTATE == 0 and self.player.state == "NORMAL":
 
+            if self.level_time <= 0:
+                self.player.die()
+            self.l_t_increment +=1
+            if self.l_t_increment >= 90:
+                self.l_t_increment = 0
+                self.level_time -= 1
+
             self.camera.update(self.player)
             if self.player.alive == False:
                 self.lives -= 1
@@ -301,9 +313,6 @@ class Data():
             other.GAMESTATE = 3
             if self.overtime == -1:
                 self.overtime = 60
-
-
-
 
 
     def draw(self, surface):
@@ -442,11 +451,10 @@ class Data():
 
         return
 
-    #menu activity
     def mainDraw(self, surface):
         #surface.blit(self.img,(0-self.player.rect.x,-320))
-        rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
-        surface.fill((55, 55, 255), rect)  # back
+        #rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
+        #surface.fill((55, 55, 255), rect)  # back
 
         cx, cy, cw, ch = self.camera.state
 
@@ -457,67 +465,29 @@ class Data():
         """for b in self.back_sprites:
             if b.rect.x > -32 - cx and b.rect.right < -cx + other.WIDTH+32 and b.rect.top > -cy - 32 and b.rect.bottom < -cy + other.HEIGHT+32:
                 surface.blit(b.image, self.camera.apply(b))"""
-
+        #surface.blit(other.off_screen, (0,0) )
         self.renderChunk(surface)
-
         #draw sprites
-        for e in self.all_sprites:
+        """for e in self.all_sprites:
 
             if e.rect.x > -32 - cx and e.rect.right < -cx + other.WIDTH + 32 and e.rect.top > -cy - 32 and e.rect.bottom < -cy + other.HEIGHT + 32:
+                if not isinstance(e, Player):
 
-                surface.blit(e.image, self.camera.apply(e))
-
-
-        """for d in self.allwalls:
-            if d:
-                for c in d:
-                    surface.blit(c.image, self.camera.apply(c))
-        for w in self.allwalls:
-            #print w
-            if w.rect.x > -32 - cx and w.rect.right < -cx + other.WIDTH + 32 and w.rect.top > -cy - 32 and w.rect.bottom < -cy + other.HEIGHT + 32:
-                rs = surface.blit(w.image, self.camera.apply(w))
-        #allwalls = self.allwalls"""
+                    surface.blit(e.image, self.camera.apply(e))"""
+        surface.blit(self.player.image, self.camera.apply(self.player))
 
 
-
+        self.changeDraw(surface)
 
 
         if other.MINISTATE ==1:
             self.pauseMenu(surface)
 
-        self.drawTextLeft(surface, "Lives  " + str(self.lives), (250, 250, 250), 2, 35, self.font)
+        self.drawTextLeft(surface, "Lives " + str(self.lives), (250, 250, 250), 2, 35, self.font)
 
-        if self.player.state == "STARTING_B":
+        self.drawTextRight(surface, str(self.level_time), (250, 250, 250), other.WIDTH-8, 32, self.font)
 
-            s = pygame.Surface((other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH), pygame.SRCALPHA)
-            rect = pygame.Rect(0,0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)# per-pixel alpha
-            surface.fill((self.alph_1,0, 0, self.alph_1), rect)  # notice the alpha value in the color
-            #rect.blit(surface, (0, 0))
-            self.alph_1 -= 5
-            self.camera.update(self.player)
-            if self.alph_1 <= 0:
-                self.player.state = "NORMAL"
-                self.emptyLists()
-                self.level.gameLev(self)
-                self.allwalls.add(self.wall_list)
-                self.hashedwalls.hashmap.from_objects(32,self.allwalls)
-                print hashmap.query(wall.Wall(32,32,self.sprite_library["wall_5"],4))
-                self.all_sprites.add(self.player)
-                for e in self.all_sprites:
-                    if isinstance(e, enemy.Base) == True:
-                        e.walls = self.allwalls
-                        e.deaths = self.deathwalls
-                        e.player = self.player
-                self.alph_1 = 255
-        elif self.player.state == "STARTING_G":
-            rect = pygame.Rect(0,0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)# per-pixel alpha
-            surface.fill((0,self.alph_1, 0, self.alph_1), rect)  # notice the alpha value in the color
-            #rect.blit(surface, (0, 0))
-            self.alph_1 -= 5
-            self.camera.update(self.player)
-            if self.alph_1 <= 0:
-                self.player.state = "NORMAL"
-                self.alph_1 = 255
+
 
 
         #self.all_sprites.draw(surface)
@@ -529,7 +499,46 @@ class Data():
         surface.fill((0,0,0), rect)  # back
         self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
 
+    def changeDraw(self, surface):
+        if self.player.state == "STARTING_B":
 
+            s = pygame.Surface((other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH))
+            rect = pygame.Rect(0, 0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)  # per-pixel alpha
+            surface.fill((self.alph_1, 0, 0, self.alph_1), rect)  # notice the alpha value in the color
+            # rect.blit(surface, (0, 0))
+            self.alph_1 -= 15
+            self.camera.update(self.player)
+            if self.alph_1 <= 0:
+                self.foo()
+                self.player.state = "NORMAL"
+
+        elif self.player.state == "STARTING_G":
+            rect = pygame.Rect(0, 0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)  # per-pixel alpha
+            surface.fill((0, self.alph_1, 0, self.alph_1), rect)  # notice the alpha value in the color
+            # rect.blit(surface, (0, 0))
+            self.alph_1 -= 15
+            self.camera.update(self.player)
+
+            if self.alph_1 <= 0:
+                self.foo()
+                self.player.state = "NORMAL"
+                print self.allwalls
+
+
+    def foo(self):
+        self.allwalls = pygame.sprite.Group()
+        self.emptyLists()
+        self.level.gameLev(self)
+        self.allwalls.add(self.wall_list)
+        self.hashedwalls = HashMap.from_objects(256, self.allwalls)
+        self.all_sprites.add(self.player)
+        for e in self.all_sprites:
+            if isinstance(e, enemy.Base) == True:
+                e.walls = self.allwalls
+                e.deaths = self.deathwalls
+                e.player = self.player
+        self.alph_1 = 255
+        self.level_time = other.LEVEL_TIME
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
@@ -568,7 +577,7 @@ class Data():
                 print "BEGINNING STORY MODE"
                 other.GAMESTATE = 2
                 self.overtime = -1
-                self.current_level = 0
+                self.current_level = other.STARTING_LEVEL
                 self.initLevel()
                 self.newbuttons.remove(1)
 
@@ -626,7 +635,8 @@ class Data():
         #self.getCollidables()
         self.allwalls.add(self.wall_list)
         self.hashedwalls = HashMap.from_objects(256, self.allwalls)
-        self.allwalls = self.getChunk()
+        self.allwalls.empty()
+        self.allwalls.add(self.getChunk())
         #self.getCollidables()
         self.all_sprites.add(self.player)
         for e in self.all_sprites:
@@ -715,7 +725,7 @@ class Data():
         self.players.empty()
         self.enemies.empty()
         self.hitwalls.empty()
-        #self.allwalls.empty()
+        self.allwalls.empty()
 
     def resetLists(self):
         self.emptyLists()
@@ -773,7 +783,7 @@ class Data():
     def getCollidables(self, obj, region=(0.0, 1.0)):
         obj.collidables.empty()
         for w in self.wall_list:
-            if isinstance(w,wall.Wall):
+            if isinstance(w,wall.Wall)or isinstance(w, wall.upWall):
                 if w.type != 4:#if is surrounded by tiles
                     distance = math.sqrt((obj.rect.x - w.rect.x) ** 2 + (obj.rect.y - w.rect.y) ** 2)
                     if distance < 50:
@@ -792,14 +802,16 @@ class Data():
                     chunks.append(chnk)
             #chunks.append(chunkx)
 
+
         return chunks
+
+
 
     def chunkUpdate(self):
         p = self.player
         if p.current_chunk != p.prev_chunk:
             chunks = self.allwalls
             dx , dy = p.current_chunk[0] - p.prev_chunk[0], p.current_chunk[1] - p.prev_chunk[1]
-            print (dx, dy)
             dir = "NUN"
             if (dx,dy) == (0, 1):
                 dir = "DOWN"
@@ -825,18 +837,6 @@ class Data():
 
 
 
-
-            """elif 0 > dy or dy > 0:
-                new_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0]) * 256), int((p.current_chunk[1]+dy) * 256),
-                                                          self.sprite_library["wall_1"], 5)))
-                old_chunk = self.hashedwalls.query(
-                    (wall.Wall(int((p.current_chunk[0]) * 256), int((p.current_chunk[1] - dy) * 256),
-                               self.sprite_library["wall_1"], 5)))
-
-                if new_chunk:
-                    if old_chunk in self.allwalls:
-                        self.allwalls.remove(old_chunk)
-                    self.allwalls.append(new_chunk)"""
     def chunkFoo(self,dx,dy):
         p = self.player
 
@@ -847,20 +847,25 @@ class Data():
             self.allwalls.remove(old_chunk)
         if new_chunk and not new_chunk in self.allwalls:
 
-            self.allwalls.append(new_chunk)
-
-
+            self.allwalls.add(new_chunk)
 
 
 
     def renderChunk(self, surface):
+        rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
+        surface.fill((55, 55, 255), rect)  # back
         for chunk in self.allwalls:
-            for row in chunk:
-                surface.blit(row.image, self.camera.apply(row))
-                #for col in row:
-                    #surface.blit(col.image, self.camera.apply(col))
+            surface.blit(chunk.image, self.camera.apply(chunk))
+
+
 
         return
+
+
+
+    def nextChunk(self):
+        return
+
 
 
 

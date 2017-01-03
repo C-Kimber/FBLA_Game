@@ -9,7 +9,7 @@ class Camera(object):
         self.state = Rect(0, 0, width, height)
 
     def apply(self, target):
-        return target.rect.move(self.state.topleft)
+        return target.rect.move((self.state.topleft[0],self.state.topleft[1]) )
 
     def update(self, target):
         self.state = self.camera_func(self.state, target.rect)
@@ -31,7 +31,7 @@ def complex_camera(camera, target_rect):
     if other.ISFULLSCREEN == True:
         n = 288
     else:
-        n = other.HEIGHT/4.35
+        n = 64
     l = max(-(other.TOTAL_LEVEL_WIDTH-45*32+10), l)  # stop scrolling at the right edge
     t = max(-(other.HEIGHT-n), t)  # stop scrolling at the bottom
     t = min(0, t)  # stop scrolling at the top
