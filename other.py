@@ -3,7 +3,7 @@ import math
 import spritesheet
 import pygame
 
-GAMESTATE = 2
+GAMESTATE = 0
 MINISTATE = 0
 FPS = 0
 WIDTH = 1366
@@ -11,7 +11,8 @@ HEIGHT = 768
 ISFULLSCREEN = False
 EDITING = False
 ON = True
-off_screen = pygame.Surface((WIDTH, HEIGHT))
+FLAG = None
+level_surface = pygame.Surface((WIDTH, HEIGHT))
 
 # CONSTANTS
 
@@ -22,7 +23,7 @@ CAMERA_SLACK = 30
 TOTAL_LEVEL_WIDTH = 0
 TOTAL_LEVEL_HEIGHT = 0
 LEVEL_TIME = 200
-STARTING_LEVEL = 0
+STARTING_LEVEL = 1
 
 
 # Store useful variables
@@ -50,6 +51,13 @@ def load_images():
                                                                                     (0, 0, 0,)).convert(),  # %
         "frag3_2": spritesheet.spritesheet('./assets/images/frag_3_2.png').image_at((0, 0, 16, 16),
                                                                                     (0, 0, 0,)).convert(),  # 6
+
+        "sfrag_1": spritesheet.spritesheet('./assets/images/sfrag_1.png').image_at((0, 0, 16, 16),
+                                                                                    (254, 254, 254)).convert(),  # s1
+        "sfrag_2": spritesheet.spritesheet('./assets/images/sfrag_2.png').image_at((0, 0, 16, 16),
+                                                                                   (254, 254, 254)).convert(),  # s1
+        "sfrag_3": spritesheet.spritesheet('./assets/images/sfrag_3.png').image_at((0, 0, 16, 16),
+                                                                                   (254, 254, 254)).convert(),  # s1
 
         "player1": spritesheet.spritesheet('./assets/images/Player1.png').image_at((0, 0, 32, 32),
                                                                                    (255, 0, 0)).convert(),

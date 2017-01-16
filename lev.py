@@ -6,6 +6,7 @@ from Adventure import Design
 
 def editor():
     pygame.font.init()
+    other.FLAG = pygame.RESIZABLE
     other.WIDTH = 980
     other.HEIGHT = 640
     c = Design(980, 640, 60)

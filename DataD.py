@@ -13,8 +13,8 @@ class DataD:
         self.height = height
         self.frame_rate = frame_rate
         self.sprite_library = other.load_images()
-        self.level = Level("level_"+str(other.STARTING_LEVEL),'./assets/long_levels/')
-        #self.level = Level("level_01")
+        self.level = Level("level_"+str(other.STARTING_LEVEL),'./assets/levels/')
+        self.level = Level("level_1",'./assets/levels/')
         self.num_files = len([f for f in os.listdir("./assets/levels")
                               if os.path.isfile(os.path.join("./assets/levels", f))])
         self.l = 1
@@ -43,8 +43,10 @@ class DataD:
             other.GAMESTATE = 2
 
         if other.GAMESTATE != 2:
-            if block[0] > 19:
-                block[0]= 19
+            if block[0] > 28:
+                block[0]= 28
+            if block[0] < 1:
+                block[0] = 1
             if block[1] > 24:
                 block[1] = 24
 
@@ -61,8 +63,8 @@ class DataD:
             self.cameraY = 0
         if self.cameraY < -736:
             self.cameraY = -736
-        if self.cameraX > 0:
-            self.cameraX = 0
+        if self.cameraX > -64:
+            self.cameraX = -64
         if self.cameraX < -16384:
             self.cameraX = -16384
 
@@ -109,14 +111,16 @@ class DataD:
 
 
         if pygame.K_n in newkeys:
-            self.level.new("level_0"+str(self.num_files))
+            self.level.new("level_"+str(self.num_files))
         elif pygame.K_DELETE in newkeys:
-            os.remove("./assets/levels/level_0"+str(self.l))
-            print 'FILE  level_0'+str(self.l) +" HAS BEEN DELETED"
+            os.remove("./assets/levels/level_"+str(self.l))
+            print 'FILE  level_'+str(self.l) +" HAS BEEN DELETED"
             pygame.quit()
             sys.exit(0)
         if pygame.K_MINUS in newkeys:
             self.is_back = not self.is_back
+        if pygame.K_ESCAPE in newkeys:
+            pygame.quit()
 
 
 
@@ -135,9 +139,9 @@ class DataD:
 
         return
     def changeLevel(self):
-        if os.path.isfile("./assets/levels/level_0"+str(self.l)):
-            self.level = Level("level_0"+str(self.l))
-            print "LEVEL_0"+str(self.l)
+        if os.path.isfile("./assets/levels/level_"+str(self.l)):
+            self.level = Level("level_"+str(self.l))
+            print "LEVEL_"+str(self.l)
 
     def button(self,mp,rect,char='0'):
         mx,my = mp
@@ -205,9 +209,8 @@ class DataD:
         if self.mp[0] < 800:
             pygame.draw.rect(surface, (55, 55, 255), pygame.Rect(self.b[0] * 32+ (self.cameraX/2), self.b[1] * 32+self.cameraY, 32, 32), 3)
             if self.selected != "0":
-                if self.selected == "-":
-                    pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(self.b[1]*32+self.cameraX,self.b[0]*32+self.cameraY, 32, 32))  # wall
-                elif self.selected == "X":
+                pygame.draw.rect(surface, (155, 155, 155), pygame.Rect(self.mp[0]+16,self.mp[1]-32, 32, 32))  # wall
+                """elif self.selected == "X":
                     pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(self.b[1]*32+self.cameraX,self.b[0]*32+self.cameraY, 32, 32))  # lava
                 elif self.selected == "1":
                     pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.b[1]*32+self.cameraX,self.b[0]*32+self.cameraY, 32, 32))  # p1
@@ -259,7 +262,7 @@ class DataD:
                                      (self.b[1] * 32 + self.cameraX, self.b[0] * 32 + self.cameraY, 32, 32))
                 elif self.selected == "h":
                     pygame.draw.rect(surface, (155, 155, 55),
-                                     (self.b[1] * 32 + self.cameraX, self.b[0] * 32 + self.cameraY, 32, 32))
+                                     (self.b[1] * 32 + self.cameraX, self.b[0] * 32 + self.cameraY, 32, 32))"""
 
         return
 

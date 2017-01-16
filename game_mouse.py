@@ -22,7 +22,7 @@ class Game:
         self.isFull = False
         flags = pygame.locals.DOUBLEBUF | pygame.locals.SRCALPHA
         if other.EDITING == False:
-            flags = pygame.locals.DOUBLEBUF | pygame.locals.SRCALPHA | pygame.locals.RESIZABLE
+            flags = pygame.locals.DOUBLEBUF | pygame.locals.SRCALPHA | other.FLAG
 
 
         self.screen = pygame.display.set_mode(

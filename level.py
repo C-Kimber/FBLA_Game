@@ -6,11 +6,10 @@ from wall import *
 
 
 class Level:
-    def __init__(self, file="level_00", dir="./assets/levels/"):
+    def __init__(self, file="level_0", dir="./assets/levels/"):
         self.dir = dir
         self.file = self.filename = file
         self.bfile = self.bfilename = file + "B"
-
 
         if os.path.isfile(self.dir + file):
             if os.path.isfile(self.dir + self.bfile):
@@ -39,7 +38,7 @@ class Level:
         self.levelMeasured = False
 
     def new(self, f):
-        b = open(self.dir + "level_00")
+        b = open(self.dir + "level_0")
         file = open(self.dir + f, 'w')
         for x in b:
             for y in x:
@@ -50,7 +49,7 @@ class Level:
         sys.exit(0)
 
     def clear(self):
-        b = open(self.dir + "level_00")
+        b = open(self.dir + "level_0")
         file = open(self.file, 'w')
         for x in b:
             for y in x:
@@ -126,76 +125,6 @@ class Level:
             btint = 50
             ftint = 0
 
-        """for x in b_txt:  # BACKGROUND
-            n += 1
-            h += 1
-            for y in x:
-                if y != ",":
-                    tile += y
-
-
-
-
-                m += 1
-                w += 1
-                r = pygame.Rect(m * multi + camx, n * multi + camy, multi, multi)
-                line = 0
-
-                if y == "X" or y == "x":  # deathwalls
-                    color = (255 - btint, 255 - btint, 0)
-
-                elif y == "-":  # one unit walls
-                    color = (55 - btint, 55 - btint, 0)
-                    # surface.blit(imgs["wall_2"], pygame.Rect(m * multi+camx, n * multi+camy, multi, multi))
-                elif y == "_":  # long walls
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == "[":  # medium walls
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == "=":  # small walls
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == "|":  # Tall wall
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == "/":  # Tall wall mid
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == ";":  # Tall wall small
-                    color = (155 - btint, 155 - btint, 155 - btint)
-                elif y == "+":
-                    color = (155 - btint, 155 - btint, 155 - btint)
-
-                elif y == "1":  # player 1 spawn
-                    color = (255 - btint, 0, 0)
-                elif y == "2":  # player 2 spawn
-                    color = (0, 255 - btint, 0)
-                elif y == "3":  # player 3 spawn
-                    color = (0, 0, 255 - btint)
-                elif y == "4":  # player 4 spawn
-                    color = (255 - btint, 0, 255 - btint)
-                elif y == "T":  # Tele wall
-                    r = pygame.Rect(m * multi + camx, n * multi + camy, multi, multi)
-                    pygame.draw.rect(surface, (255 - btint, 0, 255 - btint), r)
-                    r = pygame.Rect((m * multi) + 8 + camx, (n * multi) + 8 + camy, 16, 16)
-                    pygame.draw.rect(surface, (155 - btint, 0, 155 - btint), r)
-                    continue
-                elif y == "t":
-                    r = pygame.Rect(m * multi + camx, n * multi + camy, multi, multi)
-                    pygame.draw.rect(surface, (155 - btint, 0, 155 - btint), r)
-                    r = pygame.Rect((m * multi) + 8 + camx, (n * multi) + 8 + camy, 16, 16)
-                    pygame.draw.rect(surface, (255 - btint, 0, 255 - btint), r)
-                    continue
-                elif y == 'E':
-                    color = (0, 255 - btint, 155 - btint)
-                elif y == "b":
-                    color = (255 - btint, 185 - btint, 55 - btint)
-
-                elif y == "h":
-                    color = (155 - btint, 155 - btint, 55 - btint)
-
-                else:  # empty
-                    color = (200, 200, 200)
-                    line = 1
-
-                pygame.draw.rect(surface, color, r, line)
-            m = -1"""
 
         color = (255, 255, 255)
         for x in b_txt:
@@ -206,7 +135,7 @@ class Level:
                 # print m, n
                 if m > -2 - camx / 32:
 
-                    if m < 24 - camx / 32:
+                    if m < 30 - camx / 32:
                         if y != ",":
                             tile += y
 
@@ -225,7 +154,7 @@ class Level:
                                             multi - 5 - btint / 5,
                                             multi - 5 - btint / 5)
 
-                            if tile == "X" or tile == "x":  # deathwalls
+                            if tile == "3":  # deathwalls
                                 color = (255 - btint, 255 - btint, 0)
 
                             elif tile == "1":  # one unit walls
@@ -305,7 +234,7 @@ class Level:
             for y in x:
                 if m > -2-camx / 32:
 
-                    if m < 24-camx/32:
+                    if m < 30-camx/32:
                         if y != ",":
                             tile += y
 
@@ -323,7 +252,7 @@ class Level:
                             r = pygame.Rect(m * multi + ftint / 10 + camx, n * multi + ftint / 10 + camy, multi - 5 - ftint / 5,
                                             multi - 5 - ftint / 5)
 
-                            if tile == "X" or tile == "x":  # deathwalls
+                            if tile == "3":  # deathwalls
                                 color = (255 - ftint, 255 - ftint, 0)
 
                             elif tile == "1":  # one unit walls
@@ -413,6 +342,12 @@ class Level:
         txt = txt
         text = []
         col = []
+        if other.GAMESTATE > 1:
+            e1,e2 = 0,40
+            f1,f2 = 0,240
+        else:
+            e1, e2 = 0, 24
+            f1, f2 = 0, 30
         tile = ""
         for x in txt:  # Rows
             for y in x:  # Collums
@@ -430,8 +365,9 @@ class Level:
         for y in text:
             for x in y:
 
-                if m - 1 >= 0 and m + 1 <= 42:
-                    if n - 1 >= 0 and n + 1 < 250:  #
+                if m - 1 >= e1 and m + 1 <= e2:
+
+                    if n - 1 >= f1 and n + 1 < f2:
                         cur = y[n]  # current AKA Middle
                         left = y[n - 1]
                         right = y[n + 1]
@@ -439,29 +375,27 @@ class Level:
                         bot = text[m + 1][n]
                         if cur == "1":
                             f = other.getTileState(left, right, top, bot, "1")
-                            data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_" + str(f + 1)],
+                            data.wall_list.add(Wall(n * 32+other.WIDTH/8+32, m * 32, data.sprite_library["wall_" + str(f + 1)],
                                                     f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
 
                         if cur == "5":  # player 1 spawn
 
-                            data.player.spawnx = n * 32
+                            data.player.spawnx = n * 32+other.WIDTH/8+32
                             data.player.spawny = m * 32
-                            data.player.rect.x = n * 32
+                            data.player.rect.x = n * 32+other.WIDTH/8+32
                             data.player.rect.y = m * 32
                             print data.player.spawnx, data.player.spawny
 
-                        if x == "X" or x == "x":
-                            data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
-                            data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
-                            # elif x == "-":
 
-                            # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
+                        if x == "3":
+                            data.wall_list.add(deathWall(n * 32+other.WIDTH/8+32, m * 32, data.sprite_library["lava"]))
+
 
                         elif x == "6":  # player 2 spawn
-                            data.player2.spawnx = n * 32
-                            data.player2.spawny = m * 32
-                            data.player2.rect.x = n * 32
-                            data.player2.rect.x = m * 32
+                                data.player2.spawnx = n * 32 + other.WIDTH / 8 + 32
+                                data.player2.spawny = m * 32
+                                data.player2.rect.x = n * 32 + other.WIDTH / 8 + 32
+                                data.player2.rect.y = m * 32
 
                         elif x == "_":  # long walls
                             data.allwalls.add(longWall(n * 32, m * 32, 512))
@@ -576,6 +510,14 @@ class Level:
         text = []
         col = []
         tile = ""
+        if other.GAMESTATE > 1:
+            e1,e2 = 0, 40
+            f1,f2 = 0, 240
+        else:
+            e1,e2 = 0,24
+            f1,f2 = 0,30
+
+
         for x in txt:  # Rows
             for y in x:  # Collums
                 if y != ",":
@@ -590,9 +532,9 @@ class Level:
         for y in text:
             for _ in y:
 
-                if m - 1 >= 0 and m + 1 <= 40:
+                if m - 1 >= e1 and m + 1 <= e2:
 
-                    if n - 1 >= 0 and n + 1 < 240:  #
+                    if n - 1 >= f1 and n + 1 < f2:  #
                         cur = y[n]  # current AKA Middle
                         left = y[n - 1]
                         right = y[n + 1]
@@ -602,7 +544,7 @@ class Level:
                         if cur == "1":
 
                             f = other.getTileState(left,right,top,bot,"1")
-                            data.allwalls.add( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
+                            data.back_sprites.add( Wall(n * 32+other.WIDTH/8+32, m * 32-32, data.sprite_library["back_wall_" + str(f + 1)],
                                                    f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
                             #walllist.append ( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
                              #                          f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
@@ -610,7 +552,7 @@ class Level:
                             #walllist.append(None)
                         elif cur == "2":
                             f = other.getTileState(left, right, top, bot, "2")
-                            data.wall_list.add(upWall(n * 32, m * 32, data.sprite_library["up_wall_" + str(f + 1)], f))
+                            data.back_sprites.add(upWall(n * 32, m * 32-32, data.sprite_library["up_wall_" + str(f + 1)], f))
 
 
                 n += 1

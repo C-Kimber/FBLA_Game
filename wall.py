@@ -56,8 +56,8 @@ class deathWall(Wall):
         pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
-        self.width = 32
-        self.height = 32
+
+        self.type = 0
 
         self.image = image
         # self.image = pygame.transform.rotate(self.image, random.randrange(0,360, 90))

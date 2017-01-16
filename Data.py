@@ -32,8 +32,8 @@ class Data():
         self.menimg = pygame.image.load('./assets/images/background_3.png').convert_alpha()
         self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
 
-        self.num_files = len([f for f in os.listdir("./assets/levels")
-                         if os.path.isfile(os.path.join("./assets/levels", f))])
+        self.num_files = (len([f for f in os.listdir("./assets/levels")
+                         if os.path.isfile(os.path.join("./assets/levels", f))])-1)/2
 
 
         self.emptysprite = Empty()
@@ -43,6 +43,7 @@ class Data():
         #self.player2sprite = pygame.sprite.GroupSingle()
 
         self.player2 = Player2(self.sprite_library["player2"])
+        self.player2.data = self
         self.player3 = self.emptysprite
         self.player4 = self.emptysprite
 
@@ -97,13 +98,9 @@ class Data():
         self.isLoaded = False
 
 
-        self.camera = Camera(camera.complex_camera, other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT)
+        other.level_surface.fill((0,0,0))
 
-        self.chunksurface = pygame.Surface((other.WIDTH,other.HEIGHT))
-
-        #self.chunksurface.set_colorkey((0,0,0))
-
-
+        self.camera = Camera(camera.complex_camera, 200, 200)
 
 
 
@@ -112,9 +109,6 @@ class Data():
     def evolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.newbuttons = newbuttons
         self.mouse_position = mouse_position
-
-        if self.isLoaded == False:
-            self.initLevel()
 
         if pygame.K_ESCAPE in newkeys:
             if  other.MINISTATE == 0:
@@ -141,14 +135,7 @@ class Data():
             if pygame.K_w in keys:
                 self.player.jump()
 
-            #if pygame.K_s in keys:
-            #    self.player.moveDown()
 
-            """elif pygame.K_s in keys:
-                self.player.stunt()
-                self.player.stunting = True
-            else:
-                self.player.stunting = False"""
 
             if pygame.K_a in keys:
                 self.player.moveLeft()
@@ -158,20 +145,11 @@ class Data():
                 self.player.moveRight()
 
 
-            if pygame.K_i in newkeys:
+            if pygame.K_i in keys:
                 self.player2.jump()
 
             elif pygame.K_k in keys:
                 self.player2.moveDown()
-            """elif pygame.K_k in keys:
-                self.player2.stunt()
-
-                self.player2.image.fill((255,0,0))
-
-                self.player2.stunting = True
-            else:
-                self.player2.image.fill((0,0,0))
-                self.player2.stunting = False"""
 
             if pygame.K_j in keys:
                 self.player2.moveLeft()
@@ -189,12 +167,6 @@ class Data():
                 self.p2vic = True
 
 
-
-
-            #self.player.update(0,self.height,0, self.width)
-
-
-
             self.all_sprites.update()
 
         elif other.MINISTATE == 1:
@@ -204,128 +176,15 @@ class Data():
         return
     #wipes sprite lists, and puts in players + adding new level
 
-    def mainEvolve(self, keys, newkeys, buttons, newbuttons, mouse_position):
-        self.mouse_position = mouse_position
-        self.newbuttons = newbuttons
-        #print other.distance((0,32),(0,32))
-        a = 0
-
-        a += 1
-        if self.isLoaded == False:
-            self.initLevel()
-            self.all_sprites.remove(self.player2)
-            self.player2 = self.emptysprite
-
-        if pygame.K_ESCAPE in newkeys:
-            if other.MINISTATE == 0:
-                other.MINISTATE = 1
-            elif other.MINISTATE == 1:
-                other.MINISTATE = 0
-        if other.MINISTATE == 0 and self.player.state == "NORMAL":
-
-            if self.level_time <= 0:
-                self.player.die()
-            self.l_t_increment +=1
-            if self.l_t_increment >= 90:
-                self.l_t_increment = 0
-                self.level_time -= 1
-
-            self.camera.update(self.player)
-            if self.player.alive == False:
-                self.lives -= 1
-                self.player.alive  = True
-
-
-
-
-            #if self.player2 != self.emptysprite:
-              #  self.all_sprites.remove(self.player2)
-              #  self.player2 = self.emptysprite
-
-
-            if pygame.K_w in keys:
-                self.player.jump()
-            else:
-                self.player.jump_cut()
-            if pygame.K_s in keys:
-                    self.player.moveDown()
-
-            if pygame.K_a in keys:
-                self.player.moveLeft()
-
-
-            elif pygame.K_d in keys:
-                self.player.moveRight()
-
-
-
-            if pygame.K_3 in newkeys:
-                self.all_sprites.add(Base((self.player.rect.x, self.player.rect.y)))
-
-            if pygame.sprite.spritecollide(self.player, self.player.finish, False):
-                self.current_level += 1
-                self.player.yvel = 10
-                self.player.xvel = 3
-                self.player.state = "WIN"
-                #
-
-            live_e = []
-            for e in self.all_sprites:
-                if hasattr(e, 'alive'):
-
-                    if e.alive:
-
-                        live_e.append(e)
-                    else:
-                        self.all_sprites.remove(e)
-                else:
-                    live_e.append(e)
-            self.enemies.add(live_e)
-            self.all_sprites.add(live_e)
-
-
-
-
-            self.all_sprites.update()
-            self.chunkUpdate()
-
-
-
-
-
-        elif self.player.state == "DYING":
-            self.player.dying(a)
-            #self.player.state = "NORMAL"
-        elif self.player.state == "WIN":
-            self.player.beatLvl(self)
-
-        elif other.MINISTATE == 1:
-            return
-        self.fragmentgroup.update(a)
-
-        if self.overtime > 0:
-            self.overtime -= 1
-        if self.overtime == 0:
-            other.GAMESTATE = 0
-            self.lives = 3
-
-        if self.lives <= 0:
-            other.GAMESTATE = 3
-            if self.overtime == -1:
-                self.overtime = 60
 
 
     def draw(self, surface):
-        rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((55,55,55), rect)#back
 
-        for n in self.bimgs:
-            surface.blit(n, (0,0))
+
 
         #surface.blit(self.img, (0, 0))
         #pygame.display.flip()
-
-
+        surface.blit(other.level_surface, (0, 0))
 
 
 
@@ -354,7 +213,7 @@ class Data():
 
 
             r = pygame.Rect(200, 200, 100, 100)
-            pygame.draw.rect(surface, (25, 25, 25), rect)
+            pygame.draw.rect(surface, (25, 25, 25), r)
             pygame.draw.rect(surface, (255, 255, 255), r)
             if ((self.mouse_position[0] <= 300 and self.mouse_position[0] >= 200) and (
                             self.mouse_position[1] <= 300 and self.mouse_position[
@@ -418,6 +277,7 @@ class Data():
         if other.MINISTATE == 1:
             self.pauseMenu(surface)
         #self.level.display(surface)
+        self.drawTextLeft(surface, str(other.FPS), (255, 255, 255), other.WIDTH - 50, other.HEIGHT - 50, self.font)
 
         return
 
@@ -449,50 +309,9 @@ class Data():
 
         self.drawTextLeft(surface, "Quit", (255, 0, 0), rx+30, ry+80, self.font)
 
+
         return
 
-    def mainDraw(self, surface):
-        #surface.blit(self.img,(0-self.player.rect.x,-320))
-        #rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
-        #surface.fill((55, 55, 255), rect)  # back
-
-        cx, cy, cw, ch = self.camera.state
-
-
-
-
-        #draw background tiles/sprites
-        """for b in self.back_sprites:
-            if b.rect.x > -32 - cx and b.rect.right < -cx + other.WIDTH+32 and b.rect.top > -cy - 32 and b.rect.bottom < -cy + other.HEIGHT+32:
-                surface.blit(b.image, self.camera.apply(b))"""
-        #surface.blit(other.off_screen, (0,0) )
-        self.renderChunk(surface)
-        #draw sprites
-        """for e in self.all_sprites:
-
-            if e.rect.x > -32 - cx and e.rect.right < -cx + other.WIDTH + 32 and e.rect.top > -cy - 32 and e.rect.bottom < -cy + other.HEIGHT + 32:
-                if not isinstance(e, Player):
-
-                    surface.blit(e.image, self.camera.apply(e))"""
-        surface.blit(self.player.image, self.camera.apply(self.player))
-
-
-        self.changeDraw(surface)
-
-
-        if other.MINISTATE ==1:
-            self.pauseMenu(surface)
-
-        self.drawTextLeft(surface, "Lives " + str(self.lives), (250, 250, 250), 2, 35, self.font)
-
-        self.drawTextRight(surface, str(self.level_time), (250, 250, 250), other.WIDTH-8, 32, self.font)
-
-
-
-
-        #self.all_sprites.draw(surface)
-
-        self.drawTextLeft(surface, str(other.FPS), (250, 250, 250), 800-40, 35, self.font)
 
     def GameOverDraw(self, surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
@@ -525,21 +344,6 @@ class Data():
                 print self.allwalls
 
 
-    def foo(self):
-        self.allwalls = pygame.sprite.Group()
-        self.emptyLists()
-        self.level.gameLev(self)
-        self.allwalls.add(self.wall_list)
-        self.hashedwalls = HashMap.from_objects(256, self.allwalls)
-        self.all_sprites.add(self.player)
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.walls = self.allwalls
-                e.deaths = self.deathwalls
-                e.player = self.player
-        self.alph_1 = 255
-        self.level_time = other.LEVEL_TIME
-
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
         self.newbuttons = newbuttons
@@ -548,11 +352,11 @@ class Data():
     #menu drawing
     def menuDraw(self,surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((0, 0, 0), rect)  # back
+        surface.fill((255, 255, 0), rect)  # back
 
         surface.blit(self.menimg, (0, 0))
 
-        self.drawTextLeft(surface, "WELCOME TO THE GAME", (0, 255, 0), 200, 150, self.font)
+        self.drawTextLeft(surface, "WELCOME oh rravel sTO THE GAME", (0, 255, 0), 200, 150, self.font)
 
         r = pygame.Rect(200,400, 100,100)
         pygame.draw.rect(surface,(255,255,255),r)
@@ -561,27 +365,18 @@ class Data():
                 self.mouse_position[1] <= r[1]+r[3] and self.mouse_position[1] >= r[1])):  # If mouse is in the rectangle
             pygame.draw.rect(surface, (155, 155, 155), r)
             if 1 in self.newbuttons:
+                print "BATTLE!"
+                self.current_level = other.STARTING_LEVEL
                 other.GAMESTATE = 1
                 self.initLevel()
                 self.newbuttons.remove(1)
+                self.overtime = -1
         self.drawTextLeft(surface, "Battle", (0, 0, 255), 220, 480, self.font)
 
         r = pygame.Rect(200, 200, 100, 100)
         pygame.draw.rect(surface, (255, 255, 255), r)
 
-        if ((self.mouse_position[0] <= r[0] + r[2] and self.mouse_position[0] >= r[0]) and (
-                        self.mouse_position[1] <= r[1] + r[3] and self.mouse_position[1] >= r[
-                    1])):  # If mouse is in the rectangle
-            pygame.draw.rect(surface, (155, 155, 155), r)
-            if 1 in self.newbuttons:
-                print "BEGINNING STORY MODE"
-                other.GAMESTATE = 2
-                self.overtime = -1
-                self.current_level = other.STARTING_LEVEL
-                self.initLevel()
-                self.newbuttons.remove(1)
 
-        self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
 
         r = pygame.Rect(500, 200, 100, 100)
         pygame.draw.rect(surface, (255, 255, 255), r)
@@ -593,6 +388,8 @@ class Data():
             if 1 in self.newbuttons:
                 pygame.quit()
         self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
+
+
 
 
 
@@ -613,37 +410,17 @@ class Data():
         return
 
     def initLevel(self):
-
-        if other.GAMESTATE == 1:
-            self.level = Level("level_01")
-            self.player2 = Player2(self.sprite_library["player2"])
-            self.player = Player(self.sprite_library["player1"])
-            self.resetLists()
-
-        elif other.GAMESTATE == 2:
-            self.all_sprites.remove(self.player2)
-            self.player2 = self.emptysprite
-            self.emptyLists()
-            self.all_sprites.add(self.player)
-            self.player.finish = self.finish
-            self.player2.finish = self.finish
-
-            self.level = Level("level_" + str(self.current_level), "./assets/long_levels/")
+        print "initializing level"
+        self.emptyLists()
+        self.level = Level("level_" + str(self.current_level), "./assets/levels/")
         self.player.state = "NORMAL"
         self.emptyLists()
         self.level.gameLev(self)
-        #self.getCollidables()
         self.allwalls.add(self.wall_list)
-        self.hashedwalls = HashMap.from_objects(256, self.allwalls)
-        self.allwalls.empty()
-        self.allwalls.add(self.getChunk())
-        #self.getCollidables()
         self.all_sprites.add(self.player)
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.deaths = self.deathwalls
-                e.player = self.player
-        #self.walldecide()
+        self.all_sprites.add(self.player2)
+        self.back_sprites.draw(other.level_surface)
+        self.wall_list.draw(other.level_surface)
         self.isLoaded = True
 
 
@@ -651,8 +428,15 @@ class Data():
         self.emptyLists()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        n = str(random.randint(1, self.num_files - 1))
-        self.level = Level("level_0" + n)
+        n = str(random.randint(1, int((self.num_files))))
+        self.level = Level("level_" + str(1))
+        self.level.gameLev(self)
+        c = random.randint(0,255)
+        v = random.randint(0, 255)
+        b = random.randint(0, 255)
+        other.level_surface.fill((c,v,b))
+        self.back_sprites.draw(other.level_surface)
+        self.wall_list.draw(other.level_surface)
 
     # end of a single battle
     def endRound(self, surface):
@@ -674,8 +458,8 @@ class Data():
             return
 
         self.diedfirst = 0
-        wall.clearwalls(self)
-        wall.cleartel(self)
+        #wall.clearwalls(self)
+        #wall.cleartel(self)
         self.newRound()
 
         return
@@ -695,22 +479,10 @@ class Data():
 
         self.time = 60
 
-        self.level.gameLev(self)
+        #self.level.gameLev(self)
 
     # draws all the stuff, also button functionality
-    def newMainLev(self):
-        self.emptyLists()
-        self.all_sprites.add(self.player)
-        self.level = Level("level_" + str(self.current_level), "./assets/long_levels/")
-        self.player.state = "NORMAL"
-        self.emptyLists()
-        self.level.gameLev(self)
-        self.allwalls.add(self.wall_list)
-        self.all_sprites.add(self.player)
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.deaths = self.deathwalls
-                e.player = self.player
+
 
 
     def emptyLists(self):
@@ -772,99 +544,36 @@ class Data():
             (  # self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
                 self.sprite_library["frag1_2"]
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
-                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
+                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]),
+            (
+                self.sprite_library["sfrag_1"], self.sprite_library["sfrag_2"]  )
+        )
 
         self.player2.getfimage(
             (  # self.sprite_library["frag1"], self.sprite_library["frag2"], self.sprite_library["frag3"],
                 self.sprite_library["frag1_2"]
                 , self.sprite_library["frag2_1"], self.sprite_library["frag3_1"]
-                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]))
+                , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]),
+
+            ( self.sprite_library["sfrag_1"]  , self.sprite_library["sfrag_2"] )
+        )
 
     def getCollidables(self, obj, region=(0.0, 1.0)):
         obj.collidables.empty()
         for w in self.wall_list:
-            if isinstance(w,wall.Wall)or isinstance(w, wall.upWall):
-                if w.type != 4:#if is surrounded by tiles
-                    distance = math.sqrt((obj.rect.x - w.rect.x) ** 2 + (obj.rect.y - w.rect.y) ** 2)
-                    if distance < 50:
-                        #if w.region == region:
-                        obj.collidables.add(w)
-
-    def getChunk(self):
-        """Gets initial chunks"""
-        cell_size = 256
-        #chunkx = []
-        chunks = []
-        for a in range(-3,6):
-            for b in range(-2,4):
-                chnk = self.hashedwalls.query(wall.Wall(self.player.rect.x + a * cell_size, self.player.rect.y + b * cell_size, self.sprite_library["wall_1"], 5))
-                if chnk:
-                    chunks.append(chnk)
-            #chunks.append(chunkx)
-
-
-        return chunks
-
-
-
-    def chunkUpdate(self):
-        p = self.player
-        if p.current_chunk != p.prev_chunk:
-            chunks = self.allwalls
-            dx , dy = p.current_chunk[0] - p.prev_chunk[0], p.current_chunk[1] - p.prev_chunk[1]
-            dir = "NUN"
-            if (dx,dy) == (0, 1):
-                dir = "DOWN"
-            if (dx,dy) == (0, -1):
-                dir = "UP"
-            if (dx,dy) == (1, 0):
-                dir = "RIGHT"
-            if (dx,dy) == (-1, 0):
-                dir = "LEFT"
-
-            if  0 > dx or dx > 0 or 0 > dy or dy > 0:
-                for x in range(1, 5):
-                    self.chunkFoo(dx * x,0)
-                    self.chunkFoo(dx * x, 1)
-                    self.chunkFoo(dx * x, -1)
-                    self.chunkFoo(dx * x, 2)
-                    self.chunkFoo(dx * x, -2)
+            distance = math.sqrt((obj.rect.x - w.rect.x) ** 2 + (obj.rect.y - w.rect.y) ** 2)
+            if distance < 50:
+                if isinstance(w,wall.Wall)or isinstance(w, wall.upWall):
+                    if w.type != 4:#if is surrounded by tiles
+                            obj.collidables.add(w)
+                            continue
 
 
 
 
-            p.prev_chunk = p.current_chunk
 
 
 
-    def chunkFoo(self,dx,dy):
-        p = self.player
-
-        new_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0] + dx) * 256), int((p.current_chunk[1]+dy) * 256),self.sprite_library["wall_1"], 5)))
-        old_chunk = self.hashedwalls.query((wall.Wall(int((p.current_chunk[0] - (dx+other.unitNum((dx))*3)) * 256), int((p.current_chunk[1]+dy) * 256),self.sprite_library["wall_1"], 5)))
-
-        if old_chunk in self.allwalls:
-            self.allwalls.remove(old_chunk)
-        if new_chunk and not new_chunk in self.allwalls:
-
-            self.allwalls.add(new_chunk)
-
-
-
-    def renderChunk(self, surface):
-        rect = pygame.Rect(0, 0, other.WIDTH, other.HEIGHT)
-        surface.fill((55, 55, 255), rect)  # back
-        for chunk in self.allwalls:
-            surface.blit(chunk.image, self.camera.apply(chunk))
-
-
-
-        return
-
-
-
-    def nextChunk(self):
-        return
 
 
 
