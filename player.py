@@ -28,6 +28,7 @@ class Player(pygame.sprite.Sprite):
 
         self.image = image
         self.imageH = image
+        self.sounds = None
         # self.image.fill((255,0,0))
 
         self.rect = self.image.get_rect()
@@ -97,13 +98,6 @@ class Player(pygame.sprite.Sprite):
 
         return
 
-    def stunt(self):
-        self.down = True
-        # if self.onGround == True:
-
-        self.yvel -= 13
-
-        return
 
     def update(self):
         highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32+other.WIDTH/8+32, other.TOTAL_LEVEL_WIDTH +96+ other.WIDTH/8
@@ -170,8 +164,9 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.x <= leftbound:
             self.rect.x = leftbound + 1
             self.xvel = 0
-        if self.rect.y >= lowbound + 32:
+        if self.rect.y >= lowbound + 128:
             self.rect.y -= 3
+            random.choice((self.sounds[6], self.sounds[7])).play()
             self.die()
 
 
@@ -186,13 +181,14 @@ class Player(pygame.sprite.Sprite):
         if self.otherplayers is not None:
             hit_bros = pygame.sprite.spritecollide(self, self.otherplayers, False)
             for bro in hit_bros:
+                random.choice((self.sounds[0],self.sounds[1],self.sounds[2])).play()
                 for _ in range(random.randint(5, 15)):
                     fragment.fragmentgroup.add(custFrag((self.rect.centerx, self.rect.centery), (1, 3), random.choice(self.f2imgs) ))
 
                 if bro.rect.y - self.rect.y >= 1:  # if p1 is above p2
                     self.rect.bottom = bro.rect.top
                     if not self.onGround:
-                        bro.yvel = self.ymom
+                        bro.yvel = self.ymom + 2
                     else:
                         bro.yvel = .2
                     self.yvel = 12
@@ -202,9 +198,8 @@ class Player(pygame.sprite.Sprite):
                         bro.yvel = -bro.maxyvel / 3
 
                 bro.xvel = self.xmom
-                bro.rect.x += 1
+                self.xvel = -random.randint(3,6)* other.unitNum(self.xmom)
 
-                self.xvel = 0
                 # else:
                 #    self.onGround = False
 
@@ -231,7 +226,6 @@ class Player(pygame.sprite.Sprite):
                         self.rect.top = collider.rect.bottom
 
                 if not isinstance(collider, wall.deathWall):
-                    if pygame.sprite.collide_rect(self, collider):
                         if collider.type < 3:
                             if self.down:
                                 # self.rect.top = up.rect.bottom-4
@@ -244,13 +238,15 @@ class Player(pygame.sprite.Sprite):
                                 self.rect.bottom = collider.rect.top
                                 self.jumps = 1
                 else:
+                    random.choice((self.sounds[3], self.sounds[4], self.sounds[5])).play()
+                    for _ in range(random.randint(8, 24)):
+                        fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
                     self.die()
         return
 
     def wallCollisions(self):
 
-        if pygame.sprite.spritecollide(self, self.deaths, False):
-            self.die()
+
 
         hit_teles2 = pygame.sprite.spritecollide(self, self.teles2, False)
         hit_teles = pygame.sprite.spritecollide(self, self.teles, False)
@@ -276,9 +272,10 @@ class Player(pygame.sprite.Sprite):
         self.fimgs = images
         self.f2imgs = imgs
 
+    def getSounds(self, sounds):
+        self.sounds = sounds
+
     def die(self):
-        for _ in range(random.randint(8, 24)):
-            fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
 
         self.alive = False
         #self.rect.x = self.spawnx
@@ -340,6 +337,7 @@ class Player2(Player):
         self.image = image
         self.imageH = image
         # self.image.fill((255,0,0))
+        self.sounds = None
 
         self.rect = self.image.get_rect()
         self.spawnx = 288
@@ -380,18 +378,7 @@ class Player2(Player):
         return
 
 
-# goes on underside, and stays
-"""
-for up in hit_ups:
-            if self.down == True:
-                self.rect.top = up.rect.bottom-8
-                self.yvel = 3
 
-            elif self.yvel < 0:
-                self.yvel = 0
-                self.rect.bottom = up.rect.top + 8
-                self.onGround = True
-                self.jumps = 1"""
 
 
 class Empty(pygame.sprite.Sprite):

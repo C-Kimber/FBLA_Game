@@ -8,6 +8,7 @@ import cProfile as profile
 
 def main():
     pygame.font.init()
+    pygame.mixer.pre_init(44100, -16, 2, 2048)
     other.getRes()
     other.FLAG = pygame.FULLSCREEN
     c = Adventure(other.WIDTH, other.HEIGHT, other.FRAMES)

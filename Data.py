@@ -9,7 +9,8 @@ from level import Level
 import os
 from camera import Camera
 import camera
-from hashmap import HashMap
+import audio
+import spritesheet
 
 
 
@@ -27,9 +28,12 @@ class Data():
         self.width = width
         self.height = height
         self.sprite_library = other.load_images()
+        self.sound_library = audio.load_sounds()
+        self.channel_1 = pygame.mixer.Channel(1)
 
 
-        self.menimg = pygame.image.load('./assets/images/background_3.png').convert_alpha()
+        self.img = spritesheet.spritesheet('./assets/images/f1.png').image_at((0, 0, 928, 796),
+                                                                                (254, 254, 254,)).convert(),
         self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
 
         self.num_files = (len([f for f in os.listdir("./assets/levels")
@@ -87,7 +91,7 @@ class Data():
 
         self.time = 0
         self.overtime = -1
-        self.level_time = 200
+        self.level_time = other.LEVEL_TIME
         self.l_t_increment = 0
 
         self.fragmentgroup = fragment.fragmentgroup
@@ -99,6 +103,8 @@ class Data():
 
 
         other.level_surface.fill((0,0,0))
+        #pygame.draw.circle(other.disp_filter, (255, 0, 0), (other.WIDTH / 2, 120), 20, 2)
+
 
         self.camera = Camera(camera.complex_camera, 200, 200)
 
@@ -110,12 +116,6 @@ class Data():
         self.newbuttons = newbuttons
         self.mouse_position = mouse_position
 
-        if pygame.K_ESCAPE in newkeys:
-            if  other.MINISTATE == 0:
-                other.MINISTATE = 1
-            elif other.MINISTATE == 1:
-                other.MINISTATE = 0
-
 
         if self.time > 0:
             self.time -= 1
@@ -124,50 +124,72 @@ class Data():
         a += 1
 
         if self.time == 0 and other.MINISTATE == 0:
+            self.l_t_increment += 1
 
+            if self.l_t_increment > 60 :
+                self.l_t_increment = 0
+                self.level_time -= 1
 
             #controls
+            if self.p2vic or self.p1vic:
+                if pygame.K_SPACE in newkeys:
 
-            if pygame.K_6 in keys:
-                for _ in range(30):
-                    self.fragmentgroup.add(custFrag((400,400),(25,50),(255,255,255)))
+                    other.MINISTATE = 0
+                    other.GAMESTATE = 1
+                    self.p1score = 0
+                    self.p2score = 0
+                    self.l_t_increment = 0
+                    self.level_time = other.LEVEL_TIME
+                    self.p1vic = False
+                    self.p2vic = False
+                    self.newRound()
 
-            if pygame.K_w in keys:
-                self.player.jump()
+            else:
 
+                if pygame.K_6 in newkeys:
+                    self.channel_1.play(self.sound_library["stone_1"])
 
+                if pygame.K_w in keys:
+                    self.player.jump()
+                else:
+                    self.player.jump_cut()
 
-            if pygame.K_a in keys:
-                self.player.moveLeft()
+                if pygame.K_s in keys:
+                    self.player.moveDown()
 
-
-            elif pygame.K_d in keys:
-                self.player.moveRight()
-
-
-            if pygame.K_i in keys:
-                self.player2.jump()
-
-            elif pygame.K_k in keys:
-                self.player2.moveDown()
-
-            if pygame.K_j in keys:
-                self.player2.moveLeft()
-            elif pygame.K_l in keys:
-                self.player2.moveRight()
-            # pygame.sprite.collide_circle(self.player, self.player2):
-
-                #for _ in range(20):
-                #    self.fragmentgroup.add(custFrag((self.player.rect.x,self.player.rect.y),(1,3),(255,255,0)))
+                if pygame.K_a in keys:
+                    self.player.moveLeft()
 
 
-            if self.p1score >= 5:
-                self.p1vic = True
-            elif self.p2score >= 5:
-                self.p2vic = True
+                elif pygame.K_d in keys:
+                    self.player.moveRight()
 
 
-            self.all_sprites.update()
+                if pygame.K_i in keys:
+                    self.player2.jump()
+                else:
+                    self.player2.jump_cut()
+
+                if pygame.K_k in keys:
+                    self.player2.moveDown()
+
+                if pygame.K_j in keys:
+                    self.player2.moveLeft()
+                elif pygame.K_l in keys:
+                    self.player2.moveRight()
+                # pygame.sprite.collide_circle(self.player, self.player2):
+
+                    #for _ in range(20):
+                    #    self.fragmentgroup.add(custFrag((self.player.rect.x,self.player.rect.y),(1,3),(255,255,0)))
+
+
+                if self.p1score >= 5:
+                    self.p1vic = True
+                elif self.p2score >= 5:
+                    self.p2vic = True
+
+
+                self.all_sprites.update()
 
         elif other.MINISTATE == 1:
             return
@@ -182,7 +204,7 @@ class Data():
 
 
 
-        #surface.blit(self.img, (0, 0))
+
         #pygame.display.flip()
         surface.blit(other.level_surface, (0, 0))
 
@@ -201,74 +223,39 @@ class Data():
         self.telewalls.draw(surface)
         self.telewalls2.draw(surface)
 
+        #@surface.blit(self.img[0], (other.WIDTH/8+64, 0))
+
         ###
         #END MATCH
 
-        self.drawTextLeft(surface, str(self.p1score), (255, 255, 255), 20, 50, self.font)
-        self.drawTextLeft(surface, str(self.p2score), (255, 255, 255), self.width - 40, 50, self.font)
+        self.drawTextLeft(surface, str(self.p1score), (0,0, 255), 20, 50, self.font)
+        self.drawTextLeft(surface, str(self.p2score), (255, 0,0), self.width - 40, 50, self.font)
+        if self.level_time >= 0:
+            self.drawTextCenter(surface, str(self.level_time), (255, 255, 255), other.WIDTH / 2, 200, self.font)
+        else:
+            self.drawTextCenter(surface, str(abs(self.level_time)), (155, 0, 0), other.WIDTH / 2, 200, self.font)
 
         self.fragmentgroup.draw(surface)
 
         if self.p2vic or self.p1vic:
 
 
-            r = pygame.Rect(200, 200, 100, 100)
-            pygame.draw.rect(surface, (25, 25, 25), r)
-            pygame.draw.rect(surface, (255, 255, 255), r)
-            if ((self.mouse_position[0] <= 300 and self.mouse_position[0] >= 200) and (
-                            self.mouse_position[1] <= 300 and self.mouse_position[
-                        1] >= 200)):  # If mouse is in the rectangle
-                pygame.draw.rect(surface, (155, 155, 155), r)
-                if 1 in self.newbuttons:
-                    other.MINISTATE = 0
-                    other.GAMESTATE = 1
-                    self.p1score =0
-                    self.p2score = 0
-                    self.p1vic = False
-                    self.p2vic = False
-                    self.newRound()
-            self.drawTextLeft(surface, "Play", (0, 0, 255), 220, 280, self.font)
 
-            r = pygame.Rect(500, 200, 100, 100)
-            pygame.draw.rect(surface, (255, 255, 255), r)
-            if ((self.mouse_position[0] <= 600 and self.mouse_position[0] >= 500) and (
-                            self.mouse_position[1] <= 300 and self.mouse_position[
-                        1] >= 200)):  # If mouse is in the rectangle
-                pygame.draw.rect(surface, (155, 155, 155), r)
+            self.drawTextCenter(surface, "Press SPACE Play again!", (255, 255, 255), other.WIDTH/2, 200, self.font)
 
-                if 1 in self.newbuttons:
-                    pygame.quit()
-            self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
 
-            r = pygame.Rect(200, 400, 100, 100)
-            pygame.draw.rect(surface, (255, 255, 255), r)
-
-            if ((self.mouse_position[0] <= r[0] + r[2] and self.mouse_position[0] >= r[0]) and (
-                            self.mouse_position[1] <= r[1] + r[3] and self.mouse_position[1] >= r[
-                        1])):  # If mouse is in the rectangle
-                pygame.draw.rect(surface, (155, 155, 155), r)
-                if 1 in self.newbuttons:
-                    other.GAMESTATE = 0
-                    other.MINISTATE = 0
-                    self.p1score = 0
-                    self.p2score = 0
-                    self.p1vic = False
-                    self.p2vic = False
-                    self.newRound()
-                    self.newbuttons.remove(1)
-            self.drawTextLeft(surface, "Menu", (0, 0, 255), 220, 480, self.font)
 
         if self.p1vic :
 
-            self.drawTextLeft(surface, "PLAYER 1 WON!", (0, 255, 0), 150, 150, self.font2)
+            self.drawTextCenter(surface, "PLAYER 1 WON!", (0, 0, 255), other.WIDTH/2, 150, self.font2)
         elif self.p2vic:
-            self.drawTextLeft(surface, "PLAYER 2 WON", (0, 255, 0), 150, 150, self.font2)
+            self.drawTextCenter(surface, "PLAYER 2 WON", (255, 0, 0), other.WIDTH/2, 150, self.font2)
 
         if self.p1win > 0 and not self.p1vic and not self.p2vic:
-            self.drawTextLeft(surface, "PLAYER 1 SCORED", (255, 255, 255), 240, self.height/2, self.font)
+            self.drawTextCenter(surface, "PLAYER 1 SCORED", (0, 0, 255), other.WIDTH/2, 50, self.font)
             self.p1win -= 1
         elif self.p2win > 0 and not self.p2vic and not self.p1vic:
-            self.drawTextLeft(surface, "PLAYER 2 SCORED", (255, 255, 255), 240, self.height/2, self.font)
+            self.drawTextCenter(surface, "PLAYER 2 SCORED", (255,0,0), other.WIDTH/2, 50, self.font)
             self.p2win -= 1
 
 
@@ -281,117 +268,26 @@ class Data():
 
         return
 
-    def pauseMenu(self, surface):
-        x,y,w,h = self.width/4, self.height/8, self.width - self.width/2, self.height - self.height/4
-        rect = pygame.Rect(x,y,w,h)
-        pygame.draw.rect(surface, (25, 25, 25), rect)
-
-        rx,ry,rw,rh = (x+w/5, y+h/4, w/5, h/5)
-        r = pygame.Rect(rx,ry,rw,rh)
-        pygame.draw.rect(surface, (255, 255, 255), r)
-        self.drawTextLeft(surface, "Menu", (255, 255, 255), x+w/2, y+h/5, self.font)
-
-        if other.button(self.mouse_position,r):
-            pygame.draw.rect(surface, (155, 155, 155), r)
-            if 1 in self.newbuttons:
-                other.MINISTATE = 0
-
-        self.drawTextLeft(surface, "Play", (0, 0, 255), rx+30, ry+80, self.font)
-
-        rx, ry, rw, rh = (x +w - w / 3, y + h / 4, w / 5, h / 5)
-        r = pygame.Rect(rx,ry, rw,rh)
-        pygame.draw.rect(surface, (255, 255, 255), r)
-
-        if other.button(self.mouse_position, r):
-            pygame.draw.rect(surface, (155, 155, 155), r)
-            if 1 in self.newbuttons:
-                other.ON = False
-
-        self.drawTextLeft(surface, "Quit", (255, 0, 0), rx+30, ry+80, self.font)
-
-
-        return
-
-
-    def GameOverDraw(self, surface):
-        rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((0,0,0), rect)  # back
-        self.drawTextLeft(surface, "GAME OVER", (250, 250, 250), 170, 250, self.font2)
-
-    def changeDraw(self, surface):
-        if self.player.state == "STARTING_B":
-
-            s = pygame.Surface((other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH))
-            rect = pygame.Rect(0, 0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)  # per-pixel alpha
-            surface.fill((self.alph_1, 0, 0, self.alph_1), rect)  # notice the alpha value in the color
-            # rect.blit(surface, (0, 0))
-            self.alph_1 -= 15
-            self.camera.update(self.player)
-            if self.alph_1 <= 0:
-                self.foo()
-                self.player.state = "NORMAL"
-
-        elif self.player.state == "STARTING_G":
-            rect = pygame.Rect(0, 0, other.TOTAL_LEVEL_HEIGHT, other.TOTAL_LEVEL_WIDTH)  # per-pixel alpha
-            surface.fill((0, self.alph_1, 0, self.alph_1), rect)  # notice the alpha value in the color
-            # rect.blit(surface, (0, 0))
-            self.alph_1 -= 15
-            self.camera.update(self.player)
-
-            if self.alph_1 <= 0:
-                self.foo()
-                self.player.state = "NORMAL"
-                print self.allwalls
-
-
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
         self.mouse_position = mouse_position
         self.newbuttons = newbuttons
+
+        if pygame.K_SPACE in newkeys:
+            print "FIGHT!"
+            self.current_level = other.STARTING_LEVEL
+            other.GAMESTATE = 1
+            self.initLevel()
+            self.overtime = -1
+            self.sound_library["open_1"].play()
 
         return
     #menu drawing
     def menuDraw(self,surface):
         rect = pygame.Rect(0, 0, self.width, self.height)
-        surface.fill((255, 255, 0), rect)  # back
+        surface.fill((0, 0, 0), rect)  # back
 
-        surface.blit(self.menimg, (0, 0))
-
-        self.drawTextLeft(surface, "WELCOME oh rravel sTO THE GAME", (0, 255, 0), 200, 150, self.font)
-
-        r = pygame.Rect(200,400, 100,100)
-        pygame.draw.rect(surface,(255,255,255),r)
-
-        if ((self.mouse_position[0] <= r[0]+r[2] and self.mouse_position[0] >= r[0]) and (
-                self.mouse_position[1] <= r[1]+r[3] and self.mouse_position[1] >= r[1])):  # If mouse is in the rectangle
-            pygame.draw.rect(surface, (155, 155, 155), r)
-            if 1 in self.newbuttons:
-                print "BATTLE!"
-                self.current_level = other.STARTING_LEVEL
-                other.GAMESTATE = 1
-                self.initLevel()
-                self.newbuttons.remove(1)
-                self.overtime = -1
-        self.drawTextLeft(surface, "Battle", (0, 0, 255), 220, 480, self.font)
-
-        r = pygame.Rect(200, 200, 100, 100)
-        pygame.draw.rect(surface, (255, 255, 255), r)
-
-
-
-        r = pygame.Rect(500, 200, 100, 100)
-        pygame.draw.rect(surface, (255, 255, 255), r)
-        if ((self.mouse_position[0] <= r[0] + r[2] and self.mouse_position[0] >= r[0]) and (
-                        self.mouse_position[1] <= r[1] + r[3] and self.mouse_position[1] >= r[
-                    1])):  # If mouse is in the rectangle
-            pygame.draw.rect(surface, (155, 155, 155), r)
-
-            if 1 in self.newbuttons:
-                pygame.quit()
-        self.drawTextLeft(surface, "Quit", (255, 0, 0), 520, 280, self.font)
-
-
-
-
+        self.drawTextCenter(surface, "WELCOME TO THE GAME", (255, 255, 255), other.WIDTH/2, 150, self.font)
+        self.drawTextCenter(surface, "Press SPACE to play!", (255, 255, 255), other.WIDTH/2, 200, self.font)
 
         return
     #text function
@@ -399,6 +295,13 @@ class Data():
         textobj = font.render(text, False, color)
         textrect = textobj.get_rect()
         textrect.bottomleft = (x, y)
+        surface.blit(textobj, textrect)
+        return
+
+    def drawTextCenter(self, surface, text, color, x, y, font):
+        textobj = font.render(text, False, color)
+        textrect = textobj.get_rect()
+        textrect.center = (x, y)
         surface.blit(textobj, textrect)
         return
     #text fuunction
@@ -419,24 +322,21 @@ class Data():
         self.allwalls.add(self.wall_list)
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-        self.back_sprites.draw(other.level_surface)
-        self.wall_list.draw(other.level_surface)
+        self.drawLev()
         self.isLoaded = True
 
 
     def newLevel(self):
         self.emptyLists()
+        self.l_t_increment = 0
+        self.level_time = other.LEVEL_TIME
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
         n = str(random.randint(1, int((self.num_files))))
-        self.level = Level("level_" + str(1))
+        self.level = Level("level_" + str(n))
+        self.back_sprites.empty()
         self.level.gameLev(self)
-        c = random.randint(0,255)
-        v = random.randint(0, 255)
-        b = random.randint(0, 255)
-        other.level_surface.fill((c,v,b))
-        self.back_sprites.draw(other.level_surface)
-        self.wall_list.draw(other.level_surface)
+        self.drawLev()
 
     # end of a single battle
     def endRound(self, surface):
@@ -506,7 +406,6 @@ class Data():
         self.allwalls.add(self.wall_list)
         for x in self.players:
             if x != self.emptysprite:
-                print x
                 self.player.otherplayers.add(x)
                 self.player2.otherplayers.add(x)
                 if x == self.player:
@@ -549,6 +448,14 @@ class Data():
                 self.sprite_library["sfrag_1"], self.sprite_library["sfrag_2"]  )
         )
 
+        self.player.getSounds(
+            (self.sound_library["stone_1"], self.sound_library["stone_2"],self.sound_library["stone_3"],
+             self.sound_library["bloop_1"],self.sound_library["bloop_2"],self.sound_library["bloop_3"],
+             self.sound_library["fall_1"],self.sound_library["fall_2"]
+
+             )
+        )
+
         self.player2.getfimage(
             (  # self.sprite_library["frag1"], self.sprite_library["frag2"], self.sprite_library["frag3"],
                 self.sprite_library["frag1_2"]
@@ -556,6 +463,14 @@ class Data():
                 , self.sprite_library["frag2_2"], self.sprite_library["frag3_2"]),
 
             ( self.sprite_library["sfrag_1"]  , self.sprite_library["sfrag_2"] )
+        )
+
+        self.player2.getSounds(
+            (self.sound_library["stone_1"], self.sound_library["stone_2"], self.sound_library["stone_3"],
+             self.sound_library["bloop_1"], self.sound_library["bloop_2"], self.sound_library["bloop_3"],
+             self.sound_library["fall_1"], self.sound_library["fall_2"]
+
+             )
         )
 
     def getCollidables(self, obj, region=(0.0, 1.0)):
@@ -568,7 +483,12 @@ class Data():
                             obj.collidables.add(w)
                             continue
 
-
+    def drawLev(self):
+        for i in range(0, 28):
+            for j in range(0, 30):
+                other.level_surface.blit(self.sprite_library["far_back_lava"], (i * 32 + other.WIDTH / 8 + 64, j * 32))
+        self.back_sprites.draw(other.level_surface)
+        self.wall_list.draw(other.level_surface)
 
 
 

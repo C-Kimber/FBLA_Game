@@ -8,11 +8,12 @@ MINISTATE = 0
 FPS = 0
 WIDTH = 1366
 HEIGHT = 768
-ISFULLSCREEN = False
+ISFULLSCREEN = True
 EDITING = False
 ON = True
 FLAG = None
 level_surface = pygame.Surface((WIDTH, HEIGHT))
+disp_filter = pygame.Surface((WIDTH, HEIGHT))
 
 # CONSTANTS
 
@@ -22,7 +23,7 @@ HALF_HEIGHT = int(HEIGHT / 2)
 CAMERA_SLACK = 30
 TOTAL_LEVEL_WIDTH = 0
 TOTAL_LEVEL_HEIGHT = 0
-LEVEL_TIME = 200
+LEVEL_TIME = 20
 STARTING_LEVEL = 1
 
 
@@ -133,6 +134,39 @@ def load_images():
         "back_wall_16": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
             (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
 
+        "lava_1": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_2": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_3": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_4": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
+        "lava_5": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
+        "lava_6": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 2, 32 * 1, 32, 32), (254, 254, 254)).convert(),
+        "lava_7": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "lava_8": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "lava_9": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
+            (32 * 2, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "lava_10": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_11": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
+        "lava_12": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "lava_13": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_14": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
+        "lava_15": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
+        "lava_16": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
+            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+
         "wall_1_tall": spritesheet.spritesheet('./assets/images/wall1_small_tall.png').image_at((0, 0, 32, 32), (
             255, 255, 255)).convert(),  # 11
         "wall_1_long": spritesheet.spritesheet('./assets/images/fallenPillar.png').image_at((0, 0, 32, 32), (
@@ -177,6 +211,10 @@ def load_images():
         "t_wall_2": spritesheet.spritesheet('./assets/images/telewall2_sheet.png').image_at((0, 0, 32, 32), (
             255, 255, 255)).convert(),  # 15
         "lava": spritesheet.spritesheet('./assets/images/lava.png').image_at((0, 0, 32, 32),
+                                                                             (255, 255, 255)).convert(),  # 16
+        "back_lava": spritesheet.spritesheet('./assets/images/back_lav.png').image_at((0, 0, 32, 32),
+                                                                             (255, 255, 255)).convert(),  # 16
+        "far_back_lava": spritesheet.spritesheet('./assets/images/far_back_lav.png').image_at((0, 0, 32, 32),
                                                                              (255, 255, 255)).convert(),  # 16
         "finish": spritesheet.spritesheet('./assets/images/crystal_1.png').image_at((0, 0, 32, 32),
                                                                                     (254, 254, 254)).convert(),

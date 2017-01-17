@@ -19,7 +19,7 @@ class Game:
         self.height = height
         self.frames_per_second = frames_per_second
         self.on = True
-        self.isFull = False
+        self.isFull = other.ISFULLSCREEN
         flags = pygame.locals.DOUBLEBUF | pygame.locals.SRCALPHA
         if other.EDITING == False:
             flags = pygame.locals.DOUBLEBUF | pygame.locals.SRCALPHA | other.FLAG
@@ -27,7 +27,7 @@ class Game:
 
         self.screen = pygame.display.set_mode(
 
-            (other.WIDTH, other.HEIGHT-32),
+            (other.WIDTH, other.HEIGHT),
 
             flags
             , 8)
@@ -85,15 +85,14 @@ class Game:
                     keys.add(e.key)
                     newkeys.add(e.key)
 
-                    if e.key == pygame.K_F10:
-                       if self.isFull:
+                    if e.key == pygame.K_ESCAPE:
+                       self.on = False
+                       """if self.isFull:
                             self.screen = pygame.display.set_mode(
 
                                 (self.width, self.height-64),
 
-                                pygame.locals.DOUBLEBUF |
-
-                                pygame.locals.SRCALPHA | pygame.locals.RESIZABLE
+                                pygame.locals.DOUBLEBUF | pygame.locals.RESIZABLE
                                 , 32)
                             other.WIDTH, other.HEIGHT = self.width, self.height
 
@@ -107,7 +106,7 @@ class Game:
                                 pygame.locals.SRCALPHA | pygame.locals.FULLSCREEN
                                 , 32)
                             other.WIDTH, other.HEIGHT = pygame.display.list_modes()[0]
-                       self.isFull = not self.isFull
+                       other.ISFULLSCREEN = not self.isFull"""
 
                 if e.type == pygame.KEYUP:
                     keys.discard(e.key)

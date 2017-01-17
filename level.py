@@ -339,6 +339,7 @@ class Level:
 
     @staticmethod
     def connectTextures(data, txt):
+        buf = other.WIDTH / 8 + 32
         txt = txt
         text = []
         col = []
@@ -375,26 +376,27 @@ class Level:
                         bot = text[m + 1][n]
                         if cur == "1":
                             f = other.getTileState(left, right, top, bot, "1")
-                            data.wall_list.add(Wall(n * 32+other.WIDTH/8+32, m * 32, data.sprite_library["wall_" + str(f + 1)],
+                            data.wall_list.add(Wall(n * 32+buf, m * 32, data.sprite_library["wall_" + str(f + 1)],
                                                     f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
 
                         if cur == "5":  # player 1 spawn
 
-                            data.player.spawnx = n * 32+other.WIDTH/8+32
+                            data.player.spawnx = n * 32+buf
                             data.player.spawny = m * 32
-                            data.player.rect.x = n * 32+other.WIDTH/8+32
+                            data.player.rect.x = n * 32+buf
                             data.player.rect.y = m * 32
                             print data.player.spawnx, data.player.spawny
 
 
                         if x == "3":
-                            data.wall_list.add(deathWall(n * 32+other.WIDTH/8+32, m * 32, data.sprite_library["lava"]))
+                            f = other.getTileState(left, right, top, bot, "3")
+                            data.wall_list.add(deathWall(n * 32+buf, m * 32, data.sprite_library["lava_"+str(f+1)]))
 
 
                         elif x == "6":  # player 2 spawn
-                                data.player2.spawnx = n * 32 + other.WIDTH / 8 + 32
+                                data.player2.spawnx = n * 32 + buf
                                 data.player2.spawny = m * 32
-                                data.player2.rect.x = n * 32 + other.WIDTH / 8 + 32
+                                data.player2.rect.x = n * 32 + buf
                                 data.player2.rect.y = m * 32
 
                         elif x == "_":  # long walls
@@ -418,7 +420,7 @@ class Level:
                             data.all_sprites.add(Pillar(n * 32, m * 32, 128))
                         elif y[n] == "2":
                             f = other.getTileState(left, right, top, bot, "2")
-                            data.wall_list.add(upWall(n * 32, m * 32, data.sprite_library["up_wall_"+str(f+1)],f))
+                            data.wall_list.add(upWall(n * 32+buf, m * 32, data.sprite_library["up_wall_"+str(f+1)],f))
                         elif x == "^":
                             f = other.getTileState(left, right, top, bot, "^")
                             data.wall_list.add(upWall(n * 32, m * 32, data.sprite_library["up_wall_" + str(f + 1)], f))
@@ -447,7 +449,7 @@ class Level:
                         data.player.spawny = m * 32
                         data.player.rect.x = n * 32
                         data.player.rect.y = m * 32
-                    if x == "X" or x == "x":
+                    if x == "3":
                         data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         # elif x == "-":
@@ -500,12 +502,15 @@ class Level:
             m += 1
             other.TOTAL_LEVEL_WIDTH = n * 32 - 128
             other.TOTAL_LEVEL_HEIGHT = m * 32
-            print "LVL DIMENSIONS: ", other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT
+
 
             n = 0
 
+        print "LVL DIMENSIONS: ", other.TOTAL_LEVEL_WIDTH, other.TOTAL_LEVEL_HEIGHT
+
     @staticmethod
     def connectBackTextures(data, txt):
+        buf = other.WIDTH / 8 + 32
         txt = txt
         text = []
         col = []
@@ -514,7 +519,7 @@ class Level:
             e1,e2 = 0, 40
             f1,f2 = 0, 240
         else:
-            e1,e2 = 0,24
+            e1,e2 = 0,26
             f1,f2 = 0,30
 
 
@@ -544,7 +549,7 @@ class Level:
                         if cur == "1":
 
                             f = other.getTileState(left,right,top,bot,"1")
-                            data.back_sprites.add( Wall(n * 32+other.WIDTH/8+32, m * 32-32, data.sprite_library["back_wall_" + str(f + 1)],
+                            data.back_sprites.add( Wall(n * 32+buf, m * 32-32, data.sprite_library["back_wall_" + str(f + 1)],
                                                    f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
                             #walllist.append ( Wall(n * 32, m * 32, data.sprite_library["back_wall_" + str(f + 1)],
                              #                          f, (math.floor(n * 32 / 864), math.floor(m * 32 / 864))))
@@ -552,7 +557,7 @@ class Level:
                             #walllist.append(None)
                         elif cur == "2":
                             f = other.getTileState(left, right, top, bot, "2")
-                            data.back_sprites.add(upWall(n * 32, m * 32-32, data.sprite_library["up_wall_" + str(f + 1)], f))
+                            data.wall_list.add(upWall(n * 32+buf, m * 32-32, data.sprite_library["up_wall_" + str(f + 1)], f))
 
 
                 n += 1
