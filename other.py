@@ -23,7 +23,7 @@ HALF_HEIGHT = int(HEIGHT / 2)
 CAMERA_SLACK = 30
 TOTAL_LEVEL_WIDTH = 0
 TOTAL_LEVEL_HEIGHT = 0
-LEVEL_TIME = 20
+LEVEL_TIME = 2
 STARTING_LEVEL = 1
 
 
@@ -59,12 +59,29 @@ def load_images():
                                                                                    (254, 254, 254)).convert(),  # s1
         "sfrag_3": spritesheet.spritesheet('./assets/images/sfrag_3.png').image_at((0, 0, 16, 16),
                                                                                    (254, 254, 254)).convert(),  # s1
+        "frag_glow": spritesheet.spritesheet('./assets/images/glow.png').image_at((0, 0, 64, 64),
+                                                                                   (254, 254, 254)).convert(),  # s1
 
-        "player1": spritesheet.spritesheet('./assets/images/Player1.png').image_at((0, 0, 32, 32),
-                                                                                   (255, 0, 0)).convert(),
+        "gem": spritesheet.spritesheet('./assets/images/gem.png').image_at((0, 0, 32, 32),
+                                                                                (2, 2, 2)).convert(),
+        "gem2": spritesheet.spritesheet('./assets/images/gem2.png').image_at((0, 0, 32, 32),
+                                                                            (2, 2, 2)).convert(),
+        "gem3": spritesheet.spritesheet('./assets/images/gem3.png').image_at((0, 0, 32, 32),
+                                                                            (254, 254, 254)).convert(),
+        "gem4": spritesheet.spritesheet('./assets/images/gem4.png').image_at((0, 0, 32, 32),
+                                                                            (254, 254, 254)).convert(),
+
+        "player1": spritesheet.spritesheet('./assets/images/player_1.png').image_at((0, 0, 32, 32),
+                                                                                   (254, 254, 254)).convert(),
+        "player1_bad": spritesheet.spritesheet('./assets/images/player_1_bad.png').image_at((0, 0, 32, 32),
+                                                                                    (254, 254, 254)).convert(),
         # 8
-        "player2": spritesheet.spritesheet('./assets/images/Player2_small.png').image_at((0, 0, 32, 32), (
+        "player2": spritesheet.spritesheet('./assets/images/player_2.png').image_at((0, 0, 32, 32), (
             255, 255, 255)).convert(),  # 9
+        "player2_bad": spritesheet.spritesheet('./assets/images/player_2_bad.png').image_at((0, 0, 32, 32),
+                                                                                    (254, 254, 254)).convert(),
+        "rubble": spritesheet.spritesheet('./assets/images/rubble.png').image_at((0, 0, 32, 32),
+                                                                                    (254, 254, 254)).convert(),
 
         "wall_1": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 0, 32 * 0, 32, 32),
                                                                                       (254, 254, 254)).convert(),
@@ -218,7 +235,7 @@ def load_images():
                                                                              (255, 255, 255)).convert(),  # 16
         "finish": spritesheet.spritesheet('./assets/images/crystal_1.png').image_at((0, 0, 32, 32),
                                                                                     (254, 254, 254)).convert(),
-        "enemy": spritesheet.spritesheet('./assets/images/enemy.png').image_at((0, 0, 32, 32),
+        "item": spritesheet.spritesheet('./assets/images/gem.png').image_at((0, 0, 32, 32),
                                                                                (254, 254, 254)).convert(),
         "hitwall": spritesheet.spritesheet('./assets/images/crate.png').image_at((0, 0, 32, 32),
                                                                                  (254, 254, 254)).convert(),

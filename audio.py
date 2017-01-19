@@ -14,7 +14,8 @@ def load_sounds():
             "bloop_3": pygame.mixer.Sound("./assets/sounds/lava_boom_1.ogg"),
             "fall_1": pygame.mixer.Sound("./assets/sounds/falling_1.ogg"),
             "fall_2": pygame.mixer.Sound("./assets/sounds/falling_2.ogg"),
-            "open_1": pygame.mixer.Sound("./assets/sounds/opening_1.ogg"),
+            "open_1": pygame.mixer.Sound("./assets/sounds/opening_3.ogg"),
+            "thunder": pygame.mixer.Sound("./assets/sounds/thunder_1.ogg"),
         }
 
     except pygame.error, message:

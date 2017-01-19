@@ -87,7 +87,7 @@ class DataD:
             self.button(mouse_position,( 832 + 113, 49+self.scrolly, 16, 16), "|")  # longwall large
             self.button(mouse_position,((832 + 113, 67+self.scrolly, 32, 16)),'2')
             self.button(mouse_position,((880,  96+self.scrolly, 32, 32)), '7') #Finish block
-            self.button(mouse_position,((880,  160+self.scrolly, 32, 32)), '8')  # enemy
+            self.button(mouse_position,((880,  160+self.scrolly, 32, 32)), '8')  # item
             self.button(mouse_position,((880,  224+self.scrolly, 32, 32)), '9')  #hitable/breakable block
             if mouse_position[0] > 0 and mouse_position[0] < 800:
                 self.level.write(block,self.selected,self.is_back)
@@ -196,7 +196,7 @@ class DataD:
         pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.width - 70, self.height - 37+self.scrolly, 32, 32), 4)  # clear
 
         pygame.draw.rect(surface, (0, 255, 155), pygame.Rect(880, 96+self.scrolly, 32, 32)) # finish
-        surface.blit(self.sprite_library["enemy"], pygame.Rect(880, 160+self.scrolly, 32, 32))#enemy
+        surface.blit(self.sprite_library["item"], pygame.Rect(880, 160+self.scrolly, 32, 32))#item
 
         surface.blit(self.sprite_library["hitwall"], pygame.Rect(880, 224+self.scrolly, 32, 32))#hitwall
 

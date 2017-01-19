@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.hitHeightVel = False
         self.onGround = False
         self.dir = "right"
-        self.name = "p1"
+        self.name = "1"
 
         self.width = 32
         self.height = 32
@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.teles2 = None
         self.upwalls = None
         self.finish = None
+        self.items = pygame.sprite.Group()
         self.otherplayers = pygame.sprite.Group()
         self.collidables = pygame.sprite.Group()
 
@@ -64,6 +65,7 @@ class Player(pygame.sprite.Sprite):
 
         self.alive = True
 
+        self.dietime = 0
         self.teletime = 0
         self.data = None
 
@@ -100,60 +102,68 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self):
-        highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32+other.WIDTH/8+32, other.TOTAL_LEVEL_WIDTH +96+ other.WIDTH/8
-        self.xmom = self.xvel * self.mass / 64
-        self.ymom = self.yvel * self.mass / 64
-        # self.playerCollisions()
+        if self.state != "DYING":
+            highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32+other.WIDTH/8+32, other.TOTAL_LEVEL_WIDTH +96+ other.WIDTH/8
+            self.xmom = self.xvel * self.mass / 64
+            self.ymom = self.yvel * self.mass / 64
+            # self.playerCollisions()
 
 
-        # teleportion time
-        if self.teletime > 0:
-            self.teletime -= 1
+            # teleportion time
+            if self.teletime > 0:
+                self.teletime -= 1
 
-        self.applyDrag("air")
+            self.applyDrag("air")
 
-        # movement control
+            # movement control
 
-        # x velocity control
-        if self.xvel > self.maxxvel:
-            self.xvel = self.maxxvel
-        if self.xvel < -self.maxxvel:
-            self.xvel = -self.maxxvel
-        if 0.21 > self.xvel > -0.21:
-            self.xvel = 0.0
+            # x velocity control
+            if self.xvel > self.maxxvel:
+                self.xvel = self.maxxvel
+            if self.xvel < -self.maxxvel:
+                self.xvel = -self.maxxvel
+            if 0.21 > self.xvel > -0.21:
+                self.xvel = 0.0
 
-        # y velocity control
-        if self.yvel > self.maxyvel:
-            self.yvel = self.maxyvel
-            self.hitHeightVel = True
-        elif self.yvel < -self.maxyvel:
-            self.yvel = -self.maxyvel
+            # y velocity control
+            if self.yvel > self.maxyvel:
+                self.yvel = self.maxyvel
+                self.hitHeightVel = True
+            elif self.yvel < -self.maxyvel:
+                self.yvel = -self.maxyvel
 
-        if self.dir == "up":
-            if self.yvel < 0:
-                self.dir = "down"
+            if self.dir == "up":
+                if self.yvel < 0:
+                    self.dir = "down"
 
-        self.newfnction()
-        self.rect.x += self.xvel
-        self.wallColl(self.xvel, 0, self.collidables)
-        self.rect.y -= self.yvel
-        self.onGround = False
-        self.wallColl(0, self.yvel, self.collidables)
+            self.newfnction()
+            self.rect.x += self.xvel
+            self.wallColl(self.xvel, 0, self.collidables)
+            self.rect.y -= self.yvel
+            self.onGround = False
+            self.wallColl(0, self.yvel, self.collidables)
 
-        self.wallCollisions()
+            self.wallCollisions()
 
-        if self.otherplayers is not None and other.GAMESTATE != 2: self.playerCollisions()
+            if self.otherplayers is not None and other.GAMESTATE != 2: self.playerCollisions()
 
-        # gravity
-        if not self.onGround:
-            self.yvel -= .0066 * self.mass
+            # gravity
+            if not self.onGround:
+                self.yvel -= .0066 * self.mass
 
-        self.boundries(highbound, lowbound, leftbound, rightbound)
-        #self.getChunk()
-        self.current_chunk = math.floor((self.rect.x) / (256)), math.floor(
-            (self.rect.y) / 256)
+            self.boundries(highbound, lowbound, leftbound, rightbound)
+            #self.getChunk()
+            self.current_chunk = math.floor((self.rect.x) / (256)), math.floor(
+                (self.rect.y) / 256)
 
-        self.down = False
+            self.down = False
+        else:
+            self.slowdie()
+            if not self.onGround:
+                self.yvel -= .0066 * self.mass
+            self.rect.y -= self.yvel
+            self.onGround = False
+            self.wallColl(0, self.yvel, self.collidables)
         return
 
     # stays onscreen
@@ -181,27 +191,31 @@ class Player(pygame.sprite.Sprite):
         if self.otherplayers is not None:
             hit_bros = pygame.sprite.spritecollide(self, self.otherplayers, False)
             for bro in hit_bros:
-                random.choice((self.sounds[0],self.sounds[1],self.sounds[2])).play()
-                for _ in range(random.randint(5, 15)):
-                    fragment.fragmentgroup.add(custFrag((self.rect.centerx, self.rect.centery), (1, 3), random.choice(self.f2imgs) ))
+                if bro.state != "DYING":
+                    random.choice((self.sounds[0],self.sounds[1],self.sounds[2])).play()
+                    for _ in range(random.randint(5, 15)):
+                        fragment.fragmentgroup.add(custFrag((self.rect.centerx, self.rect.centery), (1, 3), random.choice(self.f2imgs) ))
 
-                if bro.rect.y - self.rect.y >= 1:  # if p1 is above p2
-                    self.rect.bottom = bro.rect.top
-                    if not self.onGround:
-                        bro.yvel = self.ymom + 2
-                    else:
-                        bro.yvel = .2
-                    self.yvel = 12
-                    if bro.yvel > bro.maxyvel:
-                        bro.yvel = bro.maxyvel / 3
-                    elif bro.yvel < -bro.maxyvel:
-                        bro.yvel = -bro.maxyvel / 3
+                    if bro.rect.y - self.rect.y >= 1:  # if p1 is above p2
+                        self.rect.bottom = bro.rect.top
+                        if not self.onGround:
+                            bro.yvel = self.ymom + 2
+                        else:
+                            bro.yvel = .2
+                        self.yvel = 12
+                        if bro.yvel > bro.maxyvel:
+                            bro.yvel = bro.maxyvel / 3
+                        elif bro.yvel < -bro.maxyvel:
+                            bro.yvel = -bro.maxyvel / 3
+                        if self.data.level_time < 0:
+                            bro.image = self.data.sprite_library["rubble"]
+                            bro.state = "DYING"
 
-                bro.xvel = self.xmom
-                self.xvel = -random.randint(3,6)* other.unitNum(self.xmom)
+                    bro.xvel = self.xmom
+                    self.xvel = -random.randint(3,6)* other.unitNum(self.xmom)
 
-                # else:
-                #    self.onGround = False
+                    # else:
+                    #    self.onGround = False
 
     # Collisions with walls
     def wallColl(self, xvel, yvel, colliders):
@@ -263,8 +277,13 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = tell2.rect.y
                     self.teletime = 10
                     break
+        hit_items = pygame.sprite.spritecollide(self, self.items, False)
+        for item in hit_items:
+            print "D"
+            for _ in range(random.randint(8, 24)):
+                fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
+            #item.kill()
 
-        hit_ups = pygame.sprite.spritecollide(self, self.upwalls, False)
 
 
     # death by explosion
@@ -277,9 +296,15 @@ class Player(pygame.sprite.Sprite):
 
     def die(self):
 
-        self.alive = False
+            self.alive = False
         #self.rect.x = self.spawnx
         #self.rect.y = self.spawny
+    def slowdie(self):
+        self.dietime += 1
+        if self.dietime > 60:
+            self.alive = False
+            self.dietime = 0
+            self.state = "NORMAL"
 
     def dying(self, a):
         self.rect.y -= self.yvel
@@ -326,7 +351,7 @@ class Player2(Player):
         self.hitHeightVel = False
         self.onGround = False
         self.dir = "right"
-        self.name = "p2"
+        self.name = "2"
 
         self.width = 32
         self.height = 32
@@ -351,6 +376,7 @@ class Player2(Player):
         self.teles2 = None
         self.upwalls = None
         self.finish = None
+        self.items = pygame.sprite.Group()
         self.otherplayers = pygame.sprite.Group()
         self.collidables = pygame.sprite.Group()
 
@@ -371,7 +397,7 @@ class Player2(Player):
         self.f2imgs = None
 
         self.alive = True
-
+        self.dietime = 0
         self.teletime = 0
         self.data = None
 

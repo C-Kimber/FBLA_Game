@@ -1,7 +1,7 @@
 from player import *
 import wall
-from enemy import Base
-import enemy
+from item import Base
+import item
 from fragment import *
 import fragment
 import other
@@ -32,7 +32,7 @@ class Data():
         self.channel_1 = pygame.mixer.Channel(1)
 
 
-        self.img = spritesheet.spritesheet('./assets/images/f1.png').image_at((0, 0, 928, 796),
+        self.img = spritesheet.spritesheet('./assets/images/f1.png').image_at((0, 0, 896, 792),
                                                                                 (254, 254, 254,)).convert(),
         self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
 
@@ -61,7 +61,6 @@ class Data():
         self.players = pygame.sprite.Group()
         self.finish = pygame.sprite.Group()
         self.hitwalls = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group()
         self.back_sprites = pygame.sprite.Group()
         self.displayTiles = pygame.sprite.Group()
 
@@ -88,6 +87,7 @@ class Data():
         self.p2vic = False
         self.lives = 3
         self.alph_1 = 255
+        self.boola = True
 
         self.time = 0
         self.overtime = -1
@@ -124,7 +124,7 @@ class Data():
         a += 1
 
         if self.time == 0 and other.MINISTATE == 0:
-            self.l_t_increment += 1
+
 
             if self.l_t_increment > 60 :
                 self.l_t_increment = 0
@@ -145,6 +145,7 @@ class Data():
                     self.newRound()
 
             else:
+                self.l_t_increment += 1
 
                 if pygame.K_6 in newkeys:
                     self.channel_1.play(self.sound_library["stone_1"])
@@ -159,6 +160,9 @@ class Data():
 
                 if pygame.K_a in keys:
                     self.player.moveLeft()
+
+                if pygame.K_7 in newkeys:
+                    self.player.image = self.sprite_library["player1_bad"]
 
 
                 elif pygame.K_d in keys:
@@ -223,7 +227,6 @@ class Data():
         self.telewalls.draw(surface)
         self.telewalls2.draw(surface)
 
-        #@surface.blit(self.img[0], (other.WIDTH/8+64, 0))
 
         ###
         #END MATCH
@@ -231,9 +234,15 @@ class Data():
         self.drawTextLeft(surface, str(self.p1score), (0,0, 255), 20, 50, self.font)
         self.drawTextLeft(surface, str(self.p2score), (255, 0,0), self.width - 40, 50, self.font)
         if self.level_time >= 0:
-            self.drawTextCenter(surface, str(self.level_time), (255, 255, 255), other.WIDTH / 2, 200, self.font)
+            self.drawTextCenter(surface, str(self.level_time), (255, 255, 255), other.WIDTH / 2, 30, self.font)
+
         else:
-            self.drawTextCenter(surface, str(abs(self.level_time)), (155, 0, 0), other.WIDTH / 2, 200, self.font)
+            self.drawTextCenter(surface, str(abs(self.level_time)), (155, 0, 0), other.WIDTH / 2, 30, self.font)
+            if self.boola:
+                self.player.image = self.sprite_library["player1_bad"]
+                self.player2.image = self.sprite_library["player2_bad"]
+                self.sound_library["thunder"].play()
+                self.boola = False
 
         self.fragmentgroup.draw(surface)
 
@@ -266,6 +275,7 @@ class Data():
         #self.level.display(surface)
         self.drawTextLeft(surface, str(other.FPS), (255, 255, 255), other.WIDTH - 50, other.HEIGHT - 50, self.font)
 
+
         return
 
     def menuve(self, keys, newkeys, buttons, newbuttons, mouse_position):
@@ -273,12 +283,13 @@ class Data():
         self.newbuttons = newbuttons
 
         if pygame.K_SPACE in newkeys:
+            self.sound_library["open_1"].play()
             print "FIGHT!"
             self.current_level = other.STARTING_LEVEL
             other.GAMESTATE = 1
             self.initLevel()
             self.overtime = -1
-            self.sound_library["open_1"].play()
+
 
         return
     #menu drawing
@@ -329,14 +340,22 @@ class Data():
     def newLevel(self):
         self.emptyLists()
         self.l_t_increment = 0
+        self.boola = True
         self.level_time = other.LEVEL_TIME
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
         n = str(random.randint(1, int((self.num_files))))
         self.level = Level("level_" + str(n))
+        self.player.image = self.sprite_library["player1"]
+        self.player2.image = self.sprite_library["player2"]
         self.back_sprites.empty()
         self.level.gameLev(self)
         self.drawLev()
+
+        for e in self.all_sprites:
+            if isinstance(e, item.Base) == True:
+                self.player.items.add(e)
+                self.player2.items.add(e)
 
     # end of a single battle
     def endRound(self, surface):
@@ -395,7 +414,6 @@ class Data():
         self.upwalls.empty()
         self.finish.empty()
         self.players.empty()
-        self.enemies.empty()
         self.hitwalls.empty()
         self.allwalls.empty()
 
@@ -414,15 +432,10 @@ class Data():
                 elif x == self.player2:
 
                     self.player2.otherplayers.remove(self.player2)
-        for e in self.all_sprites:
-            if isinstance(e, enemy.Base) == True:
-                e.player = self.player
+
 
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
-
-
-
 
         self.player.deaths = self.deathwalls
         self.player2.deaths = self.deathwalls

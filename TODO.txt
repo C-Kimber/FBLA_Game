@@ -8,7 +8,7 @@ use vector with random variables to create elevevation in random background (#le
 
 
 add enemies
-		*ground enemy, flying enemy, jumping enemy
+		*ground item, flying item, jumping item
      
 players animations
 

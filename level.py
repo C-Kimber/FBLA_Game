@@ -1,7 +1,7 @@
 import os
 import sys
 
-from enemy import *
+from item import *
 from wall import *
 
 
@@ -433,9 +433,9 @@ class Level:
                         elif x == 'E':
                             data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                             data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
-                        elif x == "b":
-                            data.enemies.add(Base(data,(n * 32, m * 32), data.sprite_library["enemy"]))
-                            data.all_sprites.add(Base(data,(n * 32, m * 32), data.sprite_library["enemy"]))
+                        elif x == "8":
+                            data.all_sprites.add(Base(data,(n * 32, m * 32), data.sprite_library["item"]))
+                            data.player.items.add(Base(data, (n * 32, m * 32), data.sprite_library["item"]))
                         elif x == "h":
                             data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
                             data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
@@ -451,7 +451,7 @@ class Level:
                         data.player.rect.y = m * 32
                     if x == "3":
                         data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
-                        data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                        #data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         # elif x == "-":
 
                         # data.wall_list.add(Wall(n * 32, m * 32, data.sprite_library["wall_2"]))
@@ -491,9 +491,9 @@ class Level:
                     elif x == 'E':
                         data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                         data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
-                    elif x == "b":
-                        data.enemies.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
-                        data.all_sprites.add(Base((n * 32, m * 32), data.sprite_library["enemy"]))
+                    elif x == "8":
+                        data.all_sprites.add(Base((n * 32, m * 32), data.sprite_library["item"]))
+                        data.player.items.add(Base(data, (n * 32, m * 32), data.sprite_library["item"]))
                     elif x == "h":
                         data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
                         data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
