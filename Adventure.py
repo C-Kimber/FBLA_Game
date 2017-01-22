@@ -56,5 +56,5 @@ class Adventure(Game):
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
-        Game.__init__(self, "Uukukoa", width, height, frame_rate)
+        Game.__init__(self, "Napohaku", width, height, frame_rate)
         self.data = Data(width, height, frame_rate)

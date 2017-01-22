@@ -8,15 +8,15 @@ import other
 class DataD:
     #intitialisez sprites, and other data
     def __init__(self, width, height, frame_rate):
-        self.font = pygame.font.SysFont("Times New Roman", 36)
+        self.font = pygame.font.sysFont("Times New Roman", 36)
         self.width = width
         self.height = height
         self.frame_rate = frame_rate
         self.sprite_library = other.load_images()
         self.level = Level("level_"+str(other.STARTING_LEVEL),'./assets/levels/')
         self.level = Level("level_1",'./assets/levels/')
-        self.num_files = len([f for f in os.listdir("./assets/levels")
-                              if os.path.isfile(os.path.join("./assets/levels", f))])
+        self.num_files = 4#len([f for f in os.listdir("./assets/levels")
+                          #    if os.path.isfile(os.path.join("./assets/levels", f))])
         self.l = 1
         self.selected = "0"
         self.multi  =16
@@ -179,7 +179,7 @@ class DataD:
         pygame.draw.rect(surface, (125, 125, 125), pygame.Rect(832 + 113, 67+self.scrolly, 32, 16))
 
 
-        surface.blit(self.sprite_library["lava"], pygame.Rect(832, 96+self.scrolly, 32, 32))#lava
+        surface.blit(self.sprite_library["lava_5"], pygame.Rect(832, 96+self.scrolly, 32, 32))#lava
         surface.blit(self.sprite_library["player1"], pygame.Rect(832, 160+self.scrolly, 32, 32))#player 1
         surface.blit(self.sprite_library["player2"], pygame.Rect(832, 224+self.scrolly, 32, 32))#player2
 
@@ -196,9 +196,8 @@ class DataD:
         pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.width - 70, self.height - 37+self.scrolly, 32, 32), 4)  # clear
 
         pygame.draw.rect(surface, (0, 255, 155), pygame.Rect(880, 96+self.scrolly, 32, 32)) # finish
-        surface.blit(self.sprite_library["item"], pygame.Rect(880, 160+self.scrolly, 32, 32))#item
+        surface.blit(self.sprite_library["gem1"], pygame.Rect(880, 160+self.scrolly, 32, 32))#item
 
-        surface.blit(self.sprite_library["hitwall"], pygame.Rect(880, 224+self.scrolly, 32, 32))#hitwall
 
 
         self.drawTextLeft(surface, "Level "+ str(self.l), (55,0,55), 832-self.scrolly, 35, self.font)

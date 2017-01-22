@@ -21,23 +21,23 @@ class Data():
 
 
     def __init__(self, width, height, frame_rate):
-        self.font = pygame.font.SysFont("Times New Roman", 36)
-        self.font2 = pygame.font.SysFont("Times New Roman", 72)
-        self.font = pygame.font.Font("./assets/emulogic.ttf", 21)
+        self.font = pygame.font.Font("emulogic.ttf", 21)
+        self.font2 = pygame.font.Font("emulogic.ttf", 72)
         self.frame_rate = frame_rate
         self.width = width
         self.height = height
         self.sprite_library = other.load_images()
         self.sound_library = audio.load_sounds()
-        self.channel_1 = pygame.mixer.Channel(1)
+        pygame.mixer.set_num_channels(8)
+        self.music_channel = pygame.mixer.Channel(5)
 
 
-        self.img = spritesheet.spritesheet('./assets/images/f1.png').image_at((0, 0, 896, 792),
+        self.img = spritesheet.spritesheet('f2.png').image_at((0, 0, 896, 792),
                                                                                 (254, 254, 254,)).convert(),
-        self.mengif = pygame.image.load("./assets/images/particles.gif").convert_alpha()
+        self.img[0].set_alpha(190)
 
-        self.num_files = (len([f for f in os.listdir("./assets/levels")
-                         if os.path.isfile(os.path.join("./assets/levels", f))])-1)/2
+        self.num_files = 4#(len([f for f in os.listdir("./assets/levels")
+                         #if os.path.isfile(os.path.join("./assets/levels", f))])-1)/2
 
 
         self.emptysprite = Empty()
@@ -63,6 +63,7 @@ class Data():
         self.hitwalls = pygame.sprite.Group()
         self.back_sprites = pygame.sprite.Group()
         self.displayTiles = pygame.sprite.Group()
+        self.items = pygame.sprite.Group()
 
         self.hashedwalls = ""
         self.displayhaswall = []
@@ -88,16 +89,19 @@ class Data():
         self.lives = 3
         self.alph_1 = 255
         self.boola = True
+        self.boolb = True
+        self.boolc = True
+        self.boold = True
 
         self.time = 0
         self.overtime = -1
         self.level_time = other.LEVEL_TIME
         self.l_t_increment = 0
+        self.inc_n, self.inc_m = 0,0
 
         self.fragmentgroup = fragment.fragmentgroup
         Fragment.groups = self.fragmentgroup, self.all_sprites
         custFrag.groups = self.fragmentgroup
-
 
         self.isLoaded = False
 
@@ -119,6 +123,8 @@ class Data():
 
         if self.time > 0:
             self.time -= 1
+        if self.inc_m > 0:
+            self.inc_m -= 1
 
         a = 0
         a += 1
@@ -130,6 +136,7 @@ class Data():
                 self.l_t_increment = 0
                 self.level_time -= 1
 
+
             #controls
             if self.p2vic or self.p1vic:
                 if pygame.K_SPACE in newkeys:
@@ -138,17 +145,22 @@ class Data():
                     other.GAMESTATE = 1
                     self.p1score = 0
                     self.p2score = 0
+                    self.player.score = 0
+                    self.player2.score = 0
                     self.l_t_increment = 0
                     self.level_time = other.LEVEL_TIME
+                    self.newRound()
                     self.p1vic = False
                     self.p2vic = False
-                    self.newRound()
 
             else:
                 self.l_t_increment += 1
 
-                if pygame.K_6 in newkeys:
-                    self.channel_1.play(self.sound_library["stone_1"])
+                if self.l_t_increment == 60 or self.l_t_increment == 30:# == 0 and self.l_t_increment % 3 ==0:
+                    n = random.randint(0,3)
+                    m = random.randint(0,3)
+                    if n == 3 or m == 3:
+                        self.newGem()
 
                 if pygame.K_w in keys:
                     self.player.jump()
@@ -161,8 +173,11 @@ class Data():
                 if pygame.K_a in keys:
                     self.player.moveLeft()
 
-                if pygame.K_7 in newkeys:
-                    self.player.image = self.sprite_library["player1_bad"]
+                if pygame.K_y in newkeys:
+                    self.newGem()
+
+
+                #if pygame.K_u in newkeys:
 
 
                 elif pygame.K_d in keys:
@@ -186,14 +201,22 @@ class Data():
                     #for _ in range(20):
                     #    self.fragmentgroup.add(custFrag((self.player.rect.x,self.player.rect.y),(1,3),(255,255,0)))
 
+                if self.level_time == 1:
+                    if self.boolb:
+                        self.music_channel.fadeout(3000)
+                        self.sound_library['uh_oh'].play()
+                        self.boolb = False
 
                 if self.p1score >= 5:
                     self.p1vic = True
+                    self.time = 0
                 elif self.p2score >= 5:
                     self.p2vic = True
+                    self.time = 0
 
-
+                self.items.update()
                 self.all_sprites.update()
+
 
         elif other.MINISTATE == 1:
             return
@@ -207,10 +230,11 @@ class Data():
     def draw(self, surface):
 
 
-
-
+        n,m = 0,0
+        if self.inc_m % 2:
+            n,m = random.randint(-4,4), random.randint(-2,2)
         #pygame.display.flip()
-        surface.blit(other.level_surface, (0, 0))
+        surface.blit(other.level_surface, (n,m))
 
 
 
@@ -218,47 +242,82 @@ class Data():
         #round
         if not self.player.alive or not self.player2.alive:
             self.endRound(surface)
+               #draw sprites
 
-        #draw sprites
 
-        self.all_sprites.draw(surface)
-
-        #draw
-        self.telewalls.draw(surface)
-        self.telewalls2.draw(surface)
 
 
         ###
         #END MATCH
 
-        self.drawTextLeft(surface, str(self.p1score), (0,0, 255), 20, 50, self.font)
-        self.drawTextLeft(surface, str(self.p2score), (255, 0,0), self.width - 40, 50, self.font)
-        if self.level_time >= 0:
-            self.drawTextCenter(surface, str(self.level_time), (255, 255, 255), other.WIDTH / 2, 30, self.font)
+        self.drawTextLeft(surface, str(5-self.p2score), (255,0, 0), 0, 50, self.font)
+        self.drawTextRight(surface, str(5-self.p1score), (0, 0,255), self.width, 50, self.font)
 
-        else:
-            self.drawTextCenter(surface, str(abs(self.level_time)), (155, 0, 0), other.WIDTH / 2, 30, self.font)
-            if self.boola:
-                self.player.image = self.sprite_library["player1_bad"]
-                self.player2.image = self.sprite_library["player2_bad"]
-                self.sound_library["thunder"].play()
-                self.boola = False
 
         self.fragmentgroup.draw(surface)
 
         if self.p2vic or self.p1vic:
+            if self.boolc:
+                self.music_channel.fadeout(500)
+                self.sound_library['fanfare'].play()
+                self.boolc = False
+            if self.player.score > self.player2.score:
+                self.drawTextCenter(surface, "PLAYER 1 WON!", (255, 0, 0), other.WIDTH / 2, 150, self.font2)
 
 
+            elif self.player2.score > self.player.score:
+                self.drawTextCenter(surface, "PLAYER 2 WON", (0, 0, 255), other.WIDTH / 2, 150, self.font2)
+            else:
+                self.drawTextCenter(surface, "TIED", (255, 0, 0), other.WIDTH / 2, 150, self.font2)
 
-            self.drawTextCenter(surface, "Press SPACE Play again!", (255, 255, 255), other.WIDTH/2, 200, self.font)
+            other.level_surface.fill((0, 0, 0))
+
+            self.drawTextCenter(surface, "Press SPACE To Play again!", (255, 255, 255), other.WIDTH/2, 200, self.font)
+
+            self.rpoint = 20
+            if self.player.score >= 10000 or self.player2.score >= 10000:
+                self.rpoint = 200
+            elif self.player.score >= 100000 or self.player2.score >= 100000:
+                self.rpoint = 2000
+
+            r1 = pygame.Rect(other.WIDTH/3,other.HEIGHT-other.HEIGHT/4,other.WIDTH/16,-self.player.score/self.rpoint)
+            r2 = pygame.Rect(other.WIDTH/2+other.WIDTH/8,other.HEIGHT-other.HEIGHT/4,other.WIDTH/16,-self.player2.score/self.rpoint)
+            pygame.draw.rect(surface, (255,0,0), r1)
+            pygame.draw.rect(surface, (0, 0, 255), r2)
+            n = pygame.transform.scale(self.player.image, (64,64))
+            m = pygame.transform.scale(self.player2.image, (64, 64))
+            surface.blit(n, (other.WIDTH/3+8, other.HEIGHT - other.HEIGHT / 4 - 66 - self.player.score / self.rpoint))
+            surface.blit(m, (other.WIDTH/2+other.WIDTH/8+8,other.HEIGHT-other.HEIGHT/4-66-self.player2.score/self.rpoint) )
+            self.drawTextCenter(surface, str(self.player.score), (255, 255, 255), other.WIDTH/3+40, other.HEIGHT - other.HEIGHT / 4+8, self.font)
+            self.drawTextCenter(surface, str(self.player2.score), (255, 255, 255), other.WIDTH/2+other.WIDTH/8+40, other.HEIGHT-other.HEIGHT/4+8, self.font)
+        else:
+            for e in self.all_sprites:
+                if not e.alive:
+                    self.all_sprites.remove(e)
+                else:
+                    surface.blit(e.image,(e.rect.x,e.rect.y))
+            self.items.draw(surface)
+
+            if self.level_time >= 0:
+                self.drawTextCenter(surface, str(self.level_time), (255, 255, 255), other.WIDTH / 2, 30, self.font)
+
+            else:
+                self.drawTextCenter(surface, str(abs(self.level_time)), (155, 0, 0), other.WIDTH / 2, 30, self.font)
+                if self.boola:
+                    other.level_surface.blit(self.img[0], (other.WIDTH / 8 + 64, 0))
+                    self.player.image = self.sprite_library["player1_bad"]
+                    self.player2.image = self.sprite_library["player2_bad"]
+                    self.sound_library["thunder"].play()
+                    self.inc_m = 16
+                    self.boola = False
 
 
+            # draw
+            self.telewalls.draw(surface)
+            self.telewalls2.draw(surface)
 
-        if self.p1vic :
-
-            self.drawTextCenter(surface, "PLAYER 1 WON!", (0, 0, 255), other.WIDTH/2, 150, self.font2)
-        elif self.p2vic:
-            self.drawTextCenter(surface, "PLAYER 2 WON", (255, 0, 0), other.WIDTH/2, 150, self.font2)
+            self.drawTextLeft(surface, str(self.player.score), (255, 255, 255), 0, 100, self.font)
+            self.drawTextRight(surface, str(self.player2.score), (255, 255, 255), other.WIDTH, 100, self.font)
 
         if self.p1win > 0 and not self.p1vic and not self.p2vic:
             self.drawTextCenter(surface, "PLAYER 1 SCORED", (0, 0, 255), other.WIDTH/2, 50, self.font)
@@ -283,12 +342,14 @@ class Data():
         self.newbuttons = newbuttons
 
         if pygame.K_SPACE in newkeys:
-            self.sound_library["open_1"].play()
+            #self.sound_library["open_1"].play()
             print "FIGHT!"
             self.current_level = other.STARTING_LEVEL
             other.GAMESTATE = 1
             self.initLevel()
             self.overtime = -1
+            if not self.music_channel.get_busy():
+                self.music_channel.play(self.sound_library["music"], -1, fade_ms=1000)
 
 
         return
@@ -297,8 +358,10 @@ class Data():
         rect = pygame.Rect(0, 0, self.width, self.height)
         surface.fill((0, 0, 0), rect)  # back
 
-        self.drawTextCenter(surface, "WELCOME TO THE GAME", (255, 255, 255), other.WIDTH/2, 150, self.font)
-        self.drawTextCenter(surface, "Press SPACE to play!", (255, 255, 255), other.WIDTH/2, 200, self.font)
+        self.drawTextCenter(surface, "Napohaku", (255, 255, 255), other.WIDTH/2, 150, self.font)
+        m = pygame.transform.scale(self.sprite_library["player1_mix"], (128, 128))
+        surface.blit(m, (other.WIDTH / 2-64, other.HEIGHT - other.HEIGHT / 1.5))
+        self.drawTextCenter(surface, "Press SPACE to play!", (255, 255, 255), other.WIDTH/2, other.HEIGHT-other.HEIGHT/3, self.font)
 
         return
     #text function
@@ -336,11 +399,16 @@ class Data():
         self.drawLev()
         self.isLoaded = True
 
+        if not self.music_channel.get_busy():
+            self.music_channel.play(self.sound_library["music"], -1, fade_ms=1000)
+
 
     def newLevel(self):
         self.emptyLists()
         self.l_t_increment = 0
         self.boola = True
+        self.boolb = True
+        self.boolc = True
         self.level_time = other.LEVEL_TIME
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.player2)
@@ -351,6 +419,8 @@ class Data():
         self.back_sprites.empty()
         self.level.gameLev(self)
         self.drawLev()
+        if not self.music_channel.get_busy():
+            self.music_channel.play(self.sound_library["music"], -1, fade_ms=1000)
 
         for e in self.all_sprites:
             if isinstance(e, item.Base) == True:
@@ -369,9 +439,11 @@ class Data():
 
         if self.diedfirst == 1:
             self.p2score += 1
+            self.player2.score += 1000
             self.p2win = 60
         elif self.diedfirst == 2:
             self.p1score += 1
+            self.player.score += 1000
             self.p1win = 60
         else:
             return
@@ -395,8 +467,9 @@ class Data():
         self.player2.yvel = 0
         self.player2.jumps = 1
         self.player2.alive = True
-
-        self.time = 60
+        if not self.music_channel.get_busy():
+            self.music_channel.play(self.sound_library["music"], -1, fade_ms=1000)
+        self.time = 70
 
         #self.level.gameLev(self)
 
@@ -416,6 +489,7 @@ class Data():
         self.players.empty()
         self.hitwalls.empty()
         self.allwalls.empty()
+        self.items.empty()
 
     def resetLists(self):
         self.emptyLists()
@@ -452,6 +526,9 @@ class Data():
         self.player.finish = self.finish
         self.player2.finish = self.finish
 
+        self.player.items = self.items
+        self.player2.items = self.items
+
         self.player.getfimage(
             (  # self.sprite_library["frag1"],self.sprite_library["frag2"],self.sprite_library["frag3"],
                 self.sprite_library["frag1_2"]
@@ -464,7 +541,8 @@ class Data():
         self.player.getSounds(
             (self.sound_library["stone_1"], self.sound_library["stone_2"],self.sound_library["stone_3"],
              self.sound_library["bloop_1"],self.sound_library["bloop_2"],self.sound_library["bloop_3"],
-             self.sound_library["fall_1"],self.sound_library["fall_2"]
+             self.sound_library["fall_1"],self.sound_library["fall_2"],self.sound_library["coins_1"],
+             self.sound_library["coins_2"], self.sound_library["coins_3"],
 
              )
         )
@@ -481,7 +559,8 @@ class Data():
         self.player2.getSounds(
             (self.sound_library["stone_1"], self.sound_library["stone_2"], self.sound_library["stone_3"],
              self.sound_library["bloop_1"], self.sound_library["bloop_2"], self.sound_library["bloop_3"],
-             self.sound_library["fall_1"], self.sound_library["fall_2"]
+             self.sound_library["fall_1"], self.sound_library["fall_2"],self.sound_library["coins_1"],
+             self.sound_library["coins_2"], self.sound_library["coins_3"],
 
              )
         )
@@ -491,7 +570,7 @@ class Data():
         for w in self.wall_list:
             distance = math.sqrt((obj.rect.x - w.rect.x) ** 2 + (obj.rect.y - w.rect.y) ** 2)
             if distance < 50:
-                if isinstance(w,wall.Wall)or isinstance(w, wall.upWall):
+                if isinstance(w,wall.Wall)or isinstance(w, wall.upWall)or isinstance(w, item.Base):
                     if w.type != 4:#if is surrounded by tiles
                             obj.collidables.add(w)
                             continue
@@ -503,6 +582,12 @@ class Data():
         self.back_sprites.draw(other.level_surface)
         self.wall_list.draw(other.level_surface)
 
+    def newGem(self):
+        if len(self.items) < 8:
+            n = str(random.randint(1,4))
+            m = "gem"+n
+            self.items.add(Base(self, (other.WIDTH/8+64+random.randint(0,20) * 32, 0), self.sprite_library[m],
+                                (float(n)*random.choice((-2.5,2.5)),float(n)*random.choice((-3.75,3.75)) )))
 
 
 

@@ -1,18 +1,24 @@
 import random
-
+import wall
 import pygame
 import math
 import other
+import fragment
 
 
 class Base(pygame.sprite.Sprite):
-    def __init__(self, data, pos, image):
+    def __init__(self, data, pos, image, vel = (0.0,0.0)):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = image
-        self.xvel = 0
-        self.yvel = 0
+        self.xvel = vel[0]
+        self.yvel = vel[1]
         self.state = "NORMAL"
+        self.type = 0
+        self.lifetime = 300
+        self.fimgs =(data.sprite_library["frag1_2"]
+                , data.sprite_library["frag2_1"], data.sprite_library["frag3_1"]
+                , data.sprite_library["frag2_2"], data.sprite_library["frag3_2"])
 
         self.hitHeightVel = False
         self.onGround = False
@@ -47,7 +53,7 @@ class Base(pygame.sprite.Sprite):
         self.jumps = 1
 
         self.maxyvel = 15  # * (self.mass / 100)
-        self.maxxvel = 3
+        self.maxxvel = 10
 
         self.alive = True
         self.data = data
@@ -76,10 +82,17 @@ class Base(pygame.sprite.Sprite):
 
     def update(self):
         highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32 + other.WIDTH / 8 + 32, other.TOTAL_LEVEL_WIDTH + 96 + other.WIDTH / 8
-        print self.Group()
+        #jprint self.Group()
         if self.state == 'NORMAL':
             self.applyDrag("air")
             # movement control
+            if self.lifetime <= 0:
+                self.kill()
+            elif self.alive == False:
+                self.kill()
+            elif self.data.level_time <0:
+                self.kill()
+            self.lifetime -= 1
 
             # x velocity control
             if self.xvel > self.maxxvel:
@@ -121,41 +134,6 @@ class Base(pygame.sprite.Sprite):
 
         return
 
-    def wallCollisions(self):
-
-        if pygame.sprite.spritecollide(self, self.deaths, False):
-            self.rect.y -= 3
-            self.state = "DYING"
-            self.die(10, (2 - random.randrange(-4, 8, 2)))
-
-        """hit_teles2 = pygame.sprite.spritecollide(self, self.teles2, False)
-        hit_teles = pygame.sprite.spritecollide(self, self.teles, False)
-        if self.teletime == 0:
-            for tell2 in hit_teles2:
-                for tell in self.teles:
-                    self.rect.x = tell.rect.x
-                    self.rect.y = tell.rect.y
-                    self.teletime = 10
-                    break
-            for tell in hit_teles:
-                for tell2 in self.teles2:
-                    self.rect.x = tell2.rect.x
-                    self.rect.y = tell2.rect.y
-                    self.teletime = 10
-                    break
-
-        hit_ups = pygame.sprite.spritecollide(self, self.upwalls, False)
-        for up in hit_ups:
-            if self.down == True:
-                # self.rect.top = up.rect.bottom-4
-                continue
-
-
-            elif self.rect.bottom > up.rect.top and self.rect.bottom < up.rect.top + 10 and self.yvel < 0:
-                self.yvel = 0
-                self.rect.bottom = up.rect.top + 1
-                self.onGround = True
-                self.jumps = 1"""
 
     def movementAI(self):
         if self.dir == "LEFT":
@@ -203,6 +181,10 @@ class Base(pygame.sprite.Sprite):
         #if colliders is not None:
         for collider in colliders:
             if pygame.sprite.collide_rect(self, collider):
+                if isinstance(collider, wall.deathWall):
+                    self.alive = False
+                    for _ in range(random.randint(3, 8)):
+                        fragment.fragmentgroup.add(fragment.Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
                 #print "colliding"
                 if xvel > 0:
                     self.rect.right = collider.rect.left

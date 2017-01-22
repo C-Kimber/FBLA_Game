@@ -1,7 +1,9 @@
 This program is a fun little game.
 
 
-To play the game run main.py,
+To play the game run executable main.py, remember to rebuild each time with "python setup.py build" in the command prompt
 
 
-To open the level editor, run lev.py
+#To open the level editor, run lev.py
+
+

@@ -1,5 +1,4 @@
 import pygame
-import main
 import other
 from Adventure import Design
 

@@ -7,7 +7,7 @@ from wall import *
 
 class Level:
     def __init__(self, file="level_0", dir="./assets/levels/"):
-        self.dir = dir
+        self.dir = ""
         self.file = self.filename = file
         self.bfile = self.bfilename = file + "B"
 
@@ -434,8 +434,7 @@ class Level:
                             data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                             data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                         elif x == "8":
-                            data.all_sprites.add(Base(data,(n * 32, m * 32), data.sprite_library["item"]))
-                            data.player.items.add(Base(data, (n * 32, m * 32), data.sprite_library["item"]))
+                            data.items.add(Base(data, (n * 32, m * 32), data.sprite_library["gem1"]))
                         elif x == "h":
                             data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
                             data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
@@ -450,7 +449,7 @@ class Level:
                         data.player.rect.x = n * 32
                         data.player.rect.y = m * 32
                     if x == "3":
-                        data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
+                        data.deathwalls.add(deathWall(n * 32, m * 32, data.sprite_library["lava_5"]))
                         #data.all_sprites.add(deathWall(n * 32, m * 32, data.sprite_library["lava"]))
                         # elif x == "-":
 
@@ -492,8 +491,7 @@ class Level:
                         data.finish.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                         data.all_sprites.add(Finish(n * 32, m * 32, data.sprite_library["finish"]))
                     elif x == "8":
-                        data.all_sprites.add(Base((n * 32, m * 32), data.sprite_library["item"]))
-                        data.player.items.add(Base(data, (n * 32, m * 32), data.sprite_library["item"]))
+                        data.items.add(Base(data, (n * 32, m * 32), data.sprite_library["item"]))
                     elif x == "h":
                         data.hitwalls.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))
                         data.all_sprites.add(invWall((n * 32, m * 32), data.sprite_library["hitwall"]))

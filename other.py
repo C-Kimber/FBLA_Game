@@ -23,7 +23,7 @@ HALF_HEIGHT = int(HEIGHT / 2)
 CAMERA_SLACK = 30
 TOTAL_LEVEL_WIDTH = 0
 TOTAL_LEVEL_HEIGHT = 0
-LEVEL_TIME = 2
+LEVEL_TIME = 30
 STARTING_LEVEL = 1
 
 
@@ -34,214 +34,196 @@ STARTING_LEVEL = 1
 
 def load_images():
     images = {
-        "frag1": spritesheet.spritesheet('./assets/images/frag_1.png').image_at((0, 0, 64, 64),
-                                                                                (0, 0, 0,)).convert(),  # 0
-        "frag2": spritesheet.spritesheet('./assets/images/frag_2.png').image_at((0, 0, 64, 64),
-                                                                                (0, 0, 0,)).convert(),  # 1
-        "frag3": spritesheet.spritesheet('./assets/images/frag_3.png').image_at((0, 0, 64, 64),
-                                                                                (0, 0, 0,)).convert(),  # 3
-        "frag1_1": spritesheet.spritesheet('./assets/images/frag_1_2.png').image_at((0, 0, 32, 32),
-                                                                                    (0, 0, 0,)).convert(),  # 4
-        "frag1_2": spritesheet.spritesheet('./assets/images/frag_1_3.png').image_at((0, 0, 32, 32),
-                                                                                    (0, 0, 0,)).convert(),  # 4
-        "frag2_1": spritesheet.spritesheet('./assets/images/frag_2_1.png').image_at((0, 0, 32, 32),
-                                                                                    (0, 0, 0,)).convert(),  # %
-        "frag3_1": spritesheet.spritesheet('./assets/images/frag_3_1.png').image_at((0, 0, 32, 32),
-                                                                                    (0, 0, 0,)).convert(),  # 6
-        "frag2_2": spritesheet.spritesheet('./assets/images/frag_2_2.png').image_at((0, 0, 16, 16),
-                                                                                    (0, 0, 0,)).convert(),  # %
-        "frag3_2": spritesheet.spritesheet('./assets/images/frag_3_2.png').image_at((0, 0, 16, 16),
-                                                                                    (0, 0, 0,)).convert(),  # 6
 
-        "sfrag_1": spritesheet.spritesheet('./assets/images/sfrag_1.png').image_at((0, 0, 16, 16),
-                                                                                    (254, 254, 254)).convert(),  # s1
-        "sfrag_2": spritesheet.spritesheet('./assets/images/sfrag_2.png').image_at((0, 0, 16, 16),
-                                                                                   (254, 254, 254)).convert(),  # s1
-        "sfrag_3": spritesheet.spritesheet('./assets/images/sfrag_3.png').image_at((0, 0, 16, 16),
-                                                                                   (254, 254, 254)).convert(),  # s1
-        "frag_glow": spritesheet.spritesheet('./assets/images/glow.png').image_at((0, 0, 64, 64),
-                                                                                   (254, 254, 254)).convert(),  # s1
+        "frag1_1": spritesheet.spritesheet('spritesheet_1.png').image_at((0, 96*3, 32, 32),
+                                                                                    (0, 0, 0,)),  # 4
+        "frag1_2": spritesheet.spritesheet('spritesheet_1.png').image_at((0, 96*3-16, 16, 16),
+                                                                                    (0, 0, 0,)),  # 4
+        "frag2_1": spritesheet.spritesheet('spritesheet_1.png').image_at((32, 96*3, 32, 32),
+                                                                                    (0, 0, 0,)),  # %
+        "frag3_1": spritesheet.spritesheet('spritesheet_1.png').image_at((64, 96*3, 32, 32),
+                                                                                    (0, 0, 0,)),  # 6
+        "frag2_2": spritesheet.spritesheet('spritesheet_1.png').image_at((16, 96*3-16, 16, 16),
+                                                                                    (0, 0, 0,)),  # %
+        "frag3_2": spritesheet.spritesheet('spritesheet_1.png').image_at((32, 96*3-16, 16, 16),
+                                                                                    (0, 0, 0,)),  # 6
 
-        "gem": spritesheet.spritesheet('./assets/images/gem.png').image_at((0, 0, 32, 32),
-                                                                                (2, 2, 2)).convert(),
-        "gem2": spritesheet.spritesheet('./assets/images/gem2.png').image_at((0, 0, 32, 32),
-                                                                            (2, 2, 2)).convert(),
-        "gem3": spritesheet.spritesheet('./assets/images/gem3.png').image_at((0, 0, 32, 32),
-                                                                            (254, 254, 254)).convert(),
-        "gem4": spritesheet.spritesheet('./assets/images/gem4.png').image_at((0, 0, 32, 32),
-                                                                            (254, 254, 254)).convert(),
+        "sfrag_1": spritesheet.spritesheet('spritesheet_1.png').image_at((0, 96*3-32, 16, 16),
+                                                                                    (254, 254, 254)),  # s1
+        "sfrag_2": spritesheet.spritesheet('spritesheet_1.png').image_at((16, 96*3-32, 16, 16),
+                                                                                   (254, 254, 254)),  # s1
+        "sfrag_3": spritesheet.spritesheet('spritesheet_1.png').image_at((32, 96*3-32, 16, 16),
+                                                                                   (254, 254, 254)),  # s1
+        "gem1": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 64, 32, 32),
+                                                                                (2, 2, 2)),
+        "gem2": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 32+64, 32, 32),
+                                                                            (2, 2, 2)),
+        "gem3": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 64+64, 32, 32),
+                                                                            (254, 254, 254)),
+        "gem4": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 96+64, 32, 32),
+                                                                            (254, 254, 254)),
 
-        "player1": spritesheet.spritesheet('./assets/images/player_1.png').image_at((0, 0, 32, 32),
-                                                                                   (254, 254, 254)).convert(),
-        "player1_bad": spritesheet.spritesheet('./assets/images/player_1_bad.png').image_at((0, 0, 32, 32),
-                                                                                    (254, 254, 254)).convert(),
+        "player1": spritesheet.spritesheet('spritesheet_1.png').image_at((0, 96*2, 32, 32),
+                                                                                   (254, 254, 254)),
+        "player1_bad": spritesheet.spritesheet('spritesheet_1.png').image_at((64, 96*2, 32, 32),
+                                                                                    (254, 254, 254)),
+        "player1_mix": spritesheet.spritesheet('spritesheet_1.png').image_at((32, 96*2, 32, 32),
+                                                                                            (254, 254, 254)),
         # 8
-        "player2": spritesheet.spritesheet('./assets/images/player_2.png').image_at((0, 0, 32, 32), (
-            255, 255, 255)).convert(),  # 9
-        "player2_bad": spritesheet.spritesheet('./assets/images/player_2_bad.png').image_at((0, 0, 32, 32),
-                                                                                    (254, 254, 254)).convert(),
-        "rubble": spritesheet.spritesheet('./assets/images/rubble.png').image_at((0, 0, 32, 32),
-                                                                                    (254, 254, 254)).convert(),
+        "player2": spritesheet.spritesheet('spritesheet_1.png').image_at((0, 96*2+32, 32, 32), (
+            255, 255, 255)),  # 9
+        "player2_bad": spritesheet.spritesheet('spritesheet_1.png').image_at((32, 96*2+32, 32, 32),
+                                                                                    (254, 254, 254)),
+        #"player2_mix": spritesheet.spritesheet('player_1_badspritesheet_1.png').image_at((0, 0, 32, 32),
+        #                                                                                    (254, 254, 254)),
+        "rubble": spritesheet.spritesheet('spritesheet_1.png').image_at((64, 96*2+32, 32, 32),
+                                                                                    (254, 254, 254)),
 
-        "wall_1": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 0, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
+        "wall_1": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 0, 32, 32),
+                                                                                      (254, 254, 254)),
         # 10
-        "wall_2": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 1, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_3": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 2, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_4": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 0, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_5": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 1, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_6": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 2, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
+        "wall_2": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 0, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_3": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2, 32 * 0, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_4": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 1, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_5": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 1, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_6": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2, 32 * 1, 32, 32),
+                                                                                      (254, 254, 254)),
         # 10
-        "wall_7": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 0, 32 * 2, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_8": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 1, 32 * 2, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_9": spritesheet.spritesheet('./assets/images/grass_sheet.png').image_at((32 * 2, 32 * 2, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "wall_10": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 0, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_11": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 0, 32 * 1, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_12": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 0, 32 * 2, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_13": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 1, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_14": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 1, 32 * 1, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_15": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 2, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "wall_16": spritesheet.spritesheet('./assets/images/grass_sheet_2.png').image_at((32 * 1, 32 * 2, 32, 32), (
-            254, 254, 254)).convert(),
+        "wall_7": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 2, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_8": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 2, 32, 32),
+                                                                                      (254, 254, 254)),
+        "wall_9": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2, 32 * 2, 32, 32),
+                                                                                      (254, 254, 254)),
 
-        "back_wall_1": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_2": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_3": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_4": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_5": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_6": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 2, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_7": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_8": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_9": spritesheet.spritesheet('./assets/images/back_grass_sheet.png').image_at(
-            (32 * 2, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_10": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_11": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_12": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_13": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_14": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_15": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "back_wall_16": spritesheet.spritesheet('./assets/images/back_grass_sheet_2.png').image_at(
-            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "wall_10": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 0+96, 32, 32), (
+            254, 254, 254)),
+        "wall_11": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 1+96, 32, 32), (
+            254, 254, 254)),
+        "wall_12": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0, 32 * 2+96, 32, 32), (
+            254, 254, 254)),
+        "wall_13": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 0+96, 32, 32), (
+            254, 254, 254)),
+        "wall_14": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 1+96, 32, 32), (
+            254, 254, 254)),
+        "wall_15": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2, 32 * 0+96, 32, 32), (
+            254, 254, 254)),
+        "wall_16": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1, 32 * 2+96, 32, 32), (
+            254, 254, 254)),
 
-        "lava_1": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_2": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_3": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_4": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "lava_5": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "lava_6": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 2, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "lava_7": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "lava_8": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "lava_9": spritesheet.spritesheet('./assets/images/lava_sheet.png').image_at(
-            (32 * 2, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "lava_10": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 0, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_11": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 0, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "lava_12": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 0, 32 * 2, 32, 32), (254, 254, 254)).convert(),
-        "lava_13": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 1, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_14": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 1, 32 * 1, 32, 32), (254, 254, 254)).convert(),
-        "lava_15": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 2, 32 * 0, 32, 32), (254, 254, 254)).convert(),
-        "lava_16": spritesheet.spritesheet('./assets/images/lava_sheet_2.png').image_at(
-            (32 * 1, 32 * 2, 32, 32), (254, 254, 254)).convert(),
+        "back_wall_1": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "back_wall_2": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "back_wall_3": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+96, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "back_wall_4": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 1+96, 32, 32), (254, 254, 254)),
+        "back_wall_5": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 1+96, 32, 32), (254, 254, 254)),
+        "back_wall_6": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+96, 32 * 1+96, 32, 32), (254, 254, 254)),
+        "back_wall_7": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 2+96, 32, 32), (254, 254, 254)),
+        "back_wall_8": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 2+96, 32, 32), (254, 254, 254)),
+        "back_wall_9": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+96, 32 * 2+96, 32, 32), (254, 254, 254)),
+        "back_wall_10": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 0+192, 32, 32), (254, 254, 254)),
+        "back_wall_11": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 1+192, 32, 32), (254, 254, 254)),
+        "back_wall_12": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+96, 32 * 2+192, 32, 32), (254, 254, 254)),
+        "back_wall_13": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 0+192, 32, 32), (254, 254, 254)),
+        "back_wall_14": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 1+192, 32, 32), (254, 254, 254)),
+        "back_wall_15": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+96, 32 * 0+192, 32, 32), (254, 254, 254)),
+        "back_wall_16": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+96, 32 * 2+192, 32, 32), (254, 254, 254)),
 
-        "wall_1_tall": spritesheet.spritesheet('./assets/images/wall1_small_tall.png').image_at((0, 0, 32, 32), (
-            255, 255, 255)).convert(),  # 11
-        "wall_1_long": spritesheet.spritesheet('./assets/images/fallenPillar.png').image_at((0, 0, 32, 32), (
-            255, 255, 255)).convert(),  # 12
-        "up_wall_1": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
+        "lava_1": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 0, 32, 32), (254, 254, 254)),
+        "lava_2": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 0, 32, 32), (254, 254, 254)),
+        "lava_3": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+192, 32 * 0, 32, 32), (254, 254, 254)),
+        "lava_4": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 1, 32, 32), (254, 254, 254)),
+        "lava_5": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 1, 32, 32), (254, 254, 254)),
+        "lava_6": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+192, 32 * 1, 32, 32), (254, 254, 254)),
+        "lava_7": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 2, 32, 32), (254, 254, 254)),
+        "lava_8": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 2, 32, 32), (254, 254, 254)),
+        "lava_9": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+192, 32 * 2, 32, 32), (254, 254, 254)),
+        "lava_10": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "lava_11": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 1+96, 32, 32), (254, 254, 254)),
+        "lava_12": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 0+192, 32 * 2+96, 32, 32), (254, 254, 254)),
+        "lava_13": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "lava_14": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 1+96, 32, 32), (254, 254, 254)),
+        "lava_15": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 2+192, 32 * 0+96, 32, 32), (254, 254, 254)),
+        "lava_16": spritesheet.spritesheet('spritesheet_1.png').image_at(
+            (32 * 1+192, 32 * 2+96, 32, 32), (254, 254, 254)),
+
+
+        "up_wall_1": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 0, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_2": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 0, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_3": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2+96, 32 * 0, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_4": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 1, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_5": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 1, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_6": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2+96, 32 * 1, 32, 32),
+                                                                         (254, 254, 254)),
         # 10
-        "up_wall_2": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_3": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 2, 32 * 0, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_4": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_5": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_6": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 2, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        # 10
-        "up_wall_7": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_8": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_9": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 2, 32 * 1, 32, 32),
-                                                                                      (254, 254, 254)).convert(),
-        "up_wall_10": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_11": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 1, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_12": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 0, 32 * 2, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_13": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_14": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 1, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_15": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 2, 32 * 0, 32, 32), (
-            254, 254, 254)).convert(),
-        "up_wall_16": spritesheet.spritesheet('./assets/images/grass_sheet_3.png').image_at((32 * 1, 32 * 2, 32, 32), (
-            254, 254, 254)).convert(),
+        "up_wall_7": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 1, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_8": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 1, 32, 32),
+                                                                         (254, 254, 254)),
+        "up_wall_9": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2+96, 32 * 1, 32, 32),
+                                                                                      (254, 254, 254)),
+        "up_wall_10": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 0, 32, 32), (
+            254, 254, 254)),
+        "up_wall_11": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 1, 32, 32), (
+            254, 254, 254)),
+        "up_wall_12": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 0+96, 32 * 2, 32, 32), (
+            254, 254, 254)),
+        "up_wall_13": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 0, 32, 32), (
+            254, 254, 254)),
+        "up_wall_14": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 1, 32, 32), (
+            254, 254, 254)),
+        "up_wall_15": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 2+96, 32 * 0, 32, 32), (
+            254, 254, 254)),
+        "up_wall_16": spritesheet.spritesheet('spritesheet_1.png').image_at((32 * 1+96, 32 * 2, 32, 32), (
+            254, 254, 254)),
         # 13
-        "t_wall_1": spritesheet.spritesheet('./assets/images/telewall_sheet.png').image_at((0, 0, 32, 32), (
-            255, 255, 255)).convert(),  # 14
-        "t_wall_2": spritesheet.spritesheet('./assets/images/telewall2_sheet.png').image_at((0, 0, 32, 32), (
-            255, 255, 255)).convert(),  # 15
-        "lava": spritesheet.spritesheet('./assets/images/lava.png').image_at((0, 0, 32, 32),
-                                                                             (255, 255, 255)).convert(),  # 16
-        "back_lava": spritesheet.spritesheet('./assets/images/back_lav.png').image_at((0, 0, 32, 32),
-                                                                             (255, 255, 255)).convert(),  # 16
-        "far_back_lava": spritesheet.spritesheet('./assets/images/far_back_lav.png').image_at((0, 0, 32, 32),
-                                                                             (255, 255, 255)).convert(),  # 16
-        "finish": spritesheet.spritesheet('./assets/images/crystal_1.png').image_at((0, 0, 32, 32),
-                                                                                    (254, 254, 254)).convert(),
-        "item": spritesheet.spritesheet('./assets/images/gem.png').image_at((0, 0, 32, 32),
-                                                                               (254, 254, 254)).convert(),
-        "hitwall": spritesheet.spritesheet('./assets/images/crate.png').image_at((0, 0, 32, 32),
-                                                                                 (254, 254, 254)).convert(),
 
-        "circle_1": pygame.image.load('./assets/images/circle.png')
-        # spritesheet.spritesheet('./assets/images/circle.png').image_at((0, 0, 96, 96))#,
+
+        "back_lava": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 0, 32, 32),
+                                                                             (255, 255, 255)),  # 16
+        "far_back_lava": spritesheet.spritesheet('spritesheet_1.png').image_at((96*3, 32, 32, 32),
+                                                                             (255, 255, 255)),  # 16
+
+        # spritesheet.spritesheet('circlespritesheet_1.png').image_at((0, 0, 96, 96))#,
 
     }
     return images

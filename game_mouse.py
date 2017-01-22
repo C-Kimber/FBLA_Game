@@ -2,7 +2,7 @@ import math
 
 import pygame
 import pygame.locals
-
+import sys
 import other
 from data import Data
 x = 3
@@ -111,33 +111,7 @@ class Game:
                 if e.type == pygame.KEYUP:
                     keys.discard(e.key)
 
-                """elif e.type == pygame.ACTIVEEVENT:
-                    print 'state:', e.state, '| gain:', e.gain,
-                    if e.state == 1:
-                        print e.
-                        if self.screen.get_flags() & e.gain == 0:
-                            self.screen = pygame.display.set_mode(
 
-                                (self.width, self.height),
-
-                                pygame.locals.DOUBLEBUF |
-
-                                pygame.locals.SRCALPHA | pygame.locals.RESIZABLE
-                                , 32)
-                            print "| mouse out",
-                        elif e.gain == 1:
-                            print "| mouse in",
-                    elif e.state == 2:
-                        if e.gain == 0:
-                            print "| titlebar pressed",
-                        elif e.gain == 1:
-                            print "| titlebar unpressed",
-                    elif e.state == 6:
-                        if e.gain == 0:
-                            print "| window minimized",
-                    elif e.state == 4:
-                        if e.gain == 1:
-                            print "| window normal","""
 
             if self.on:
                 self.game_logic(keys, newkeys, buttons, newbuttons, mouse_position)
@@ -151,3 +125,4 @@ class Game:
                 #pygame.display.update(rects)
             if Data.allwalls is not None:
                 Data.allwalls.clear(self.screen, Game.background)"""
+        sys.exit()

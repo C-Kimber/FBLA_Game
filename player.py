@@ -1,7 +1,7 @@
 import math
-
-import fragment
 import other
+import fragment
+import item
 import wall
 from fragment import *
 
@@ -50,6 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.down = False
 
         self.jumps = 1
+        self.score = 0
 
         self.stunting = False
         self.mass = 100  # at mass 190, goes down through walls
@@ -103,7 +104,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         if self.state != "DYING":
-            highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 32+other.WIDTH/8+32, other.TOTAL_LEVEL_WIDTH +96+ other.WIDTH/8
+            highbound, lowbound, leftbound, rightbound = -33, other.TOTAL_LEVEL_HEIGHT, 30+other.WIDTH/8+32, other.TOTAL_LEVEL_WIDTH +96+ other.WIDTH/8
             self.xmom = self.xvel * self.mass / 64
             self.ymom = self.yvel * self.mass / 64
             # self.playerCollisions()
@@ -188,7 +189,7 @@ class Player(pygame.sprite.Sprite):
         return
 
     def playerCollisions(self):
-        if self.otherplayers is not None:
+        if self.otherplayers is not None and self.data.p1vic == False and self.data.p2vic == False:
             hit_bros = pygame.sprite.spritecollide(self, self.otherplayers, False)
             for bro in hit_bros:
                 if bro.state != "DYING":
@@ -209,6 +210,7 @@ class Player(pygame.sprite.Sprite):
                             bro.yvel = -bro.maxyvel / 3
                         if self.data.level_time < 0:
                             bro.image = self.data.sprite_library["rubble"]
+                            self.data.inc_m = 16
                             bro.state = "DYING"
 
                     bro.xvel = self.xmom
@@ -256,6 +258,7 @@ class Player(pygame.sprite.Sprite):
                     for _ in range(random.randint(8, 24)):
                         fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
                     self.die()
+
         return
 
     def wallCollisions(self):
@@ -277,12 +280,17 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = tell2.rect.y
                     self.teletime = 10
                     break
-        hit_items = pygame.sprite.spritecollide(self, self.items, False)
+        hit_items = pygame.sprite.spritecollide(self, self.items, True)
         for item in hit_items:
-            print "D"
-            for _ in range(random.randint(8, 24)):
-                fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
-            #item.kill()
+            random.choice((self.sounds[8], self.sounds[9], self.sounds[10])).play()
+            #for _ in range(random.randint(8, 24)):
+            #    fragment.fragmentgroup.add(Fragment((self.rect.x, self.rect.y), random.choice(self.fimgs)))
+            self.score += 300*(item.type+1)
+            item.alive = False
+            item.kill()
+
+            self.data.all_sprites.remove(item)
+
 
 
 
@@ -295,13 +303,14 @@ class Player(pygame.sprite.Sprite):
         self.sounds = sounds
 
     def die(self):
-
+            self.data.inc_m = 16
             self.alive = False
         #self.rect.x = self.spawnx
         #self.rect.y = self.spawny
     def slowdie(self):
         self.dietime += 1
         if self.dietime > 60:
+            self.data.inc_m = 16
             self.alive = False
             self.dietime = 0
             self.state = "NORMAL"
@@ -383,6 +392,7 @@ class Player2(Player):
         self.down = False
 
         self.jumps = 1
+        self.score = 10000
 
         self.stunting = False
         self.mass = 100  # at mass 190, goes down through walls
